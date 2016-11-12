@@ -1,0 +1,64 @@
+{
+  "name": "Intercom",
+  "description": "Sync a Intercom Tag whenever a User enters or leaves a Segment",
+  "tags": ["outgoing", "incoming", "batch", "oneColumn"],
+  "admin" : "/auth/",
+  "picture": "picture.png",
+  "version": "0.0.1",
+  "settings": [],
+  "private_settings":[
+    {
+      "name": "synchronized_segments",
+      "title": "Segments",
+      "description": "Post to Intercom when users match these segments (Empty to send everyone)",
+      "default": [],
+      "type": "array",
+      "format": "segment"
+    },
+    {
+      "name": "access_token",
+      "title": "Access Token",
+      "type": "string",
+      "format": "hidden"
+    },
+    {
+      "name": "last_fetch_started_at",
+      "description": "Last time fetched at operation was started",
+      "type": "string",
+      "format": "hidden"
+    },
+    {
+      "name": "fetch_count",
+      "description": "Count of contacts already fetched from Hubspot",
+      "type": "number",
+      "format": "hidden"
+    },
+    {
+      "name": "is_fetch_completed",
+      "type": "boolean",
+      "default": false,
+      "format": "hidden"
+    }
+  ],
+  "deployment_settings": [],
+  "resources": [],
+  "readme": "readme.md",
+  "ui": false,
+  "subscriptions": [
+    {
+      "url": "/notify"
+    }
+  ],
+  "schedules": [
+    {
+      "url": "/sync",
+      "type": "cron",
+      "value": "*/5 * * * *"
+    },
+    {
+      "url": "/monitor/checkToken",
+      "type": "cron",
+      "value": "0 * * * *"
+    }
+ ]
+}

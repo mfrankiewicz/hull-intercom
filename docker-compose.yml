@@ -1,0 +1,31 @@
+version: '2'
+services:
+    node-cli:
+        image: node:6
+        env_file: .env
+        entrypoint: bash
+        working_dir: /app
+        ports:
+            - "8082:8082"
+        volumes:
+            - .:/app
+    dev:
+        image: node:6
+        env_file: .env
+        entrypoint: npm run start:dev
+        ports:
+            - "8082:8082"
+        working_dir: /app
+        volumes:
+            - .:/app
+    install:
+        image: node:6
+        env_file: .env
+        command: npm install
+        working_dir: /app
+        volumes:
+            - .:/app
+    redis:
+        image: redis:3
+        ports:
+          - "6379:6379"
