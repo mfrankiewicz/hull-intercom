@@ -15,6 +15,7 @@ export default class IntercomClient {
     this.appId = _.get(ship, "private_settings.app_id");
     this.accessToken = _.get(ship, "private_settings.access_token");
     this.req = request;
+    this.remaining = 0;
   }
 
   attach(req) {
@@ -38,11 +39,11 @@ export default class IntercomClient {
       .accept("application/json")
       .auth(userName, userPass)
       .on("request", (reqData) => {
-        console.log("REQ", reqData.method, reqData.url);
+        console.log("REQ", reqData.method, reqData.url, this.remaining);
       })
       .on("response", (res) => {
         const limit = _.get(res.header, "x-ratelimit-limit");
-        const remaining = _.get(res.header, "x-ratelimit-remaining");
+        this.remaining = _.get(res.header, "x-ratelimit-remaining");
         const remainingSeconds = moment(_.get(res.header, "x-ratelimit-reset"), "X")
           .diff(moment(), "seconds");
       });

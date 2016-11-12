@@ -22,7 +22,7 @@ if (instrumentationAgent.raven) {
 }
 
 app
-  .use("/app", AppRouter({ Hull, ...bootstrap }))
+  .use("/", AppRouter({ Hull, ...bootstrap }))
   .use("/", StaticRouter({ Hull }))
   .use("/auth", OAuthRouter({ Hull, ...bootstrap }))
   .use("/kue", KueRouter({ hostSecret: bootstrap.shipConfig.hostSecret, queueAdapter }));

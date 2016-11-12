@@ -1,9 +1,11 @@
+import _ from "lodash";
 import ExtractAgent from "./extract-agent";
 
 export default class HullAgent {
 
-  constructor(deps) {
-    this.extractAgent = new ExtractAgent(deps);
+  constructor(ship, hullClient) {
+    this.hullClient = hullClient;
+    this.extractAgent = new ExtractAgent();
   }
 
   /**

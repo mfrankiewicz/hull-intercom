@@ -14,9 +14,9 @@ export default function AppMiddleware({ queueAdapter }) {
 
     const intercomClient = new IntercomClient(req.hull.ship);
     const queueAgent = new QueueAgent(queueAdapter, req);
-    const intercomAgent = new IntercomAgent(intercomClient, req.hull.ship, req.hull.client);
+    const intercomAgent = new IntercomAgent(intercomClient, queueAgent, req.hull.ship, req.hull.client);
     const hullAgent = new HullAgent(req.hull.ship, req.hull.client);
-    const syncAgent = new SyncAgent(intercomClient, req.hull.client, req.hull.ship);
+    const syncAgent = new SyncAgent(intercomAgent, hullAgent, req.hull.ship);
 
     req.shipApp = {
       intercomClient,
