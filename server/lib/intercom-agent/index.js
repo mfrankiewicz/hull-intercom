@@ -11,18 +11,37 @@ export default class IntercomAgent {
       this.queueAgent = queueAgent;
     }
 
-    /**
-     *
-     */
-    userAdded(user) {
-      return !_.isEmpty(user["intercom/id"]);
+    getJob(id) {
+      return this.intercomClient.get(`/jobs/${id}`)
+        .then(res => {
+          return _.get(res, "body.tasks[0].state") === "completed";
+        });
     }
 
-    /**
-     *
-     */
-    userWithError(user) {
-      return !_.isEmpty(user["traits_mailchimp/import_error"]);
+    importUsers(scroll_param = null) {
+      return this.intercomClient.get("/users/scroll")
+      .query({ scroll_param })
+      .then(response => {
+        const { users, scroll_param } = response.body;
+
+        return { users, scroll_param };
+      })
+      .catch(err => {
+        const fErr = this.intercomClient.handleError(err);
+
+        if (_.get(fErr, "extra.body.errors[0].code") === "scroll_exists") {
+          console.error("Trying to perform two separate scrolls");
+          return Promise.resolve([]);
+        }
+
+        if (_.get(fErr, "extra.body.errors[0].code") === "not_found") {
+          console.error("Scroll expired, should start it again");
+          return Promise.resolve([]);
+        }
+
+        // handle errors which may happen here
+        return Promise.reject(fErr);
+      });
     }
 
     saveUsers(users) {
@@ -47,10 +66,18 @@ export default class IntercomAgent {
         });
     }
 
-    tagUsers(users) {
-      const body = {
-
-      };
+    tagUsers(ops) {
+      const opArray = [];
+      _.map(ops, (op, segmentName) => {
+        opArray.push({
+          name: segmentName,
+          users: op
+        });
+      });
+      return Promise.map(opArray, (op) => {
+        return this.intercomClient.post("/tags")
+          .send(op);
+      }, { concurrency: 3 });
     }
 
 }

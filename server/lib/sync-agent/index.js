@@ -15,17 +15,49 @@ export default class SyncAgent {
     this.webhookAgent = new WebhookAgent(intercomAgent, hullAgent, ship, hostname);
   }
 
+  /**
+   *
+   */
+  userAdded(user) {
+    return !_.isEmpty(user["intercom/id"]);
+  }
+
+  /**
+   *
+   */
+  userWithError(user) {
+    return !_.isEmpty(user["traits_mailchimp/import_error"]);
+  }
+
   getUsersToSave(users) {
     return users.filter((u) => this.hullAgent.userComplete(u)
       && this.hullAgent.userWhitelisted(u)
-      && !this.intercomAgent.userAdded(u)
-      && !this.intercomAgent.userWithError(u));
+      && !this.userAdded(u)
+      && !this.userWithError(u));
   }
 
   getUsersToTag(users) {
     return users.filter((u) => this.hullAgent.userWhitelisted(u)
-      && this.intercomAgent.userAdded(u)
-      && !this.intercomAgent.userWithError(u));
+      && this.userAdded(u)
+      && !this.userWithError(u));
+  }
+
+  groupUsersToTag(users) {
+    return this.hullAgent.getSegments()
+      .then(segments => {
+        const ops =  _.reduce(users, (o, user) => {
+
+          user.segment_ids.map(segment_id => {
+            const segment = _.find(segments, { id: segment_id });
+            o[segment.name] = o[segment.name] || [];
+            o[segment.name].push({
+              email: user.email
+            });
+          });
+          return o;
+        }, {});
+        return ops;
+      });
   }
 
 }
