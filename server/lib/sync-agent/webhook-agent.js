@@ -4,12 +4,12 @@ import Promise from "bluebird";
 
 export default class WebhookAgent {
 
-  constructor(intercomAgent, hullAgent, ship, req) {
+  constructor(intercomAgent, hullAgent, ship, hostname) {
     this.ship = ship;
     this.hullAgent = hullAgent
     this.hullClient = hullAgent.hullClient;
     this.intercomClient = intercomAgent.intercomClient;
-    this.req = req;
+    this.hostname = hostname;
 
     this.webhookId = _.get(this.ship, `private_settings.webhook_id`);
   }
@@ -18,7 +18,7 @@ export default class WebhookAgent {
    * @return Promise
    */
   ensureWebhook() {
-    if (this.webhookId) {
+    if (false && this.webhookId) {
       return Promise.resolve(this.webhookId);
     }
     return this.createWebhook();
@@ -31,7 +31,7 @@ export default class WebhookAgent {
     return this.intercomClient.post("/subscriptions")
       .send({
         service_type: "web",
-        topics: ["conversation", "user"],
+        topics: ["event", "user"],
         url: url
       })
       .then(res => {
@@ -45,13 +45,12 @@ export default class WebhookAgent {
   }
 
   getWebhookUrl() {
-    const { hostname } = this.req;
     const { organization, id, secret } = this.hullClient.configuration();
     const search = {
       organization,
       secret,
       ship: id
     };
-    return uri(`https://${hostname}/mailchimp`).search(search).toString();
+    return uri(`https://${this.hostname}/intercom`).search(search).toString();
   }
 }
