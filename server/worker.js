@@ -8,11 +8,11 @@ import WorkerRouter from "./router/worker";
 
 const workerApp = new WorkerApp(bootstrap);
 
-const { hullMiddleware, shipCache, instrumentationAgent, queueAdapter } = bootstrap;
+const { hullMiddleware, shipCache, instrumentationAgent, queueAdapter, appMiddleware } = bootstrap;
 
 workerApp
   .use(hullMiddleware)
-  .use(AppMiddleware(bootstrap))
+  .use(appMiddleware)
   .use(WorkerRouter());
 
 workerApp.process();

@@ -2,7 +2,7 @@ import _ from "lodash";
 
 export default class UserMapping {
 
-  constructor({ ship }) {
+  constructor(ship) {
     this.ship = ship;
     this.map = [
       { intercom: "id", hull: "intercom/id" },

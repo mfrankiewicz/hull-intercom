@@ -1,11 +1,12 @@
 import _ from "lodash";
+import Promise from "bluebird";
 
 export default class TagMapping {
 
-  constructor({ intercomClient, hullClient, ship }) {
+  constructor(intercomAgent, hullAgent, ship) {
     this.ship = ship;
-    this.hullClient = hullClient;
-    this.intercomClient = intercomClient;
+    this.hullAgent = hullAgent;
+    this.intercomClient = intercomAgent.intercomClient;
 
     this.settingKey = "tag_mapping";
     this.mapping = _.get(this.ship, `private_settings[${this.settingKey}]`, {});
@@ -19,8 +20,9 @@ export default class TagMapping {
     if (_.isEqual(this.originalMapping, this.mapping)) {
       return Promise.resolve();
     }
-    this.ship.private_settings[this.settingKey] = this.mapping;
-    return this.hullClient.put(this.ship.id, { private_settings: this.ship.private_settings });
+    const newSetting = {};
+    newSettings[this.settingKey] = this.mapping;
+    return this.hullAgent(newSetting);
   }
 
   /**

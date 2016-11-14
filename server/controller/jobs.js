@@ -3,6 +3,10 @@ import _ from "lodash";
 
 export default class Jobs {
 
+  /**
+   * Takes incoming list of users with fields and segment_ids set.
+   * Performing the
+   */
   sendUsers(req) {
     const { users } = req.payload;
 

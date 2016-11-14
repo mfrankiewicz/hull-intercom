@@ -1,6 +1,7 @@
 import CacheManager from "cache-manager";
 import Hull from "hull";
 
+import AppMiddleware from "./lib/app-middleware";
 import InstrumentationAgent from "./util/instrumentation-agent";
 import KueAdapter from "./util/queue/adapter/kue";
 
@@ -25,5 +26,6 @@ const cacheManager = CacheManager.caching({
 
 const shipCache = new Hull.ShipCache(cacheManager, process.env.SHIP_CACHE_PREFIX || "hull-hubspot");
 const hullMiddleware = new Hull.Middleware({ hostSecret: shipConfig.hostSecret, shipCache });
+const appMiddleware = new AppMiddleware({ queueAdapter, shipCache });
 
-export default { queueAdapter, instrumentationAgent, shipCache, hullMiddleware, shipConfig };
+export default { queueAdapter, instrumentationAgent, shipCache, hullMiddleware, shipConfig, appMiddleware };

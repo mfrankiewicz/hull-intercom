@@ -3,9 +3,29 @@ import ExtractAgent from "./extract-agent";
 
 export default class HullAgent {
 
-  constructor(ship, hullClient) {
+  constructor(ship, hullClient, shipCache) {
     this.hullClient = hullClient;
+    this.ship = ship;
+    this.shipCache = shipCache;
+
     this.extractAgent = new ExtractAgent();
+  }
+
+  updateShipSettings(newSettings) {
+    return this.hullClient.get(this.ship.id)
+      .then(ship => {
+        this.ship = ship;
+        const private_settings = { ...this.ship.private_settings, ...newSettings };
+        this.ship.private_settings = private_settings;
+        console.log(private_settings);
+        return this.hullClient.put(this.ship.id, { private_settings });
+      })
+      .then((ship) => {
+        return this.shipCache.del(this.ship.id)
+          .then(() => {
+            return ship;
+          });
+      });
   }
 
   /**

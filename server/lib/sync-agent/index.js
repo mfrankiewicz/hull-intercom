@@ -2,15 +2,17 @@ import _ from "lodash";
 
 import TagMapping from "./tag-mapping";
 import UserMapping from "./user-mapping";
+import WebhookAgent from "./webhook-agent"
 
 export default class SyncAgent {
 
-  constructor(intercomAgent, hullAgent, ship) {
+  constructor(intercomAgent, hullAgent, ship, hostname) {
     this.ship = ship;
     this.hullAgent = hullAgent;
     this.intercomAgent = intercomAgent;
-    this.tagMapping = new TagMapping(ship);
+    this.tagMapping = new TagMapping(intercomAgent, hullAgent, ship);
     this.userMapping = new UserMapping(ship);
+    this.webhookAgent = new WebhookAgent(intercomAgent, hullAgent, ship, hostname);
   }
 
   getUsersToSave(users) {

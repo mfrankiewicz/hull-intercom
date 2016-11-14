@@ -22,6 +22,12 @@
       "format": "hidden"
     },
     {
+      "name": "webhook_id",
+      "title": "Intercom webhook id",
+      "type": "string",
+      "format": "hidden"
+    },
+    {
       "name": "last_fetch_started_at",
       "description": "Last time fetched at operation was started",
       "type": "string",
