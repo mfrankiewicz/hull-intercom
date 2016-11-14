@@ -18,7 +18,7 @@ export default class WebhookAgent {
    * @return Promise
    */
   ensureWebhook() {
-    if (false && this.webhookId) {
+    if (this.webhookId) {
       return Promise.resolve(this.webhookId);
     }
     return this.createWebhook();
@@ -31,8 +31,13 @@ export default class WebhookAgent {
     return this.intercomClient.post("/subscriptions")
       .send({
         service_type: "web",
-        topics: ["event", "user"],
+        topics: ["user.created", "user.deleted", "user.unsubscribed", "user.updated"],
         url: url
+      })
+      .catch(err => {
+        const fErr = this.intercomClient.handleError(err);
+        // handle errors which may happen here
+        return Promise.reject(fErr);
       })
       .then(res => {
         this.webhookId = res.body.id;

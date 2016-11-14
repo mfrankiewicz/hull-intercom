@@ -12,4 +12,18 @@ export default class Actions {
     });
     res.end("ok");
   }
+
+  userSchema(req, res) {
+    res.json({
+      options: [{
+        label: "This is label",
+        value: "This is value"
+      }]
+    });
+  }
+
+  webhook(req, res) {
+    console.log(req.body);
+    res.end("ok")
+  }
 }

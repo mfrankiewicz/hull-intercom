@@ -38,7 +38,7 @@ export default class WorkerApp {
     const jobName = job.data.name;
     const req = job.data.context;
     const jobData = job.data.payload;
-    console.log("dispatch", jobName, job.id);
+    console.log("dispatch", job.id, jobName);
     req.payload = jobData || {};
     const res = {};
 

@@ -14,7 +14,8 @@ export default class IntercomAgent {
     getJob(id) {
       return this.intercomClient.get(`/jobs/${id}`)
         .then(res => {
-          return _.get(res, "body.tasks[0].state") === "completed";
+          return _.get(res, "body.tasks[0].state") === "completed"
+            || _.get(res, "body.tasks[0].state") === "completed_with_errors";
         });
     }
 
@@ -76,7 +77,11 @@ export default class IntercomAgent {
       });
       return Promise.map(opArray, (op) => {
         return this.intercomClient.post("/tags")
-          .send(op);
+          .send(op)
+          .catch(err => {
+            const fErr = this.intercomClient.handleError(err);
+            return Promise.reject(fErr);
+          });
       }, { concurrency: 3 });
     }
 

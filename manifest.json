@@ -44,6 +44,55 @@
       "type": "boolean",
       "default": false,
       "format": "hidden"
+    },
+    {
+      "name" : "sync_fields_to_intercom",
+      "title" : "List of User fields to push to Intercom",
+      "type" : "array",
+      "format" : "table",
+      "default" : [],
+      "items" : {
+        "type" : "object",
+        "properties" : {
+          "hull" : {
+            "type" : "string",
+            "format" : "trait",
+            "title" : "Hull Field"
+          },
+          "intercom" : {
+            "type" : "string",
+            "title" : "Intercom Field"
+          }
+        },
+        "required" : [
+          "hull",
+          "intercom"
+        ]
+      }
+    },
+    {
+      "name" : "sync_fields_to_hull",
+      "title" : "List of User fields to fetch from Intercom",
+      "type" : "array",
+      "format" : "table",
+      "items" : {
+        "type" : "object",
+        "properties" : {
+          "intercom" : {
+            "type" : "string",
+            "title" : "Intercom Field"
+          },
+          "hull" : {
+            "type" : "string",
+            "format" : "trait",
+            "title" : "Hull Field"
+          }
+        },
+        "required" : [
+          "intercom",
+          "hull"
+        ]
+      }
     }
   ],
   "deployment_settings": [],

@@ -1,6 +1,7 @@
 import { Router } from "express";
 import bodyParser from "body-parser";
 import moment from "moment";
+import cors from 'cors';
 
 import ParseMessageMiddleware from "../util/parse-message-middleware";
 import NotifHandler from "../util/notif-handler";
@@ -34,6 +35,10 @@ export default function AppRouter(deps) {
     },
     shipCache: deps.shipCache
   }));
+
+  router.get("/schema/user", cors(), actions.userSchema);
+
+  router.post("/intercom", bodyParser.json(), actions.webhook);
 
   return router;
 }
