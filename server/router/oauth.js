@@ -1,7 +1,7 @@
 import { Strategy as IntercomStrategy } from "passport-intercom";
 import moment from "moment";
 
-// import AppMiddleware from "../lib/middleware/app";
+import AppMiddleware from "../lib/app-middleware";
 
 export default function OAuthRouter(deps) {
 
@@ -39,12 +39,15 @@ export default function OAuthRouter(deps) {
         // TODO: we have notices problems with syncing hull segments property
         // after a Hubspot resync, there may be a problem with notification
         // subscription. Following two lines fixes that problem.
-        // AppMiddleware({ queueAdapter, shipCache, instrumentationAgent })(req, {}, () => {});
+        AppMiddleware({ queueAdapter, shipCache, instrumentationAgent })(req, {}, () => {});
         // req.shipApp.hubspotAgent.syncContactProperties()
         //   .catch((err) => hull.logger.error("Error in creating segments property", err));
 
         return hull.get(ship.id).then(s => {
-          return { settings: s.private_settings };
+          return req.shipApp.intercomAgent.getUsersTotalCount()
+            .then(total_count => {
+              return { settings: s.private_settings, total_count };
+            });
         });
       }
       return Promise.reject();

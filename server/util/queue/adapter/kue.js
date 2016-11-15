@@ -21,7 +21,7 @@ export default class KueAdapter {
    * @param {Object} jobPayload
    * @return {Promise}
    */
-  create(jobName, jobPayload = {}, { ttl = 0, delay = null } = {}) {
+  create(jobName, jobPayload = {}, { ttl = 0, delay = null, priority = null } = {}) {
     return Promise.fromCallback((callback) => {
       const job = this.queue.create(jobName, jobPayload)
         .attempts(3)
@@ -33,6 +33,10 @@ export default class KueAdapter {
 
       if (delay) {
         job.delay(delay);
+      }
+
+      if (priority) {
+        job.priority(priority);
       }
 
       return job.save((err) => {

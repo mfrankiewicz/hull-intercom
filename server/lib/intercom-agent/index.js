@@ -85,4 +85,21 @@ export default class IntercomAgent {
       }, { concurrency: 3 });
     }
 
+    /**
+     * get total count of users
+     */
+    getUsersTotalCount()
+    {
+      return this.intercomClient.get("/users")
+        .query({ per_page: 1})
+        .then(response => {
+          return _.get(response, "body.total_count");
+        })
+        .catch(err => {
+          const fErr = this.intercomClient.handleError(err);
+          console.log("FERROR", fErr);
+          return Promise.reject(fErr);
+        });
+    }
+
 }

@@ -28,6 +28,10 @@
           <h5>Last Sync <small class="pull-right"><strong><%=settings.fetch_count || 0%> Users</strong> on <span data-time>Friday, September 8 @ 12h30</span></small></h5>
           <% } %>
 
+          <% if (total_count) { %>
+          <h5>Users to fetch <small class="pull-right"><strong><%=total_count || 0%></strong></small></h5>
+          <% } %>
+
           <hr>
 
           <div class="">

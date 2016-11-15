@@ -68,7 +68,7 @@ export default class UserMapping {
       }
       return traits;
     }, {});
-    console.log("intercom => hull", intercomUser, hullTraits);
+    // console.log("intercom => hull", intercomUser, hullTraits);
     return hullTraits;
   }
 
@@ -79,7 +79,7 @@ export default class UserMapping {
       }
       return fields;
     }, {});
-    console.log("hull => intercom", hullUser, intercomFields);
+    // console.log("hull => intercom", hullUser, intercomFields);
     return intercomFields;
   }
 }

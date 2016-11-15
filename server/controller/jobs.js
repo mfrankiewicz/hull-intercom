@@ -73,13 +73,23 @@ export default class Jobs {
 
   importUsers(req) {
     const { scroll_param } = req.payload;
-    return req.shipApp.intercomAgent.importUsers(scroll_param)
+    const { intercomAgent, queueAgent } = req.shipApp;
+    return intercomAgent.importUsers(scroll_param)
       .then(({ users, scroll_param }) => {
         if (_.isEmpty(users)) {
           return Promise.resolve();
         }
-        req.shipApp.queueAgent.create("importUsers", { scroll_param })
-        return req.shipApp.queueAgent.create("saveUsers", { users });
+        console.log("IMPORTED", users.length);
+        // scroll feature of Intercom API have expiration time which is
+        // hard to recover from. The is the reason why continuing the import
+        // scroll queries is more important than other tasks here.
+        // It will put much more data into the queue, but when user scroll param
+        // expires it cannot be recovered.
+        // @see https://developers.intercom.com/reference#iterating-over-all-users
+        return Promise.all([
+          queueAgent.create("importUsers", { scroll_param }, { priority: "high" }),
+          queueAgent.create("saveUsers", { users })
+        ]);
       });
   }
 
