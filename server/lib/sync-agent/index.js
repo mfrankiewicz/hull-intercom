@@ -15,18 +15,35 @@ export default class SyncAgent {
     this.webhookAgent = new WebhookAgent(intercomAgent, hullAgent, ship, hostname);
   }
 
+  syncShip() {
+    return this.webhookAgent.ensureWebhook()
+      .then(() => this.hullAgent.getSegments())
+      .then((segments) => {
+        return this.tagMapping.sync(segments)
+      });
+  }
+
   /**
    *
    */
   userAdded(user) {
-    return !_.isEmpty(user["intercom/id"]);
+    return !_.isEmpty(user["traits_intercom/id"]);
   }
 
   /**
    *
    */
   userWithError(user) {
-    return !_.isEmpty(user["traits_mailchimp/import_error"]);
+    return !_.isEmpty(user["traits_intercom/import_error"]);
+  }
+
+  saveUserError(error) {
+    const email = _.get(error, "req.data.email");
+    const errorMessage = _.get(error, "body.errors", []).map(e => e.message).join(" ");
+
+    return this.hullAgent.hullClient.as({ email }).traits({
+      "intercom/import_error": errorMessage
+    });
   }
 
   getUsersToSave(users) {
@@ -45,8 +62,7 @@ export default class SyncAgent {
   groupUsersToTag(users) {
     return this.hullAgent.getSegments()
       .then(segments => {
-        const ops =  _.reduce(users, (o, user) => {
-
+        const ops = _.reduce(users, (o, user) => {
           user.segment_ids.map(segment_id => {
             const segment = _.find(segments, { id: segment_id });
             o[segment.name] = o[segment.name] || [];
@@ -54,10 +70,37 @@ export default class SyncAgent {
               email: user.email
             });
           });
+          user.remove_segment_ids.map(segment_id => {
+            const segment = _.find(segments, { id: segment_id });
+            o[segment.name] = o[segment.name] || [];
+            o[segment.name].push({
+              email: user.email,
+              untag: true
+            });
+          });
           return o;
         }, {});
         return ops;
       });
+  }
+
+  /**
+   * When the user is within the
+   * @type {Array}
+   */
+  updateUserSegments(user, { add_segment_ids = [], remove_segment_ids = [] }) {
+    if (this.hullAgent.userWhitelisted(user)) {
+      user.segment_ids = _.uniq(_.concat(user.segment_ids || [], _.filter(add_segment_ids)));
+      user.remove_segment_ids = _.filter(remove_segment_ids);
+    } else {
+      if (this.userAdded(user)) {
+        user.segment_ids = [];
+        user.remove_segment_ids = this.tagMapping.getSegmentIds();
+      } else {
+        return null;
+      }
+    }
+    return user;
   }
 
 }

@@ -5,6 +5,7 @@ import cors from 'cors';
 
 import ParseMessageMiddleware from "../util/parse-message-middleware";
 import NotifHandler from "../util/notif-handler";
+import ResponseMiddleware from "../util/middleware/response";
 
 import Actions from "../controller/actions"
 import NotifHandlers from "../controller/notif-handlers"
@@ -20,25 +21,22 @@ export default function AppRouter(deps) {
   // router.use(deps.hullMiddleware);
   // router.use(AppMiddleware(deps));
 
-  router.use("/notify", ParseMessageMiddleware)
-
-  router.post("/fetch-all", deps.hullMiddleware, deps.appMiddleware, actions.fetchAll);
-  router.post("/batch", deps.hullMiddleware, deps.appMiddleware, bodyParser.json(), actions.batchHandler);
-  router.post("/notify", deps.hullMiddleware, deps.appMiddleware, NotifHandler(deps.Hull, {
+  router.post("/fetch-all", deps.hullMiddleware, deps.appMiddleware, actions.fetchAll, ResponseMiddleware);
+  router.post("/batch", deps.hullMiddleware, deps.appMiddleware, bodyParser.json(), actions.batchHandler, ResponseMiddleware);
+  router.post("/notify", ParseMessageMiddleware, deps.hullMiddleware, deps.appMiddleware, NotifHandler(deps.Hull, {
     hostSecret: deps.shipConfig.hostSecret,
     groupTraits: false,
     handlers: {
       // "segment:update": notifyController.segmentUpdateHandler,
       // "segment:delete": notifyController.segmentDeleteHandler,
-      // "user:update": notifyController.userUpdateHandler,
+      "user:update": notifHandlers.userUpdateHandler,
       "ship:update": notifHandlers.shipUpdateHandler,
     },
     shipCache: deps.shipCache
   }));
 
-  router.get("/schema/user", cors(), actions.userSchema);
-
-  router.post("/intercom", bodyParser.json(), actions.webhook);
+  // FIXME: 404 for that endpoint?
+  router.post("/intercom", deps.hullMiddleware, deps.appMiddleware, bodyParser.json(), actions.webhook, ResponseMiddleware);
 
   return router;
 }

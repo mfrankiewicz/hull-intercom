@@ -5,20 +5,20 @@ export default class UserMapping {
   constructor(ship) {
     this.ship = ship;
     this.map = [
-      { intercom: "id", hull: "intercom/id" },
+      { intercom: "id", hull: "traits_intercom/id" },
       { intercom: "email", hull: "email" },
-      { intercom: "name", hull: "intercom/name" },
-      { intercom: "avatar.image_url", hull: "intercom/avatar_image_url" },
-      { intercom: "location_data.latitude", hull: "intercom/latitude" },
-      { intercom: "location_data.longitude", hull: "intercom/longitude" },
-      { intercom: "last_request_at", hull: "intercom/last_request_at" },
-      { intercom: "last_seen_ip", hull: "intercom/last_seen_ip" },
-      { intercom: "created_at", hull: "intercom/created_at" },
-      { intercom: "remote_created_at", hull: "intercom/remote_created_at" },
-      { intercom: "signed_up_at", hull: "intercom/signed_up_at" },
-      { intercom: "updated_at", hull: "intercom/updated_at" },
-      { intercom: "session_count", hull: "intercom/session_count" },
-      { intercom: "unsubscribed_from_emails", hull: "intercom/unsubscribed_from_emails" },
+      { intercom: "name", hull: "traits_intercom/name" },
+      { intercom: "avatar.image_url", hull: "traits_intercom/avatar_image_url" },
+      { intercom: "location_data.latitude", hull: "traits_intercom/latitude" },
+      { intercom: "location_data.longitude", hull: "traits_intercom/longitude" },
+      { intercom: "last_request_at", hull: "traits_intercom/last_request_at" },
+      { intercom: "last_seen_ip", hull: "traits_intercom/last_seen_ip" },
+      { intercom: "created_at", hull: "traits_intercom/created_at" },
+      { intercom: "remote_created_at", hull: "traits_intercom/remote_created_at" },
+      { intercom: "signed_up_at", hull: "traits_intercom/signed_up_at" },
+      { intercom: "updated_at", hull: "traits_intercom/updated_at" },
+      { intercom: "session_count", hull: "traits_intercom/session_count" },
+      { intercom: "unsubscribed_from_emails", hull: "traits_intercom/unsubscribed_from_emails" },
     ];
   }
 
@@ -51,7 +51,7 @@ export default class UserMapping {
   }
 
   getHullTraitsKeys() {
-    return this.computeHullTraits().map(f => f.hull);
+    return this.computeHullTraits().map(f => f.hull.replace(/^traits_/, ""));
   }
 
   getIntercomFieldsKeys() {
@@ -64,7 +64,7 @@ export default class UserMapping {
   getHullTraits(intercomUser) {
     const hullTraits = _.reduce(this.computeHullTraits(), (traits, prop) => {
       if (_.get(intercomUser, prop.intercom)) {
-        traits[prop.hull] = _.get(intercomUser, prop.intercom);
+        traits[prop.hull.replace(/^traits_/, "")] = _.get(intercomUser, prop.intercom);
       }
       return traits;
     }, {});

@@ -13,6 +13,10 @@ export default class TagMapping {
     this.originalMapping = _.cloneDeep(this.mapping);
   }
 
+  getSegmentIds() {
+    return _.keys(this.mapping);
+  }
+
   /**
    * @return Promise
    */

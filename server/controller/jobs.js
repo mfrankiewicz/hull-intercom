@@ -15,15 +15,29 @@ export default class Jobs {
     const usersToTag = syncAgent.getUsersToTag(users);
 
     const intercomUsersToSave = usersToSave.map(u => syncAgent.userMapping.getIntercomFields(u));
-    const intercomUsersToTag = usersToTag.map(u => syncAgent.userMapping.getIntercomFields(u));
-    return syncAgent.webhookAgent.ensureWebhook()
-      .then(() => hullAgent.getSegments())
-      .then((segments) => {
-        return syncAgent.tagMapping.sync(segments)
+
+    return syncAgent.syncShip()
+      .then(() => {
+        return syncAgent.groupUsersToTag(usersToTag)
+          .then(groupedUsers => intercomAgent.tagUsers(groupedUsers));
       })
-      .then(() => intercomAgent.tagUsers(intercomUsersToTag))
       .then(() => intercomAgent.saveUsers(intercomUsersToSave))
       .then(res => {
+        if (_.isArray(res)) {
+          const savedUsers = _.intersectionBy(usersToSave, res, "email");
+          const errors = _.filter(res, { body: { type: "error.list" } });
+          // ERRORS [ [ { code: 'bad_request', message: 'bad \'asdfasdf\' parameter' } ] ]
+          console.log("ERRORS", errors.map(e => e.errors));
+
+          return syncAgent.groupUsersToTag(savedUsers)
+            .then(groupedUsers => intercomAgent.tagUsers(groupedUsers))
+            .then(() => {
+              return Promise.map(errors, error => {
+                return syncAgent.saveUserError(error);
+              });
+            })
+        }
+
         if (_.get(res, "body.id")) {
           return queueAgent.create("handleBulkJob", { users: usersToSave, id: res.body.id });
         }
@@ -67,7 +81,7 @@ export default class Jobs {
             ident.anonymous_id = `intercom:${user["intercom/id"]}`;
           }
           return req.hull.client.as(ident).traits(user);
-        }, { concurrency: 3 });
+        });
       });
   }
 
@@ -91,6 +105,17 @@ export default class Jobs {
           queueAgent.create("saveUsers", { users })
         ]);
       });
+  }
+
+  handleBatch(req) {
+    const { hullAgent, syncAgent } = req.shipApp;
+    const { body, segmentId } = req.payload;
+    return hullAgent.extractAgent.handleExtract(body, 100, (users) => {
+      users = _.filter(users.map(u => {
+        return syncAgent.updateUserSegments(u, { add_segment_ids: [segmentId] });
+      }));
+      return req.shipApp.queueAgent.create("sendUsers", { users });
+    });
   }
 
 }

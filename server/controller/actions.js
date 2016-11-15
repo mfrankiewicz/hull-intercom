@@ -1,29 +1,34 @@
+import _ from "lodash";
+
+import BatchSyncHandler from "../util/batch-sync-handler";
+
 export default class Actions {
 
-  fetchAll(req, res) {
+  fetchAll(req, res, next) {
     req.shipApp.queueAgent.create("importUsers")
-      .then(res => console.log(res), err => console.log(err));
+      .then(next, next);
+  }
+
+  batchHandler(req, res, next) {
+    const segmentId = req.query.segment_id || null;
+    req.shipApp.queueAgent.create("handleBatch", { body: req.body, segmentId })
+      .then(next, next);
+  }
+
+  webhook(req, res, next) {
+    if (_.get(req, "body.topic") === "user.created") {
+      return BatchSyncHandler.getHandler({
+        hull: req.hull,
+        ship: req.hull.ship,
+        options: {
+          maxSize: process.env.NOTIFY_BATCH_HANDLER_SIZE || 100,
+          throttle: process.env.NOTIFY_BATCH_HANDLER_THROTTLE || 30000
+        }
+      })
+      .setCallback(users => req.shipApp.queueAgent.create("saveUsers", { users }))
+      .add(_.get(req, "body.data.item"))
+      .then(next, next);
+    }
     res.end("ok");
-  }
-
-  batchHandler(req, res) {
-    req.shipApp.hullAgent.extractAgent.handleExtract(req.body, 100, (users) => {
-      req.shipApp.queueAgent.create("sendUsers", { users });
-    });
-    res.end("ok");
-  }
-
-  userSchema(req, res) {
-    res.json({
-      options: [{
-        label: "This is label",
-        value: "This is value"
-      }]
-    });
-  }
-
-  webhook(req, res) {
-    console.log(req.body);
-    res.end("ok")
   }
 }

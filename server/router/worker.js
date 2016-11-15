@@ -7,6 +7,7 @@ export default function (deps) {
     workerApp.attach("saveUsers", jobsController.saveUsers);
     workerApp.attach("sendUsers", jobsController.sendUsers);
     workerApp.attach("handleBulkJob", jobsController.handleBulkJob);
+    workerApp.attach("handleBatch", jobsController.handleBatch);
     return workerApp;
   };
 }

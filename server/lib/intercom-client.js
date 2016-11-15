@@ -102,13 +102,13 @@ export default class IntercomClient {
   handleError(err) {
     const filteredError = new Error(err.message);
     filteredError.stack = err.stack;
-    filteredError.extra = {
-      reqUrl: _.get(err, "response.request.url"),
-      reqMethod: _.get(err, "response.request.method"),
-      reqData: _.get(err, "response.request._data"),
-      body: _.get(err, "response.body"),
-      statusCode: _.get(err, "response.statusCode"),
+    filteredError.req = {
+      url: _.get(err, "response.request.url"),
+      method: _.get(err, "response.request.method"),
+      data: _.get(err, "response.request._data")
     };
+    filteredError.body = _.get(err, "response.body");
+    filteredError.statusCode = _.get(err, "response.statusCode");
     return filteredError;
   }
 

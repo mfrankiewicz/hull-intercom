@@ -79,5 +79,4 @@ export default class HullAgent {
     ];
     return props.concat(traits);
   }
-
 }
