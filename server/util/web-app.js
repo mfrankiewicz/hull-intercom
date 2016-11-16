@@ -3,7 +3,7 @@ import path from "path";
 import { renderFile } from "ejs";
 import timeout from "connect-timeout";
 
-import TokenMiddleware from "../util/token-middleware";
+import TokenMiddleware from "../util/middleware/token";
 
 export default function WebApp() {
   const app = express();

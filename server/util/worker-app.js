@@ -34,8 +34,8 @@ export default class WorkerApp {
     const res = {};
 
     if (!this.controllers.Jobs[jobName]) {
-      const err = new Error(`No such job registered ${jobName}`);
-      console.error(err.message)
+      const err = new Error(`Job not found: ${jobName}`);
+      console.error(err.message);
       return Promise.reject(err);
     }
     return Promise.fromCallback((callback) => {
@@ -48,6 +48,7 @@ export default class WorkerApp {
           .then((jobRes) => {
             callback(null, jobRes);
           }, (err) => {
+            console.error(err.message);
             this.instrumentationAgent.metricInc("job.error", 1, req.hull.ship);
             this.instrumentationAgent.catchError(err, {
               job_id: job.id

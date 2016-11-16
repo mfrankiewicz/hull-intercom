@@ -1,8 +1,7 @@
 import { Router } from "express";
 import bodyParser from "body-parser";
-import moment from "moment";
 
-import ParseMessageMiddleware from "../util/parse-message-middleware";
+import ParseMessageMiddleware from "../util/middleware/parse-message";
 import NotifHandler from "../util/notif-handler";
 import ResponseMiddleware from "../util/middleware/response";
 

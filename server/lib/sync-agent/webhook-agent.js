@@ -6,12 +6,12 @@ export default class WebhookAgent {
 
   constructor(intercomAgent, hullAgent, ship, hostname) {
     this.ship = ship;
-    this.hullAgent = hullAgent
+    this.hullAgent = hullAgent;
     this.hullClient = hullAgent.hullClient;
     this.intercomClient = intercomAgent.intercomClient;
     this.hostname = hostname;
 
-    this.webhookId = _.get(this.ship, `private_settings.webhook_id`);
+    this.webhookId = _.get(this.ship, "private_settings.webhook_id");
   }
 
   /**
@@ -25,14 +25,13 @@ export default class WebhookAgent {
   }
 
   createWebhook() {
-
     const url = this.getWebhookUrl();
 
     return this.intercomClient.post("/subscriptions")
       .send({
         service_type: "web",
         topics: ["user.created", "user.deleted", "user.unsubscribed", "user.updated"],
-        url: url
+        url
       })
       .catch(err => {
         const fErr = this.intercomClient.handleError(err);

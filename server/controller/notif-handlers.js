@@ -12,20 +12,20 @@ export default class NotifHandlers {
 
   static userUpdateHandler(payload, { req }) {
     const { syncAgent, queueAgent, hullAgent } = req.shipApp;
-    let { user, changes = {}, segments = [] } = payload.message;
-    const { left = [] } = changes.segments || {};
+    const { user, changes = {}, segments = [] } = payload.message;
+    const { left = [] } = changes.segments;
 
     if (!_.isEmpty(_.get(changes, "user['traits_intercom/id'][1]"))) {
       req.hull.client.logger.info("user skipped");
       return Promise.resolve();
     }
 
-    user = syncAgent.updateUserSegments(user, {
+    const filteredUser = syncAgent.updateUserSegments(user, {
       add_segment_ids: segments.map(s => s.id),
       remove_segment_ids: left.map(s => s.id)
     });
 
-    if (!user) {
+    if (!filteredUser) {
       return Promise.resolve();
     }
 
@@ -37,6 +37,6 @@ export default class NotifHandlers {
         throttle: process.env.NOTIFY_BATCH_HANDLER_THROTTLE || 30000
       }
     }).setCallback(users => queueAgent.create("sendUsers", { users }))
-    .add(user);
+    .add(filteredUser);
   }
 }

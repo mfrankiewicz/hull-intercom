@@ -36,7 +36,7 @@ export default class Jobs {
               return Promise.map(errors, error => {
                 return syncAgent.saveUserError(error);
               });
-            })
+            });
         }
 
         if (_.get(res, "body.id")) {
@@ -57,9 +57,8 @@ export default class Jobs {
             .then(groupedUsers => {
               return intercomAgent.tagUsers(groupedUsers);
             });
-        } else {
-          return queueAgent.create("handleBulkJob", { users, id }, { delay: 10000 });
         }
+        return queueAgent.create("handleBulkJob", { users, id }, { delay: 10000 });
       });
   }
 
@@ -71,9 +70,7 @@ export default class Jobs {
 
     return syncAgent.webhookAgent.ensureWebhook()
       .then(() => hullAgent.getSegments())
-      .then((segments) => {
-        return syncAgent.tagMapping.sync(segments)
-      })
+      .then((segments) => syncAgent.tagMapping.sync(segments))
       .then(() => {
         return Promise.map(mappedUsers, (user) => {
           console.log("SAVE USER", user.email);
@@ -90,7 +87,7 @@ export default class Jobs {
     const { scroll_param } = req.payload;
     const { intercomAgent, queueAgent } = req.shipApp;
     return intercomAgent.importUsers(scroll_param)
-      .then(({ users, scroll_param }) => {
+      .then(({ users, scroll_param: next_scroll_param }) => {
         if (_.isEmpty(users)) {
           return Promise.resolve();
         }
@@ -102,7 +99,7 @@ export default class Jobs {
         // expires it cannot be recovered.
         // @see https://developers.intercom.com/reference#iterating-over-all-users
         return Promise.all([
-          queueAgent.create("importUsers", { scroll_param }, { priority: "high" }),
+          queueAgent.create("importUsers", { scroll_param: next_scroll_param }, { priority: "high" }),
           queueAgent.create("saveUsers", { users })
         ]);
       });
@@ -121,7 +118,8 @@ export default class Jobs {
 
   static syncUsers(req) {
     const { hullAgent, syncAgent, intercomAgent, queueAgent } = req.shipApp;
-    let { last_sync_at, count, page } = req.payload;
+    let { last_sync_at } = req.payload;
+    const { count, page } = req.payload;
 
     return (() => {
       if (_.isEmpty(last_sync_at)) {

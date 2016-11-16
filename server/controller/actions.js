@@ -34,6 +34,7 @@ export default class Actions {
       .add(_.get(req, "body.data.item"))
       .then(next, next);
     }
-    res.end("ok");
+
+    return next();
   }
 }

@@ -24,9 +24,9 @@ export default class TagMapping {
     if (_.isEqual(this.originalMapping, this.mapping)) {
       return Promise.resolve();
     }
-    const newSetting = {};
+    const newSettings = {};
     newSettings[this.settingKey] = this.mapping;
-    return this.hullAgent(newSetting);
+    return this.hullAgent(newSettings);
   }
 
   /**

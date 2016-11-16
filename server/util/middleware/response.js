@@ -12,4 +12,5 @@ export default function ResponseMiddleware(result, req, res, next) {
     res.status(200);
   }
   res.end("ok");
+  next();
 }

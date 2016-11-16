@@ -4,11 +4,10 @@ import WorkerApp from "./util/worker-app";
 import ExitHandler from "./util/exit-handler";
 
 import bootstrap from "./bootstrap";
-import AppMiddleware from "./lib/app-middleware";
 
 const workerApp = new WorkerApp(bootstrap);
 
-const { hullMiddleware, shipCache, instrumentationAgent, queueAdapter, appMiddleware } = bootstrap;
+const { hullMiddleware, queueAdapter, appMiddleware } = bootstrap;
 
 workerApp
   .use(hullMiddleware)

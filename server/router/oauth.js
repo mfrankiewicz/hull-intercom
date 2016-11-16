@@ -4,7 +4,6 @@ import moment from "moment";
 import AppMiddleware from "../lib/app-middleware";
 
 export default function OAuthRouter(deps) {
-
   const {
     Hull,
     shipConfig,
@@ -56,7 +55,7 @@ export default function OAuthRouter(deps) {
       return Promise.resolve();
     },
     onAuthorize: (req, { hull, ship }) => {
-      const { refreshToken, accessToken, expiresIn } = (req.account || {});
+      const { accessToken } = (req.account || {});
       const newShip = {
         private_settings: {
           ...ship.private_settings,

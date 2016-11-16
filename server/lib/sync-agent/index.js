@@ -2,7 +2,7 @@ import _ from "lodash";
 
 import TagMapping from "./tag-mapping";
 import UserMapping from "./user-mapping";
-import WebhookAgent from "./webhook-agent"
+import WebhookAgent from "./webhook-agent";
 
 export default class SyncAgent {
 
@@ -18,9 +18,7 @@ export default class SyncAgent {
   syncShip() {
     return this.webhookAgent.ensureWebhook()
       .then(() => this.hullAgent.getSegments())
-      .then((segments) => {
-        return this.tagMapping.sync(segments)
-      });
+      .then((segments) => this.tagMapping.sync(segments));
   }
 
   /**
