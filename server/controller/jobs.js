@@ -118,33 +118,34 @@ export default class Jobs {
 
   static syncUsers(req) {
     const { hullAgent, syncAgent, intercomAgent, queueAgent } = req.shipApp;
-    let { last_sync_at } = req.payload;
-    const { count, page } = req.payload;
+    let { last_updated_at } = req.payload;
+    const { count, page = 1 } = req.payload;
 
     return (() => {
-      if (_.isEmpty(last_sync_at)) {
-        last_sync_at = _.get(req, "hull.ship.private_settings.last_sync_at", moment().utc());
-        return hullAgent.updateShipSettings({ last_sync_at });
+      if (_.isEmpty(last_updated_at)) {
+        return syncAgent.getLastUpdatedAt();
       }
-      return Promise.resolve();
+      return Promise.resolve(last_updated_at);
     })()
-      .then(() => intercomAgent.getRecentUsers(last_sync_at, count, page))
-      .then(({ users, hasMore }) => {
-        const promises = [];
+      .then((new_last_updated_at) => {
+        console.log("syncUsers", { new_last_updated_at, page });
+        return intercomAgent.getRecentUsers(new_last_updated_at, count, page)
+          .then(({ users, hasMore }) => {
+            const promises = [];
+            if (hasMore) {
+              promises.push(queueAgent.create("syncUsers", {
+                last_updated_at: new_last_updated_at,
+                count,
+                page: page + 1
+              }));
+            }
 
-        if (hasMore && !_.isEmpty(users)) {
-          promises.push(queueAgent.create("syncUsers", {
-            last_sync_at,
-            count,
-            page: page + 1
-          }));
-        }
+            if (!_.isEmpty(users)) {
+              promises.push(queueAgent.create("saveUsers", { users }));
+            }
 
-        if (!_.isEmpty(users)) {
-          promises.push(queueAgent.create("saveUsers", { users }));
-        }
-
-        return Promise.all(promises);
+            return Promise.all(promises);
+          });
       });
   }
 

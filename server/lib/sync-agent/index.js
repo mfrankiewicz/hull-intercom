@@ -1,4 +1,5 @@
 import _ from "lodash";
+import moment from "moment";
 
 import TagMapping from "./tag-mapping";
 import UserMapping from "./user-mapping";
@@ -99,6 +100,27 @@ export default class SyncAgent {
       }
     }
     return user;
+  }
+
+  /**
+   * Get information about last import done from intercom
+   * @return {Promise}
+   */
+  getLastUpdatedAt() {
+    return this.hullAgent.hullClient.get("/search/user_reports", {
+      include: ["traits_intercom/updated_at"],
+      sort: {
+        "traits_intercom/updated_at": "desc"
+      },
+      per_page: 1,
+      page: 1
+    })
+    .then((r) => {
+      return r.data[0]["traits_intercom/updated_at"];
+    })
+    .catch(() => {
+      return Promise.resolve(moment().utc().format());
+    });
   }
 
 }

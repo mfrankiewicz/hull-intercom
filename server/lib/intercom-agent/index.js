@@ -124,7 +124,7 @@ export default class IntercomAgent {
       });
   }
 
-  getRecentUsers(last_sync_at, count, page) {
+  getRecentUsers(last_updated_at, count, page) {
     return this.intercomClient.get("/users")
       .query({
         per_page: count,
@@ -133,14 +133,16 @@ export default class IntercomAgent {
         sort: "updated_at"
       })
       .then(response => {
-        const users = _.get(response, "body.users", []).filter((u) => {
-          return moment(u.updated_at, "x")
-            .isAfter(last_sync_at);
+        const originalUsers = _.get(response, "body.users", []);
+        const users = originalUsers.filter((u) => {
+          return moment(u.updated_at, "X")
+            .isAfter(last_updated_at);
         });
 
         return {
           users,
           hasMore: !_.isEmpty(_.get(response, "body.pages.next"))
+            && users.length === originalUsers.length
         };
       })
       .catch(err => {
