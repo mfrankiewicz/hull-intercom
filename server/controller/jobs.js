@@ -8,7 +8,7 @@ export default class Jobs {
    * Takes incoming list of users with fields and segment_ids set.
    * Performing the
    */
-  sendUsers(req) {
+  static sendUsers(req) {
     const { users } = req.payload;
     const { syncAgent, hullAgent, intercomAgent, queueAgent } = req.shipApp;
 
@@ -46,7 +46,7 @@ export default class Jobs {
       });
   }
 
-  handleBulkJob(req) {
+  static handleBulkJob(req) {
     const { id, users } = req.payload;
     const { syncAgent, intercomAgent, queueAgent, hullAgent } = req.shipApp;
 
@@ -63,7 +63,7 @@ export default class Jobs {
       });
   }
 
-  saveUsers(req) {
+  static saveUsers(req) {
     const { users } = req.payload;
     const { syncAgent, hullAgent } = req.shipApp;
 
@@ -86,7 +86,7 @@ export default class Jobs {
       });
   }
 
-  importUsers(req) {
+  static importUsers(req) {
     const { scroll_param } = req.payload;
     const { intercomAgent, queueAgent } = req.shipApp;
     return intercomAgent.importUsers(scroll_param)
@@ -108,7 +108,7 @@ export default class Jobs {
       });
   }
 
-  handleBatch(req) {
+  static handleBatch(req) {
     const { hullAgent, syncAgent } = req.shipApp;
     const { body, segmentId } = req.payload;
     return hullAgent.extractAgent.handleExtract(body, 100, (users) => {
@@ -119,7 +119,7 @@ export default class Jobs {
     });
   }
 
-  syncUsers(req) {
+  static syncUsers(req) {
     const { hullAgent, syncAgent, intercomAgent, queueAgent } = req.shipApp;
     let { last_sync_at, count, page } = req.payload;
 

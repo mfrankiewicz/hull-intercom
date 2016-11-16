@@ -4,13 +4,13 @@ import BatchSyncHandler from "../util/batch-sync-handler";
 
 export default class NotifHandlers {
 
-  shipUpdateHandler(payload, { req }) {
+  static shipUpdateHandler(payload, { req }) {
     console.log("SHIP, UPDATE");
     const { syncAgent, hullAgent } = req.shipApp;
     return syncAgent.syncShip();
   }
 
-  userUpdateHandler(payload, { req }) {
+  static userUpdateHandler(payload, { req }) {
     const { syncAgent, queueAgent, hullAgent } = req.shipApp;
     let { user, changes = {}, segments = [] } = payload.message;
     const { left = [] } = changes.segments || {};

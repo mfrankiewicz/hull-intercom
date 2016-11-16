@@ -7,7 +7,7 @@ export default function ExitHandler(promise) {
   function handleExit() {
     console.log("Exiting... waiting 30 seconds workers to flush");
     setTimeout(exitNow, 30000);
-    promise.then(exitNow);
+    promise().then(exitNow);
   }
 
   process.on("SIGINT", handleExit);

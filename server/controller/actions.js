@@ -4,23 +4,23 @@ import BatchSyncHandler from "../util/batch-sync-handler";
 
 export default class Actions {
 
-  fetchAll(req, res, next) {
+  static fetchAll(req, res, next) {
     req.shipApp.queueAgent.create("importUsers")
       .then(next, next);
   }
 
-  batchHandler(req, res, next) {
+  static batchHandler(req, res, next) {
     const segmentId = req.query.segment_id || null;
     req.shipApp.queueAgent.create("handleBatch", { body: req.body, segmentId })
       .then(next, next);
   }
 
-  sync(req, res, next) {
+  static sync(req, res, next) {
     req.shipApp.queueAgent.create("syncUsers")
       .then(next, next);
   }
 
-  webhook(req, res, next) {
+  static webhook(req, res, next) {
     if (_.get(req, "body.topic") === "user.created") {
       return BatchSyncHandler.getHandler({
         hull: req.hull,

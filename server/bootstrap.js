@@ -4,6 +4,7 @@ import Hull from "hull";
 import AppMiddleware from "./lib/app-middleware";
 import InstrumentationAgent from "./util/instrumentation-agent";
 import KueAdapter from "./util/queue/adapter/kue";
+import * as controllers from "./controller";
 
 const shipConfig = {
   hostSecret: process.env.SECRET || "1234",
@@ -28,4 +29,12 @@ const shipCache = new Hull.ShipCache(cacheManager, process.env.SHIP_CACHE_PREFIX
 const hullMiddleware = new Hull.Middleware({ hostSecret: shipConfig.hostSecret, shipCache });
 const appMiddleware = new AppMiddleware({ queueAdapter, shipCache });
 
-export default { queueAdapter, instrumentationAgent, shipCache, hullMiddleware, shipConfig, appMiddleware };
+export default {
+  queueAdapter,
+  instrumentationAgent,
+  shipCache,
+  hullMiddleware,
+  shipConfig,
+  appMiddleware,
+  controllers
+};

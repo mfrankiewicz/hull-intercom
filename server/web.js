@@ -1,15 +1,15 @@
 import Hull from "hull";
 import raven from "raven";
 
-import ExitHandler from "./util/exit-handler";
-import bootstrap from "./bootstrap";
-import BatchSyncHandler from "./util/batch-sync-handler";
-
 import WebApp from "./util/web-app";
-import AppRouter from "./router/app";
+import ExitHandler from "./util/exit-handler";
+import BatchSyncHandler from "./util/batch-sync-handler";
 import StaticRouter from "./util/static-router";
-import OAuthRouter from "./router/oauth";
 import KueRouter from "./util/kue-router";
+
+import bootstrap from "./bootstrap";
+import AppRouter from "./router/app";
+import OAuthRouter from "./router/oauth";
 
 const { queueAdapter, instrumentationAgent, shipCache } = bootstrap;
 
@@ -35,4 +35,4 @@ app.listen(port, () => {
   Hull.logger.info("webApp.listen", port);
 });
 
-ExitHandler(BatchSyncHandler.exit);
+ExitHandler(BatchSyncHandler.exit.bind(BatchSyncHandler));

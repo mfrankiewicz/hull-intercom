@@ -3,25 +3,16 @@ import Promise from "bluebird";
 import _ from "lodash";
 
 export default class WorkerApp {
-  constructor({ queueAdapter, instrumentationAgent }) {
+  constructor({ queueAdapter, instrumentationAgent, controllers }) {
     this.queueAdapter = queueAdapter;
-    this.handlers = {};
     this.instrumentationAgent = instrumentationAgent;
+    this.controllers = controllers;
+
     this.supply = new Supply();
   }
 
   use(middleware) {
-    if (middleware.length === 3) {
-      this.supply.use(middleware);
-    } else {
-      middleware(this);
-    }
-
-    return this;
-  }
-
-  attach(jobName, worker) {
-    this.handlers[jobName] = worker;
+    this.supply.use(middleware);
     return this;
   }
 
@@ -42,7 +33,7 @@ export default class WorkerApp {
     req.payload = jobData || {};
     const res = {};
 
-    if (!this.handlers[jobName]) {
+    if (!this.controllers.Jobs[jobName]) {
       const err = new Error(`No such job registered ${jobName}`);
       console.error(err.message)
       return Promise.reject(err);
@@ -52,7 +43,7 @@ export default class WorkerApp {
         this.runMiddleware(req, res)
           .then(() => {
             this.instrumentationAgent.metricInc("job.start", 1, req.hull.ship);
-            return this.handlers[jobName].call(job, req, res);
+            return this.controllers.Jobs[jobName].call(job, req, res);
           })
           .then((jobRes) => {
             callback(null, jobRes);
