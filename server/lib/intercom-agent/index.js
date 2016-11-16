@@ -1,5 +1,6 @@
 import _ from "lodash";
 import Promise from "bluebird";
+import moment from "moment";
 
 /**
  * Superset of Intercom API
@@ -110,12 +111,38 @@ export default class IntercomAgent {
     /**
      * get total count of users
      */
-    getUsersTotalCount()
-    {
+    getUsersTotalCount() {
       return this.intercomClient.get("/users")
         .query({ per_page: 1})
         .then(response => {
           return _.get(response, "body.total_count");
+        })
+        .catch(err => {
+          const fErr = this.intercomClient.handleError(err);
+          console.log("FERROR", fErr);
+          return Promise.reject(fErr);
+        });
+    }
+
+    getRecentUsers(last_sync_at, count, page) {
+      return this.intercomClient.get("/users")
+        .query({
+          per_page: count,
+          page,
+          order: "desc",
+          sort: "updated_at"
+        })
+        .then(response => {
+
+          const users = _.get(response, "body.users", []).filter((u) => {
+            return moment(u.updated_at, "x")
+              .isAfter(last_sync_at);
+          });
+
+          return {
+            users,
+            hasMore: !_.isEmpty(_.get(response, "body.pages.next"))
+          };
         })
         .catch(err => {
           const fErr = this.intercomClient.handleError(err);

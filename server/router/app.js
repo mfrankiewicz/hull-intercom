@@ -38,5 +38,7 @@ export default function AppRouter(deps) {
   // FIXME: 404 for that endpoint?
   router.post("/intercom", deps.hullMiddleware, deps.appMiddleware, bodyParser.json(), actions.webhook, ResponseMiddleware);
 
+  router.post("/sync", deps.hullMiddleware, deps.appMiddleware, bodyParser.json(), actions.sync, ResponseMiddleware);
+
   return router;
 }

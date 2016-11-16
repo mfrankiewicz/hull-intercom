@@ -15,6 +15,11 @@ export default class Actions {
       .then(next, next);
   }
 
+  sync(req, res, next) {
+    req.shipApp.queueAgent.create("syncUsers")
+      .then(next, next);
+  }
+
   webhook(req, res, next) {
     if (_.get(req, "body.topic") === "user.created") {
       return BatchSyncHandler.getHandler({

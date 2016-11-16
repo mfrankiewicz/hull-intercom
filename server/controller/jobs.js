@@ -1,5 +1,6 @@
 import Promise from "bluebird";
 import _ from "lodash";
+import moment from "moment";
 
 export default class Jobs {
 
@@ -116,6 +117,37 @@ export default class Jobs {
       }));
       return req.shipApp.queueAgent.create("sendUsers", { users });
     });
+  }
+
+  syncUsers(req) {
+    const { hullAgent, syncAgent, intercomAgent, queueAgent } = req.shipApp;
+    let { last_sync_at, count, page } = req.payload;
+
+    return (() => {
+      if (_.isEmpty(last_sync_at)) {
+        last_sync_at = _.get(req, "hull.ship.private_settings.last_sync_at", moment().utc());
+        return hullAgent.updateShipSettings({ last_sync_at });
+      }
+      return Promise.resolve();
+    })()
+      .then(() => intercomAgent.getRecentUsers(last_sync_at, count, page))
+      .then(({ users, hasMore }) => {
+        const promises = [];
+
+        if (hasMore && !_.isEmpty(users)) {
+          promises.push(queueAgent.create("syncUsers", {
+            last_sync_at,
+            count,
+            page: page + 1
+          }));
+        }
+
+        if (!_.isEmpty(users)) {
+          promises.push(queueAgent.create("saveUsers", { users }));
+        }
+
+        return Promise.all(promises);
+      });
   }
 
 }
