@@ -9,25 +9,23 @@ export default class Jobs {
    * Performing the
    */
   static sendUsers(req) {
-    const { users } = req.payload;
+    const { users, mode = "bulk" } = req.payload;
     const { syncAgent, hullAgent, intercomAgent, queueAgent } = req.shipApp;
 
     const usersToSave = syncAgent.getUsersToSave(users);
     const usersToTag = syncAgent.getUsersToTag(users);
 
     const intercomUsersToSave = usersToSave.map(u => syncAgent.userMapping.getIntercomFields(u));
-
     return syncAgent.syncShip()
       .then(() => {
         return syncAgent.groupUsersToTag(usersToTag)
           .then(groupedUsers => intercomAgent.tagUsers(groupedUsers));
       })
-      .then(() => intercomAgent.saveUsers(intercomUsersToSave))
+      .then(() => intercomAgent.saveUsers(intercomUsersToSave, mode))
       .then(res => {
         if (_.isArray(res)) {
           const savedUsers = _.intersectionBy(usersToSave, res, "email");
           const errors = _.filter(res, { body: { type: "error.list" } });
-          // ERRORS [ [ { code: 'bad_request', message: 'bad \'asdfasdf\' parameter' } ] ]
           console.log("ERRORS", errors.map(e => e.errors));
 
           return syncAgent.groupUsersToTag(savedUsers)
@@ -47,18 +45,50 @@ export default class Jobs {
   }
 
   static handleBulkJob(req) {
-    const { id, users } = req.payload;
+    const { id, users, attempt = 1 } = req.payload;
     const { syncAgent, intercomAgent, queueAgent, hullAgent } = req.shipApp;
 
     return intercomAgent.getJob(id)
-      .then(isCompleted => {
+      .then(({ isCompleted, hasErrors }) => {
         if (isCompleted) {
           return syncAgent.groupUsersToTag(users)
             .then(groupedUsers => {
               return intercomAgent.tagUsers(groupedUsers);
             });
         }
-        return queueAgent.create("handleBulkJob", { users, id }, { delay: 10000 });
+
+        if (hasErrors) {
+
+          return intercomAgent.getJobErrors(id)
+            .then(data => {
+              const errors = data.map(d => {
+                return {
+                  req: {
+                    data: {
+                      email: d.data.email
+                    }
+                  },
+                  body: {
+                    errors: d.error
+                  }
+                };
+              });
+
+              return Promise.map(errors, error => {
+                return syncAgent.saveUserError(error);
+              });
+            });
+        }
+
+        if (attempt > 20) {
+          return queueAgent.create("sendUsers", { users, mode: "regular" });
+        }
+
+        return queueAgent.create("handleBulkJob", {
+          users,
+          id,
+          attempt: attempt + 1
+        }, { delay: attempt * 10000 });
       });
   }
 
@@ -150,3 +180,7 @@ export default class Jobs {
   }
 
 }
+// 9:21
+// 9:27 50%
+// 9:31 100%
+//

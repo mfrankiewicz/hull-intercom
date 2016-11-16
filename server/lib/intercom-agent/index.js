@@ -15,8 +15,22 @@ export default class IntercomAgent {
   getJob(id) {
     return this.intercomClient.get(`/jobs/${id}`)
       .then(res => {
-        return _.get(res, "body.tasks[0].state") === "completed"
+        const isCompleted = _.get(res, "body.tasks[0].state") === "completed"
           || _.get(res, "body.tasks[0].state") === "completed_with_errors";
+
+        const hasErrors = _.get(res, "body.tasks[0].state") === "completed_with_errors";
+
+        return {
+          isCompleted,
+          hasErrors
+        };
+      });
+  }
+
+  getJobErrors(id) {
+    return this.intercomClient.get(`/jobs/${id}/error`)
+      .then(res => {
+        return _.get(res, "body.items", []);
       });
   }
 
@@ -46,7 +60,7 @@ export default class IntercomAgent {
     });
   }
 
-  saveUsers(users) {
+  saveUsers(users, mode = "bulk") {
     if (_.isEmpty(users)) {
       return Promise.resolve();
     }
@@ -63,9 +77,10 @@ export default class IntercomAgent {
       })
     };
 
-    if (users.length < (process.env.MINMUM_BULK_SIZE || 150)) {
+    if (users.length < (process.env.MINMUM_BULK_SIZE || 10)
+      || mode === "regular") {
+
       return Promise.map(body.items, item => {
-        // item.data.asdfasdf = "zxcvzxcv";
         return this.intercomClient.post("/users")
           .send(item.data)
           .then(response => {
@@ -76,7 +91,7 @@ export default class IntercomAgent {
             console.log("intercomAgent.saveUsers.microbatch.error", fErr);
             return Promise.resolve(fErr);
           });
-      }, { concurrency: 3 });
+      }, { concurrency: 5 });
     }
 
     return this.intercomClient
