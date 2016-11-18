@@ -26,7 +26,7 @@ export default class NotifHandlers {
   static userUpdateHandler(payload, { req }) {
     const { syncAgent, queueAgent, hullAgent } = req.shipApp;
     const { user, changes = {}, segments = [] } = payload.message;
-    const { left = [] } = changes.segments;
+    const { left = [] } = _.get(changes, "segments", {});
 
     if (!_.isEmpty(_.get(changes, "user['traits_intercom/id'][1]"))) {
       req.hull.client.logger.info("user skipped");

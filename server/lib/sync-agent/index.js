@@ -63,6 +63,10 @@ export default class SyncAgent {
         const ops = _.reduce(users, (o, user) => {
           user.segment_ids.map(segment_id => {
             const segment = _.find(segments, { id: segment_id });
+            if (_.isEmpty(segment)) {
+              console.log("segment not found", segment);
+              return o;
+            }
             o[segment.name] = o[segment.name] || [];
             o[segment.name].push({
               email: user.email
@@ -70,6 +74,10 @@ export default class SyncAgent {
           });
           user.remove_segment_ids.map(segment_id => {
             const segment = _.find(segments, { id: segment_id });
+            if (_.isEmpty(segment)) {
+              console.log("segment not found", segment);
+              return o;
+            }
             o[segment.name] = o[segment.name] || [];
             o[segment.name].push({
               email: user.email,
