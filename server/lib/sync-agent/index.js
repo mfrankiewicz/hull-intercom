@@ -48,7 +48,6 @@ export default class SyncAgent {
   getUsersToSave(users) {
     return users.filter((u) => this.hullAgent.userComplete(u)
       && this.hullAgent.userWhitelisted(u)
-      && !this.userAdded(u)
       && !this.userWithError(u));
   }
 

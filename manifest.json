@@ -59,37 +59,38 @@
             "format" : "trait",
             "title" : "Hull Field"
           },
-          "intercom" : {
+          "name" : {
             "type" : "string",
             "title" : "Intercom Field"
           }
         },
         "required" : [
           "hull",
-          "intercom"
+          "name"
         ]
       }
     },
     {
       "name" : "sync_fields_to_hull",
-      "title" : "List of User fields to fetch from Intercom",
+      "title" : "List of User custom attributes to fetch from Intercom",
       "type" : "array",
       "format" : "table",
       "items" : {
         "type" : "object",
         "properties" : {
-          "intercom" : {
+          "name" : {
             "type" : "string",
             "title" : "Intercom Field"
           },
           "hull" : {
             "type" : "string",
             "format" : "trait",
-            "title" : "Hull Field"
+            "title" : "Hull Field",
+            "allowCreate": true
           }
         },
         "required" : [
-          "intercom",
+          "name",
           "hull"
         ]
       }
