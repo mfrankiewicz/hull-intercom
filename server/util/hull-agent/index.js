@@ -3,12 +3,12 @@ import ExtractAgent from "./extract-agent";
 
 export default class HullAgent {
 
-  constructor(ship, hullClient, shipCache) {
+  constructor(ship, hullClient, shipCache, req) {
     this.hullClient = hullClient;
     this.ship = ship;
     this.shipCache = shipCache;
 
-    this.extractAgent = new ExtractAgent();
+    this.extractAgent = new ExtractAgent(req, hullClient);
   }
 
   updateShipSettings(newSettings) {

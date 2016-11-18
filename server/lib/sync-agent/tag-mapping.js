@@ -26,7 +26,7 @@ export default class TagMapping {
     }
     const newSettings = {};
     newSettings[this.settingKey] = this.mapping;
-    return this.hullAgent(newSettings);
+    return this.hullAgent.updateShipSettings(newSettings);
   }
 
   /**
@@ -81,6 +81,18 @@ export default class TagMapping {
     }
 
     return this.intercomClient
-      .delete(`/tags/${tagId}`);
+      .delete(`/tags/${tagId}`)
+      .then(() => {
+        _.unset(this.mapping, segment.id);
+        return Promise.resolve();
+      })
+      .catch(err => {
+        const fErr = this.intercomClient.handleError(err);
+
+        if (fErr.statusCode === 404) {
+          _.unset(this.mapping, segment.id);
+          return Promise.resolve();
+        }
+      });
   }
 }

@@ -3,9 +3,10 @@ import raven from "raven";
 
 export default class InstrumentationAgent {
 
-  constructor() {
+  constructor(name) {
     this.nr = null;
     this.raven = null;
+    this.name = name;
 
     if (process.env.NEW_RELIC_LICENSE_KEY) {
       this.nr = require("newrelic"); // eslint-disable-line global-require
@@ -48,7 +49,7 @@ export default class InstrumentationAgent {
   metricVal(metric = "", value = 1, ship = {}) {
     try {
       if (this.librato) {
-        this.librato.measure(`hubspot.${metric}`, value, Object.assign({}, { source: ship.id }));
+        this.librato.measure(`${this.name}.${metric}`, value, Object.assign({}, { source: ship.id }));
       }
     } catch (err) {
       console.warn("error in librato.measure", err);
@@ -58,7 +59,7 @@ export default class InstrumentationAgent {
   metricInc(metric = "", value = 1, ship = {}) {
     try {
       if (this.librato) {
-        this.librato.increment(`hubspot.${metric}`, value, Object.assign({}, { source: ship.id }));
+        this.librato.increment(`${this.name}.${metric}`, value, Object.assign({}, { source: ship.id }));
       }
     } catch (err) {
       console.warn("error in librato.measure", err);

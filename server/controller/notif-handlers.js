@@ -10,6 +10,19 @@ export default class NotifHandlers {
     return syncAgent.syncShip();
   }
 
+  static segmentUpdateHandler(payload, { req }) {
+    const { syncAgent, hullAgent } = req.shipApp;
+    const segment = payload.message;
+    const fields = syncAgent.userMapping.getHullTraitsKeys()
+    return syncAgent.syncShip()
+      .then(() => hullAgent.extractAgent.requestExtract({ segment, fields }));
+  }
+
+  static segmentDeleteHandler(payload, { req }) {
+    const { syncAgent, hullAgent } = req.shipApp;
+    return syncAgent.syncShip();
+  }
+
   static userUpdateHandler(payload, { req }) {
     const { syncAgent, queueAgent, hullAgent } = req.shipApp;
     const { user, changes = {}, segments = [] } = payload.message;

@@ -22,8 +22,8 @@ export default function AppRouter(deps) {
     hostSecret: deps.shipConfig.hostSecret,
     groupTraits: false,
     handlers: {
-      // "segment:update": notifyController.segmentUpdateHandler,
-      // "segment:delete": notifyController.segmentDeleteHandler,
+      "segment:update": NotifHandlers.segmentUpdateHandler,
+      "segment:delete": NotifHandlers.segmentDeleteHandler,
       "user:update": NotifHandlers.userUpdateHandler,
       "ship:update": NotifHandlers.shipUpdateHandler,
     },

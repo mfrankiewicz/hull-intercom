@@ -75,6 +75,7 @@ export default class ExtractAgent {
     })()
     .then(({ query }) => {
       const params = { query, format, url, fields };
+      console.log(params);
       this.hullClient.logger.info("extractAgent.requestExtract", params);
       return this.hullClient.post("extract/user_reports", params);
     });

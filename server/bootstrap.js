@@ -15,7 +15,7 @@ const shipConfig = {
 const instrumentationAgent = new InstrumentationAgent();
 
 const queueAdapter = new KueAdapter(({
-  prefix: process.env.KUE_PREFIX || "hull-hubspot",
+  prefix: process.env.KUE_PREFIX || "hull-intercom",
   redis: process.env.REDIS_URL
 }));
 
@@ -25,7 +25,7 @@ const cacheManager = CacheManager.caching({
   ttl: process.env.SHIP_CACHE_TTL || 60
 });
 
-const shipCache = new Hull.ShipCache(cacheManager, process.env.SHIP_CACHE_PREFIX || "hull-hubspot");
+const shipCache = new Hull.ShipCache(cacheManager, process.env.SHIP_CACHE_PREFIX || "hull-intercom");
 const hullMiddleware = new Hull.Middleware({ hostSecret: shipConfig.hostSecret, shipCache });
 const appMiddleware = new AppMiddleware({ queueAdapter, shipCache });
 
