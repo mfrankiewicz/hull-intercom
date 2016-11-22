@@ -6,7 +6,7 @@ import HullAgent from "../util/hull-agent";
 import IntercomAgent from "./intercom-agent";
 import QueueAgent from "../util/queue/queue-agent";
 
-export default function AppMiddleware({ queueAdapter, shipCache }) {
+export default function AppMiddleware({ queueAdapter, instrumentationAgent, shipCache }) {
   return function middleware(req, res, next) {
     req.shipApp = req.shipApp || {};
 
@@ -14,7 +14,7 @@ export default function AppMiddleware({ queueAdapter, shipCache }) {
       return next();
     }
 
-    const intercomClient = new IntercomClient(req.hull.ship);
+    const intercomClient = new IntercomClient(req.hull.ship, instrumentationAgent);
     const queueAgent = new QueueAgent(queueAdapter, req);
     const intercomAgent = new IntercomAgent(intercomClient, queueAgent, req.hull.ship, req.hull.client);
     const hullAgent = new HullAgent(req.hull.ship, req.hull.client, shipCache, _.pick(req, ["hostname", "query"]));

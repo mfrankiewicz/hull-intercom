@@ -12,7 +12,7 @@ const shipConfig = {
   clientSecret: process.env.CLIENT_SECRET
 };
 
-const instrumentationAgent = new InstrumentationAgent();
+const instrumentationAgent = new InstrumentationAgent("intercom");
 
 const queueAdapter = new KueAdapter(({
   prefix: process.env.KUE_PREFIX || "hull-intercom",
@@ -27,7 +27,7 @@ const cacheManager = CacheManager.caching({
 
 const shipCache = new Hull.ShipCache(cacheManager, process.env.SHIP_CACHE_PREFIX || "hull-intercom");
 const hullMiddleware = new Hull.Middleware({ hostSecret: shipConfig.hostSecret, shipCache });
-const appMiddleware = new AppMiddleware({ queueAdapter, shipCache });
+const appMiddleware = new AppMiddleware({ queueAdapter, shipCache, instrumentationAgent });
 
 export default {
   queueAdapter,

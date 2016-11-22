@@ -10,12 +10,14 @@ import moment from "moment";
 
 export default class IntercomClient {
 
-  constructor(ship) {
+  constructor(ship, instrumentationAgent) {
     this.apiKey = _.get(ship, "private_settings.api_key");
     this.appId = _.get(ship, "private_settings.app_id");
     this.accessToken = _.get(ship, "private_settings.access_token");
+    this.ship = ship;
+    this.instrumentationAgent = instrumentationAgent;
+
     this.req = request;
-    this.remaining = 0;
   }
 
   attach(req) {
@@ -28,17 +30,21 @@ export default class IntercomClient {
       .use(superagentPromisePlugin)
       .accept("application/json")
       .on("request", (reqData) => {
-        console.log("REQ", reqData.method, reqData.url, this.remaining);
+        console.log("REQ", reqData.method, reqData.url);
       })
       .on("response", (res) => {
         const limit = _.get(res.header, "x-ratelimit-limit");
-        this.remaining = _.get(res.header, "x-ratelimit-remaining");
-        const remainingSeconds = moment(_.get(res.header, "x-ratelimit-reset"), "X")
-          .diff(moment(), "seconds");
+        const remaining = _.get(res.header, "x-ratelimit-remaining");
+        // const remainingSeconds = moment(_.get(res.header, "x-ratelimit-reset"), "X")
+        //   .diff(moment(), "seconds");
+        // x-runtime
+        this.instrumentationAgent.metricInc("api_call", 1, this.ship);
+        this.instrumentationAgent.metricVal("ratelimit_remaining", remaining, this.ship);
+        this.instrumentationAgent.metricVal("ratelimit_limit", limit, this.ship);
       });
 
     if (this.accessToken) {
-      return preparedReq.auth(this.accessToken)
+      return preparedReq.auth(this.accessToken);
     }
     return preparedReq.auth(this.appId, this.apiKey);
   }
