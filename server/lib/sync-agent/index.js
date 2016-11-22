@@ -7,10 +7,12 @@ import WebhookAgent from "./webhook-agent";
 
 export default class SyncAgent {
 
-  constructor(intercomAgent, hullAgent, ship, hostname) {
+  constructor(intercomAgent, hullAgent, ship, hostname, hullClient) {
     this.ship = ship;
     this.hullAgent = hullAgent;
     this.intercomAgent = intercomAgent;
+    this.hullClient = hullClient;
+
     this.tagMapping = new TagMapping(intercomAgent, hullAgent, ship);
     this.userMapping = new UserMapping(ship);
     this.webhookAgent = new WebhookAgent(intercomAgent, hullAgent, ship, hostname);
@@ -64,7 +66,7 @@ export default class SyncAgent {
           user.segment_ids.map(segment_id => {
             const segment = _.find(segments, { id: segment_id });
             if (_.isEmpty(segment)) {
-              console.log("segment not found", segment);
+              this.hullClient.logger.error("segment not found", segment);
               return o;
             }
             o[segment.name] = o[segment.name] || [];
@@ -75,7 +77,7 @@ export default class SyncAgent {
           user.remove_segment_ids.map(segment_id => {
             const segment = _.find(segments, { id: segment_id });
             if (_.isEmpty(segment)) {
-              console.log("segment not found", segment);
+              this.hullClient.logger.error("segment not found", segment);
               return o;
             }
             o[segment.name] = o[segment.name] || [];

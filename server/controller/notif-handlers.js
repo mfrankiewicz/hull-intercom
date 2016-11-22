@@ -5,7 +5,6 @@ import BatchSyncHandler from "../util/batch-sync-handler";
 export default class NotifHandlers {
 
   static shipUpdateHandler(payload, { req }) {
-    console.log("SHIP, UPDATE");
     const { syncAgent, hullAgent } = req.shipApp;
     return syncAgent.syncShip();
   }

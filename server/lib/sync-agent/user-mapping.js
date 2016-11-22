@@ -94,7 +94,7 @@ export default class UserMapping {
     hullTraits["intercom/companies"] = _.map(intercomUser.companies.companies, "name").join(";");
     hullTraits["intercom/segments"] = _.map(intercomUser.segments.segments, "name").join(";");
     hullTraits["intercom/tags"] = _.map(intercomUser.tags.tags, "name").join(";");
-console.log(hullTraits);
+
     return hullTraits;
   }
 
@@ -105,7 +105,6 @@ console.log(hullTraits);
       }
       return fields;
     }, {});
-    console.log(intercomFields);
     return intercomFields;
   }
 }

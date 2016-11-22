@@ -36,7 +36,7 @@ export default class ExtractAgent {
         try {
           return callback(...args);
         } catch (e) {
-          console.error(e);
+          this.hullClient.logger.error("ExtractAgent.handleExtract.error", e);
           // throw e;
           return Promise.reject(e);
         }
@@ -75,7 +75,6 @@ export default class ExtractAgent {
     })()
     .then(({ query }) => {
       const params = { query, format, url, fields };
-      console.log(params);
       this.hullClient.logger.info("extractAgent.requestExtract", params);
       return this.hullClient.post("extract/user_reports", params);
     });

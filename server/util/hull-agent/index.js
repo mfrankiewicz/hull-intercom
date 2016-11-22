@@ -17,7 +17,6 @@ export default class HullAgent {
         this.ship = ship;
         const private_settings = { ...this.ship.private_settings, ...newSettings };
         this.ship.private_settings = private_settings;
-        console.log(private_settings);
         return this.hullClient.put(this.ship.id, { private_settings });
       })
       .then((ship) => {
@@ -52,7 +51,7 @@ export default class HullAgent {
 
   updateUser(member) {
     const traits = this.getUserTraitsForMember(member);
-    console.warn("updateUser", traits.email);
+    this.hullClient.logger.info("updateUser", traits.email);
     const { email, unique_email_id } = traits;
     const ident = { email };
     if (unique_email_id) {

@@ -26,7 +26,7 @@ export default class Jobs {
         if (_.isArray(res)) {
           const savedUsers = _.intersectionBy(usersToSave, res, "email");
           const errors = _.filter(res, { body: { type: "error.list" } });
-          console.log("ERRORS", errors.map(e => e.errors));
+          req.hull.client.logger.error("ERRORS", errors.map(e => e.errors));
 
           return syncAgent.groupUsersToTag(savedUsers)
             .then(groupedUsers => intercomAgent.tagUsers(groupedUsers))
@@ -103,7 +103,7 @@ export default class Jobs {
       .then((segments) => syncAgent.tagMapping.sync(segments))
       .then(() => {
         return Promise.map(mappedUsers, (user) => {
-          console.log("SAVE USER", user.email);
+          req.hull.client.logger.info("SAVE USER", user.email);
           const ident = { email: user.email };
           if (user["intercom/id"]) {
             ident.anonymous_id = `intercom:${user["intercom/id"]}`;
@@ -121,7 +121,6 @@ export default class Jobs {
         if (_.isEmpty(users)) {
           return Promise.resolve();
         }
-        console.log("IMPORTED", users.length);
         // scroll feature of Intercom API have expiration time which is
         // hard to recover from. The is the reason why continuing the import
         // scroll queries is more important than other tasks here.
@@ -158,7 +157,7 @@ export default class Jobs {
       return Promise.resolve(last_updated_at);
     })()
       .then((new_last_updated_at) => {
-        console.log("syncUsers", { new_last_updated_at, page });
+        req.hull.client.logger.info("syncUsers", { new_last_updated_at, page });
         return intercomAgent.getRecentUsers(new_last_updated_at, count, page)
           .then(({ users, hasMore }) => {
             const promises = [];

@@ -7,9 +7,11 @@ import moment from "moment";
  */
 export default class IntercomAgent {
 
-  constructor(intercomClient, queueAgent) {
+  constructor(intercomClient, queueAgent, ship, hullClient) {
     this.intercomClient = intercomClient;
     this.queueAgent = queueAgent;
+    this.ship = ship;
+    this.hullClient = hullClient;
   }
 
   getJob(id) {
@@ -46,12 +48,12 @@ export default class IntercomAgent {
       const fErr = this.intercomClient.handleError(err);
 
       if (_.get(fErr, "extra.body.errors[0].code") === "scroll_exists") {
-        console.error("Trying to perform two separate scrolls");
+        this.hullClient.logger.error("Trying to perform two separate scrolls");
         return Promise.resolve([]);
       }
 
       if (_.get(fErr, "extra.body.errors[0].code") === "not_found") {
-        console.error("Scroll expired, should start it again");
+        this.hullClient.logger.error("Scroll expired, should start it again");
         return Promise.resolve([]);
       }
 
@@ -65,7 +67,7 @@ export default class IntercomAgent {
       return Promise.resolve();
     }
 
-    console.log("SAVING", users.length);
+    this.hullClient.logger.info("SAVING", users.length);
 
     const body = {
       items: users.map(u => {
@@ -88,7 +90,7 @@ export default class IntercomAgent {
           })
           .catch(err => {
             const fErr = this.intercomClient.handleError(err);
-            console.log("intercomAgent.saveUsers.microbatch.error", fErr);
+            this.hullClient.logger.error("intercomAgent.saveUsers.microbatch.error", fErr);
             return Promise.resolve(fErr);
           });
       }, { concurrency: 5 });
@@ -99,7 +101,7 @@ export default class IntercomAgent {
       .send(body)
       .catch(err => {
         const fErr = this.intercomClient.handleError(err);
-        console.log("intercomAgent.saveUsers.bulkSubmit.error", fErr);
+        thus.hullClient.logger.error("intercomAgent.saveUsers.bulkSubmit.error", fErr);
         return Promise.reject(fErr);
       });
   }
@@ -117,7 +119,7 @@ export default class IntercomAgent {
         .send(op)
         .catch(err => {
           const fErr = this.intercomClient.handleError(err);
-          console.log("intercomAgent.tagUsers.error", fErr);
+          this.hullClient.logger.error("intercomAgent.tagUsers.error", fErr);
           return Promise.reject(fErr);
         });
     }, { concurrency: 3 });
@@ -134,7 +136,7 @@ export default class IntercomAgent {
       })
       .catch(err => {
         const fErr = this.intercomClient.handleError(err);
-        console.log("FERROR", fErr);
+        this.hullClient.logger.error("getUsersTotalCount.error", fErr);
         return Promise.reject(fErr);
       });
   }
@@ -162,7 +164,7 @@ export default class IntercomAgent {
       })
       .catch(err => {
         const fErr = this.intercomClient.handleError(err);
-        console.log("FERROR", fErr);
+        this.hullClient.logger.error("getRecentUsers.error", fErr);
         return Promise.reject(fErr);
       });
   }
