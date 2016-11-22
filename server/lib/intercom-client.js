@@ -23,21 +23,10 @@ export default class IntercomClient {
       throw new Error("Client access data not set!");
     }
 
-    let userName;
-    let userPass;
-    if (this.acessToken) {
-      userName = this.acessToken;
-      userPass = "";
-    } else {
-      userName = this.appId;
-      userPass = this.apiKey;
-    }
-
-    return req
+    const preparedReq = req
       .use(prefixPlugin("https://api.intercom.io"))
       .use(superagentPromisePlugin)
       .accept("application/json")
-      .auth(userName, userPass)
       .on("request", (reqData) => {
         console.log("REQ", reqData.method, reqData.url, this.remaining);
       })
@@ -47,6 +36,11 @@ export default class IntercomClient {
         const remainingSeconds = moment(_.get(res.header, "x-ratelimit-reset"), "X")
           .diff(moment(), "seconds");
       });
+
+    if (this.accessToken) {
+      return preparedReq.auth(this.accessToken)
+    }
+    return preparedReq.auth(this.appId, this.apiKey);
   }
 
   get(url) {
