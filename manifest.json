@@ -50,7 +50,7 @@
       "title" : "List of User fields to push to Intercom",
       "type" : "array",
       "format" : "table",
-      "default" : [],
+      "default": [],
       "items" : {
         "type" : "object",
         "properties" : {
@@ -61,7 +61,12 @@
           },
           "name" : {
             "type" : "string",
-            "title" : "Intercom Field"
+            "format": "select",
+            "title" : "Intercom Field",
+            "options" : {
+              "allowCreate": true,
+              "loadOptions" : "/schema/user_fields"
+            }
           }
         },
         "required" : [
@@ -75,6 +80,7 @@
       "title" : "List of User custom attributes to fetch from Intercom",
       "type" : "array",
       "format" : "table",
+      "default": [],
       "items" : {
         "type" : "object",
         "properties" : {
@@ -86,7 +92,9 @@
             "type" : "string",
             "format" : "trait",
             "title" : "Hull Field",
-            "allowCreate": true
+            "options": {
+              "allowCreate": true
+            }
           }
         },
         "required" : [

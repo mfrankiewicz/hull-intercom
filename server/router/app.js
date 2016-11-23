@@ -1,5 +1,6 @@
 import { Router } from "express";
 import bodyParser from "body-parser";
+import cors from 'cors';
 
 import ParseMessageMiddleware from "../util/middleware/parse-message";
 import NotifHandler from "../util/notif-handler";
@@ -35,6 +36,8 @@ export default function AppRouter(deps) {
   router.post("/intercom", hullMiddleware, appMiddleware, RequireConfiguration, bodyParser.json(), Actions.webhook, ResponseMiddleware);
 
   router.post("/sync", hullMiddleware, appMiddleware, RequireConfiguration, bodyParser.json(), Actions.sync, ResponseMiddleware);
+
+  router.get("/schema/user_fields", cors(), hullMiddleware, appMiddleware, RequireConfiguration, bodyParser.json(), Actions.fields);
 
   return router;
 }

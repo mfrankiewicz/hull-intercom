@@ -37,4 +37,14 @@ export default class Actions {
 
     return next("ok");
   }
+
+  static fields(req, res, next) {
+    const fieldsMap = _.filter(req.shipApp.syncAgent.userMapping.map, (f) => !f.read_only);
+
+    res.json({
+      options: fieldsMap.map(f => {
+        return { label: f.name, value: f.name };
+      })
+    });
+  }
 }

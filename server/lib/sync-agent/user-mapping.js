@@ -18,10 +18,10 @@ export default class UserMapping {
 
       { "name": "unsubscribed_from_emails", "hull":"traits_intercom/unsubscribed_from_emails",  "type": "boolean",   "read_only": false },
       { "name": "session_count",            "hull":"traits_intercom/session_count",             "type": "number",    "read_only": true  },
-      { "name": "pseudonym",                "hull":"traits_intercom/pseudonym",                 "type": "true",      "read_only": false },
-      { "name": "anonymous",                "hull":"traits_intercom/anonymous",                 "type": "boolean",   "read_only": false },
+      { "name": "pseudonym",                "hull":"traits_intercom/pseudonym",                 "type": "true",      "read_only": true },
+      { "name": "anonymous",                "hull":"traits_intercom/anonymous",                 "type": "boolean",   "read_only": true },
 
-      { "name": "avatar.image_url", "hull":"traits_intercom/avatar",                    "type": "string",    "read_only": false },
+      { "name": "avatar.image_url", "hull":"traits_intercom/avatar",                    "type": "string",    "read_only": true },
 
       { "name": "location_data.city_name",      "hull":"traits_intercom/location_city_name",        "type": "string",    "read_only": true },
       { "name": "location_data.continent_code", "hull":"traits_intercom/location_continent_code",   "type": "string",    "read_only": true },
@@ -42,7 +42,7 @@ export default class UserMapping {
     if (addFields && addFields.length > 0) {
       addFields.map(({ name, hull }) => {
         if (name && hull) {
-          fields.push({ name, hull: hull.value/*.replace(/^traits_/, "")*/ });
+          fields.push({ name, hull: hull.value });
         }
       });
     }
@@ -53,8 +53,16 @@ export default class UserMapping {
     let fields = _.get(this.ship, "private_settings.sync_fields_to_intercom") || [];
 
     fields = fields.map(f => {
-      const hull = f.hull.value; //.value.replace(/^traits_/, "");
-      const name = `custom_attributes.${f.name}`;
+      const hull = f.hull.value;
+
+      let name = `custom_attributes.${f.name}`;
+
+      // selected field is standard one -> save it as standard
+      const writableFields = _.filter(this.map, (f) => !f.read_only);
+      if (_.find(writableFields, { name: f.name })) {
+        name = f.name;
+      }
+
       return { name, hull };
     });
 
@@ -101,7 +109,13 @@ export default class UserMapping {
   getIntercomFields(hullUser) {
     const intercomFields = _.reduce(this.computeIntercomFields(), (fields, prop) => {
       if (_.get(hullUser, prop.hull)) {
-        _.set(fields, prop.name, _.get(hullUser, prop.hull));
+        // if field is standard and should not be overwritten
+        const writableFields = _.filter(this.map, (f) => !f.read_only);
+        if (!_.get(prop, "overwrite") && _.find(writableFields, { name: prop.name })) {
+          _.set(fields, prop.name, (_.get(hullUser, prop.hull) || _.get(hullUser, prop.hull.replace(/^traits_/, ""))));
+        } else {
+          _.set(fields, prop.name, _.get(hullUser, prop.hull));
+        }
       }
       return fields;
     }, {});
