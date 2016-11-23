@@ -4,6 +4,7 @@ import bodyParser from "body-parser";
 import ParseMessageMiddleware from "../util/middleware/parse-message";
 import NotifHandler from "../util/notif-handler";
 import ResponseMiddleware from "../util/middleware/response";
+import RequireConfiguration from "../util/middleware/require-configuration";
 
 export default function AppRouter(deps) {
   const router = new Router();
@@ -16,9 +17,9 @@ export default function AppRouter(deps) {
   // router.use(deps.hullMiddleware);
   // router.use(AppMiddleware(deps));
 
-  router.post("/fetch-all", hullMiddleware, appMiddleware, Actions.fetchAll, ResponseMiddleware);
-  router.post("/batch", hullMiddleware, appMiddleware, bodyParser.json(), Actions.batchHandler, ResponseMiddleware);
-  router.post("/notify", ParseMessageMiddleware, hullMiddleware, appMiddleware, NotifHandler(deps.Hull, {
+  router.post("/fetch-all", hullMiddleware, appMiddleware, RequireConfiguration, Actions.fetchAll, ResponseMiddleware);
+  router.post("/batch", hullMiddleware, appMiddleware, RequireConfiguration, bodyParser.json(), Actions.batchHandler, ResponseMiddleware);
+  router.post("/notify", ParseMessageMiddleware, hullMiddleware, appMiddleware, RequireConfiguration, NotifHandler(deps.Hull, {
     hostSecret: deps.shipConfig.hostSecret,
     groupTraits: false,
     handlers: {
@@ -31,9 +32,9 @@ export default function AppRouter(deps) {
   }));
 
   // FIXME: 404 for that endpoint?
-  router.post("/intercom", hullMiddleware, appMiddleware, bodyParser.json(), Actions.webhook, ResponseMiddleware);
+  router.post("/intercom", hullMiddleware, appMiddleware, RequireConfiguration, bodyParser.json(), Actions.webhook, ResponseMiddleware);
 
-  router.post("/sync", hullMiddleware, appMiddleware, bodyParser.json(), Actions.sync, ResponseMiddleware);
+  router.post("/sync", hullMiddleware, appMiddleware, RequireConfiguration, bodyParser.json(), Actions.sync, ResponseMiddleware);
 
   return router;
 }

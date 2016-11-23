@@ -18,6 +18,10 @@ export default class SyncAgent {
     this.webhookAgent = new WebhookAgent(intercomAgent, hullAgent, ship, hostname);
   }
 
+  isConfigured() {
+    return this.intercomAgent.intercomClient.ifConfigured();
+  }
+
   syncShip() {
     return this.webhookAgent.ensureWebhook()
       .then(() => this.hullAgent.getSegments())

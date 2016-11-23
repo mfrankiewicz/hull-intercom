@@ -20,8 +20,12 @@ export default class IntercomClient {
     this.req = request;
   }
 
+  ifConfigured() {
+    return (!_.isEmpty(this.apiKey) && !_.isEmpty(this.appId)) || !_.isEmpty(this.accessToken);
+  }
+
   attach(req) {
-    if ((_.isEmpty(this.apiKey) || _.isEmpty(this.appId)) && _.isEmpty(this.accessToken)) {
+    if (!this.ifConfigured()) {
       throw new Error("Client access data not set!");
     }
 

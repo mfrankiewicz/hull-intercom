@@ -35,6 +35,6 @@ export default class Actions {
       .then(next, next);
     }
 
-    return next();
+    return next("ok");
   }
 }
