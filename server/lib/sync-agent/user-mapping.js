@@ -42,7 +42,7 @@ export default class UserMapping {
     if (addFields && addFields.length > 0) {
       addFields.map(({ name, hull }) => {
         if (name && hull) {
-          fields.push({ name, hull: hull.value });
+          fields.push({ name: `custom_attributes.${name}`, hull: hull });
         }
       });
     }
@@ -53,7 +53,7 @@ export default class UserMapping {
     let fields = _.get(this.ship, "private_settings.sync_fields_to_intercom") || [];
 
     fields = fields.map(f => {
-      const hull = f.hull.value;
+      const hull = f.hull;
 
       let name = `custom_attributes.${f.name}`;
 
@@ -65,10 +65,6 @@ export default class UserMapping {
 
       return { name, hull };
     });
-
-    if (!_.find(fields, { name: "email" })) {
-      fields.push({ name: "email", hull: "email" });
-    }
 
     return fields;
   }
@@ -106,19 +102,28 @@ export default class UserMapping {
     return hullTraits;
   }
 
-  getIntercomFields(hullUser) {
+  getIntercomFields(hullUser, { setUserId = false } = {}) {
     const intercomFields = _.reduce(this.computeIntercomFields(), (fields, prop) => {
       if (_.get(hullUser, prop.hull)) {
         // if field is standard and should not be overwritten
         const writableFields = _.filter(this.map, (f) => !f.read_only);
         if (!_.get(prop, "overwrite") && _.find(writableFields, { name: prop.name })) {
-          _.set(fields, prop.name, (_.get(hullUser, prop.hull) || _.get(hullUser, prop.hull.replace(/^traits_/, ""))));
+          const traitsIntercomField = _.find(writableFields, { name: prop.name }).hull;
+          _.set(fields, prop.name, _.get(hullUser, traitsIntercomField) || _.get(hullUser, prop.hull));
         } else {
           _.set(fields, prop.name, _.get(hullUser, prop.hull));
         }
       }
       return fields;
     }, {});
+
+    _.set(intercomFields, "id", _.get(hullUser, "traits_intercom/id"));
+    _.set(intercomFields, "email", _.get(hullUser, "email"));
+
+    if (setUserId) {
+      _.set(intercomFields, "user_id", _.get(hullUser, "id"));
+    }
+
     return intercomFields;
   }
 }

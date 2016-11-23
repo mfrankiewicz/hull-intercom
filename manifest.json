@@ -86,7 +86,10 @@
         "properties" : {
           "name" : {
             "type" : "string",
-            "title" : "Intercom Field"
+            "title" : "Intercom Field",
+            "options": {
+              "allowCreate": true
+            }
           },
           "hull" : {
             "type" : "string",

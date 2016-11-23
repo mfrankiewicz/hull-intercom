@@ -25,7 +25,8 @@ export default function AppMiddleware({ queueAdapter, instrumentationAgent, ship
       queueAgent,
       intercomAgent,
       hullAgent,
-      syncAgent
+      syncAgent,
+      instrumentationAgent
     };
 
     return next();

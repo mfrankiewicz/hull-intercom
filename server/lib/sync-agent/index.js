@@ -1,5 +1,6 @@
 import _ from "lodash";
 import moment from "moment";
+import Promise from "bluebird";
 
 import TagMapping from "./tag-mapping";
 import UserMapping from "./user-mapping";
@@ -42,13 +43,30 @@ export default class SyncAgent {
     return !_.isEmpty(user["traits_intercom/import_error"]);
   }
 
-  saveUserError(error) {
-    const email = _.get(error, "req.data.email");
-    const errorMessage = _.get(error, "body.errors", []).map(e => e.message).join(" ");
+  /**
+   * error {Array} [{
+   *  data: {
+   *    email: "email"
+   *  },
+   *  error: [
+   *    message: "message"
+   *  ]
+   * }]
+   */
+  handleUserErrors(errors, users) {
+    return Promise.map(errors, error => {
+      const email = _.get(error, "data.email");
+      const errorDetails = _.get(error, "error", []);
+      const errorMessage = errorDetails.map(e => e.message).join(" ");
+      if (_.find(errorDetails, { code: "conflict"})) {
+        return _.find(users, { email });
+      }
 
-    return this.hullAgent.hullClient.as({ email }).traits({
-      "intercom/import_error": errorMessage
-    });
+      return this.hullAgent.hullClient.as({ email }).traits({
+        "intercom/import_error": errorMessage
+      })
+      .then(() => false);
+    }).then(res => _.filter(res));
   }
 
   getUsersToSave(users) {
@@ -67,6 +85,9 @@ export default class SyncAgent {
     return this.hullAgent.getSegments()
       .then(segments => {
         const ops = _.reduce(users, (o, user) => {
+          if (_.isEmpty(user["traits_intercom/id"])) {
+            return o;
+          }
           user.segment_ids.map(segment_id => {
             const segment = _.find(segments, { id: segment_id });
             if (_.isEmpty(segment)) {
@@ -75,7 +96,7 @@ export default class SyncAgent {
             }
             o[segment.name] = o[segment.name] || [];
             o[segment.name].push({
-              email: user.email
+              id: user["traits_intercom/id"]
             });
           });
           user.remove_segment_ids.map(segment_id => {
@@ -86,7 +107,7 @@ export default class SyncAgent {
             }
             o[segment.name] = o[segment.name] || [];
             o[segment.name].push({
-              email: user.email,
+              id: user["traits_intercom/id"],
               untag: true
             });
           });

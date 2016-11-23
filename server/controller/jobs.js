@@ -9,32 +9,38 @@ export default class Jobs {
    * Performing the
    */
   static sendUsers(req) {
-    const { users, mode = "bulk" } = req.payload;
+    const { users, mode = "bulk", setUserId = false } = req.payload;
     const { syncAgent, hullAgent, intercomAgent, queueAgent } = req.shipApp;
 
-    const usersToSave = syncAgent.getUsersToSave(users);
-    const usersToTag = syncAgent.getUsersToTag(users);
+    req.shipApp.instrumentationAgent.metricVal("send_users", users.length);
 
-    const intercomUsersToSave = usersToSave.map(u => syncAgent.userMapping.getIntercomFields(u));
+    const usersToSave = syncAgent.getUsersToSave(users);
+    const intercomUsersToSave = usersToSave.map(u => syncAgent.userMapping.getIntercomFields(u, { setUserId }));
+
     return syncAgent.syncShip()
-      .then(() => {
-        return syncAgent.groupUsersToTag(usersToTag)
-          .then(groupedUsers => intercomAgent.tagUsers(groupedUsers));
-      })
       .then(() => intercomAgent.saveUsers(intercomUsersToSave, mode))
       .then(res => {
         if (_.isArray(res)) {
           const savedUsers = _.intersectionBy(usersToSave, res, "email");
           const errors = _.filter(res, { body: { type: "error.list" } });
-          req.hull.client.logger.error("ERRORS", errors.map(e => e.errors));
+
+          req.hull.client.logger.error("ERRORS", errors.map(r => r.body.errors));
+
+          const groupedErrors = errors.map(errorReq => {
+            return {
+              data: errorReq.req.data,
+              error: errorReq.body.errors
+            };
+          });
 
           return syncAgent.groupUsersToTag(savedUsers)
             .then(groupedUsers => intercomAgent.tagUsers(groupedUsers))
-            .then(() => {
-              return Promise.map(errors, error => {
-                return syncAgent.saveUserError(error);
-              });
-            });
+            .then(() => syncAgent.handleUserErrors(groupedErrors, usersToSave))
+            .then(res => {
+              if (!_.isEmpty(res)) {
+                return queueAgent.create("sendUsers", { users: res, setUserId: true });
+              }
+            })
         }
 
         if (_.get(res, "body.id")) {
@@ -50,37 +56,27 @@ export default class Jobs {
 
     return intercomAgent.getJob(id)
       .then(({ isCompleted, hasErrors }) => {
+
         if (isCompleted) {
-          return syncAgent.groupUsersToTag(users)
-            .then(groupedUsers => {
-              return intercomAgent.tagUsers(groupedUsers);
-            });
-        }
-
-        if (hasErrors) {
-
-          return intercomAgent.getJobErrors(id)
-            .then(data => {
-              const errors = data.map(d => {
-                return {
-                  req: {
-                    data: {
-                      email: d.data.email
-                    }
-                  },
-                  body: {
-                    errors: d.error
+          req.shipApp.instrumentationAgent.metricVal("bulk_job.attempt", attempt);
+          return (() => {
+            if (hasErrors) {
+              return intercomAgent.getJobErrors(id)
+                .then(data => syncAgent.handleUserErrors(data, users))
+                .then(res => {
+                  if (!_.isEmpty(res)) {
+                    return queueAgent.create("sendUsers", { users: res, setUserId: true });
                   }
-                };
-              });
-
-              return Promise.map(errors, error => {
-                return syncAgent.saveUserError(error);
-              });
-            });
+                });
+            }
+            return Promise.resolve();
+          })()
+            .then(() => syncAgent.groupUsersToTag(users))
+            .then(groupedUsers => intercomAgent.tagUsers(groupedUsers))
         }
 
         if (attempt > 20) {
+          req.shipApp.instrumentationAgent.metricInc("bulk_job.fallback");
           return queueAgent.create("sendUsers", { users, mode: "regular" });
         }
 
@@ -95,6 +91,8 @@ export default class Jobs {
   static saveUsers(req) {
     const { users } = req.payload;
     const { syncAgent, hullAgent } = req.shipApp;
+
+    req.shipApp.instrumentationAgent.metricVal("save_users", users.length);
 
     const mappedUsers = users.map((u) => syncAgent.userMapping.getHullTraits(u));
 
@@ -179,7 +177,3 @@ export default class Jobs {
   }
 
 }
-// 9:21
-// 9:27 50%
-// 9:31 100%
-//
