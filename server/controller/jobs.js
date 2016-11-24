@@ -12,7 +12,7 @@ export default class Jobs {
     const { users, mode = "bulk", setUserId = false } = req.payload;
     const { syncAgent, hullAgent, intercomAgent, queueAgent } = req.shipApp;
 
-    req.shipApp.instrumentationAgent.metricVal("send_users", users.length);
+    req.shipApp.instrumentationAgent.metricVal("send_users", users.length, req.hull.ship);
 
     const usersToSave = syncAgent.getUsersToSave(users);
     const intercomUsersToSave = usersToSave.map(u => syncAgent.userMapping.getIntercomFields(u, { setUserId }));
@@ -58,7 +58,7 @@ export default class Jobs {
       .then(({ isCompleted, hasErrors }) => {
 
         if (isCompleted) {
-          req.shipApp.instrumentationAgent.metricVal("bulk_job.attempt", attempt);
+          req.shipApp.instrumentationAgent.metricVal("bulk_job.attempt", attempt, req.hull.ship);
           return (() => {
             if (hasErrors) {
               return intercomAgent.getJobErrors(id)
@@ -76,7 +76,7 @@ export default class Jobs {
         }
 
         if (attempt > 20) {
-          req.shipApp.instrumentationAgent.metricInc("bulk_job.fallback");
+          req.shipApp.instrumentationAgent.metricInc("bulk_job.fallback", 1, req.hull.ship);
           return queueAgent.create("sendUsers", { users, mode: "regular" });
         }
 
@@ -92,7 +92,7 @@ export default class Jobs {
     const { users } = req.payload;
     const { syncAgent, hullAgent } = req.shipApp;
 
-    req.shipApp.instrumentationAgent.metricVal("save_users", users.length);
+    req.shipApp.instrumentationAgent.metricVal("save_users", users.length, req.hull.ship);
 
     const mappedUsers = users.map((u) => syncAgent.userMapping.getHullTraits(u));
 
