@@ -23,7 +23,6 @@ export default function OAuthRouter(deps) {
 
   return OAuthHandler({
     hostSecret,
-    shipCache,
     name: "Intercom",
     Strategy: IntercomStrategy,
     options: {
@@ -64,9 +63,7 @@ export default function OAuthRouter(deps) {
         }
       };
       return hull.put(ship.id, newShip)
-        .then(() => {
-          return shipCache.del(ship.id);
-        });
+        .then(() => shipCache.del(ship.id));
     },
     views: {
       login: "login.html",

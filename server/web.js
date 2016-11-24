@@ -11,7 +11,7 @@ import bootstrap from "./bootstrap";
 import AppRouter from "./router/app";
 import OAuthRouter from "./router/oauth";
 
-const { queueAdapter, instrumentationAgent, shipCache } = bootstrap;
+const { queueAdapter, instrumentationAgent } = bootstrap;
 
 const port = process.env.PORT || 8082;
 

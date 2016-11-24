@@ -20,7 +20,7 @@ export default function AppRouter(deps) {
 
   router.post("/fetch-all", hullMiddleware, appMiddleware, RequireConfiguration, Actions.fetchAll, ResponseMiddleware);
   router.post("/batch", hullMiddleware, appMiddleware, RequireConfiguration, bodyParser.json(), Actions.batchHandler, ResponseMiddleware);
-  router.post("/notify", ParseMessageMiddleware, hullMiddleware, appMiddleware, RequireConfiguration, NotifHandler(deps.Hull, {
+  router.post("/notify", ParseMessageMiddleware, hullMiddleware, appMiddleware, NotifHandler(deps.Hull, {
     hostSecret: deps.shipConfig.hostSecret,
     groupTraits: false,
     handlers: {

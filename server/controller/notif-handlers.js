@@ -6,11 +6,21 @@ export default class NotifHandlers {
 
   static shipUpdateHandler(payload, { req }) {
     const { syncAgent, hullAgent } = req.shipApp;
+    if (!syncAgent.isConfigured()) {
+      req.hull.client.logger.info("ship is not configured");
+      return Promise.resolve();
+    }
+
     return syncAgent.syncShip();
   }
 
   static segmentUpdateHandler(payload, { req }) {
     const { syncAgent, hullAgent } = req.shipApp;
+    if (!syncAgent.isConfigured()) {
+      req.hull.client.logger.info("ship is not configured");
+      return Promise.resolve();
+    }
+
     const segment = payload.message;
     const fields = syncAgent.userMapping.getHullTraitsKeys()
     return syncAgent.syncShip()
@@ -19,11 +29,21 @@ export default class NotifHandlers {
 
   static segmentDeleteHandler(payload, { req }) {
     const { syncAgent, hullAgent } = req.shipApp;
+    if (!syncAgent.isConfigured()) {
+      req.hull.client.logger.info("ship is not configured");
+      return Promise.resolve();
+    }
+
     return syncAgent.syncShip();
   }
 
   static userUpdateHandler(payload, { req }) {
     const { syncAgent, queueAgent, hullAgent } = req.shipApp;
+    if (!syncAgent.isConfigured()) {
+      req.hull.client.logger.info("ship is not configured");
+      return Promise.resolve();
+    }
+
     const { user, changes = {}, segments = [] } = payload.message;
     const { left = [] } = _.get(changes, "segments", {});
 
