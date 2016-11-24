@@ -85,7 +85,12 @@ export default class SyncAgent {
     return this.hullAgent.getSegments()
       .then(segments => {
         const ops = _.reduce(users, (o, user) => {
-          if (_.isEmpty(user["traits_intercom/id"])) {
+          let userOp = {};
+          if (!_.isEmpty(user["traits_intercom/id"])) {
+            userOp.id = user["traits_intercom/id"];
+          } else if(!_.isEmpty(user.email)) {
+            userOp.email = user.email;
+          } else {
             return o;
           }
           user.segment_ids.map(segment_id => {
@@ -95,9 +100,7 @@ export default class SyncAgent {
               return o;
             }
             o[segment.name] = o[segment.name] || [];
-            o[segment.name].push({
-              id: user["traits_intercom/id"]
-            });
+            o[segment.name].push(userOp);
           });
           user.remove_segment_ids.map(segment_id => {
             const segment = _.find(segments, { id: segment_id });
@@ -106,10 +109,9 @@ export default class SyncAgent {
               return o;
             }
             o[segment.name] = o[segment.name] || [];
-            o[segment.name].push({
-              id: user["traits_intercom/id"],
+            o[segment.name].push(_.merge({}, userOp, {
               untag: true
-            });
+            }));
           });
           return o;
         }, {});

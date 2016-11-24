@@ -67,6 +67,11 @@
               "allowCreate": true,
               "loadOptions" : "/schema/user_fields"
             }
+          },
+          "overwrite" : {
+            "type" : "boolean",
+            "title" : "Hull overwrites Intercom",
+            "default" : false
           }
         },
         "required" : [
