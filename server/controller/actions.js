@@ -39,11 +39,13 @@ export default class Actions {
   }
 
   static fields(req, res, next) {
-    const fieldsMap = _.filter(req.shipApp.syncAgent.userMapping.map, (f) => !f.read_only);
-
+    const fieldsMap = _.filter(req.shipApp.syncAgent.userMapping.map, f => !f.read_only)
+      .map(f => f.name);
+    const customAttributes = req.hull.ship.private_settings.custom_attributes;
+    const fields = _.uniq(_.concat(fieldsMap, customAttributes));
     res.json({
-      options: fieldsMap.map(f => {
-        return { label: f.name, value: f.name };
+      options: fields.map(f => {
+        return { label: f, value: f };
       })
     });
   }

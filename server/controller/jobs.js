@@ -108,6 +108,13 @@ export default class Jobs {
           }
           return req.hull.client.as(ident).traits(user);
         });
+      })
+      .then(() => {
+        const custom_attributes = _.uniq(_.flatten(users.map(u => _.keys(u.custom_attributes))));
+        if (!_.isEqual(req.hull.ship.private_settings.custom_attributes, custom_attributes)) {
+          return hullAgent.updateShipSettings({ custom_attributes });
+        }
+        return true;
       });
   }
 
