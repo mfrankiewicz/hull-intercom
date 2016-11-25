@@ -110,9 +110,13 @@ export default class Jobs {
         });
       })
       .then(() => {
-        const custom_attributes = _.uniq(_.flatten(users.map(u => _.keys(u.custom_attributes))));
-        if (!_.isEqual(req.hull.ship.private_settings.custom_attributes, custom_attributes)) {
-          return hullAgent.updateShipSettings({ custom_attributes });
+        const customAttributes = _.uniq(_.flatten(users.map(u => _.keys(u.custom_attributes))));
+        const oldAttributes = req.hull.ship.private_settings.custom_attributes;
+        const newAttributes = _.difference(customAttributes, oldAttributes);
+        if (!_.isEmpty(newAttributes)) {
+          return hullAgent.updateShipSettings({
+            custom_attributes: _.concat(oldAttributes, newAttributes)
+          });
         }
         return true;
       });

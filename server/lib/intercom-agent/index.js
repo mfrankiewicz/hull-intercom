@@ -155,6 +155,10 @@ export default class IntercomAgent {
           return moment(u.updated_at, "X")
             .isAfter(last_updated_at);
         });
+        this.hullClient.logger.info("getRecentUsers.count", {
+          total: originalUsers.length,
+          filtered: users.length
+        });
 
         return {
           users,

@@ -91,9 +91,11 @@
         "properties" : {
           "name" : {
             "type" : "string",
+            "format": "select",
             "title" : "Intercom Field",
-            "options": {
-              "allowCreate": true
+            "options" : {
+              "allowCreate": true,
+              "loadOptions" : "/schema/user_fields"
             }
           },
           "hull" : {
