@@ -107,6 +107,8 @@ export default class UserMapping {
       }
     })
 
+    console.warn('----> getHullTraits', JSON.stringify(hullTraits));
+
     return hullTraits;
   }
 
