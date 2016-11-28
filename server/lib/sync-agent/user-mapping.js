@@ -80,7 +80,7 @@ export default class UserMapping {
   /**
    * @return Promise
    */
-  getHullTraits(intercomUser) {
+  getHullTraits(intercomUser = {}) {
     const hullTraits = _.reduce(this.computeHullTraits(), (traits, prop) => {
       if (_.get(intercomUser, prop.name)) {
         traits[prop.hull.replace(/^traits_/, "")] = _.get(intercomUser, prop.name);
@@ -88,10 +88,11 @@ export default class UserMapping {
       return traits;
     }, {});
 
+    const social_profiles = _.get(intercomUser, 'social_profiles.social_profiles');
 
-    console.warn('getHullTraits: ', JSON.stringify({ intercomUser }));
+    console.warn('Social Profiles: ', JSON.stringify(social_profiles))
 
-    _.map(intercomUser.social_profiles.social_profiles, (social_profile) => {
+    _.map(social_profiles, (social_profile) => {
       const spn = social_profile.name.toLowerCase();
       hullTraits[`intercom/${spn}_username`] = social_profile.username;
       hullTraits[`intercom/${spn}_id`] = social_profile.id;
