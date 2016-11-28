@@ -88,20 +88,24 @@ export default class UserMapping {
       return traits;
     }, {});
 
+
     const social_profiles = _.get(intercomUser, 'social_profiles.social_profiles');
 
-    console.warn('Social Profiles: ', JSON.stringify(social_profiles))
+    if (social_profiles) {
+      _.map(social_profiles, (social_profile) => {
+        const spn = social_profile.name.toLowerCase();
+        hullTraits[`intercom/${spn}_username`] = social_profile.username;
+        hullTraits[`intercom/${spn}_id`] = social_profile.id;
+        hullTraits[`intercom/${spn}_url`] = social_profile.url;
+      });      
+    }
 
-    _.map(social_profiles, (social_profile) => {
-      const spn = social_profile.name.toLowerCase();
-      hullTraits[`intercom/${spn}_username`] = social_profile.username;
-      hullTraits[`intercom/${spn}_id`] = social_profile.id;
-      hullTraits[`intercom/${spn}_url`] = social_profile.url;
-    });
-
-    hullTraits["intercom/companies"] = _.map(intercomUser.companies.companies, "name").join(";");
-    hullTraits["intercom/segments"] = _.map(intercomUser.segments.segments, "name").join(";");
-    hullTraits["intercom/tags"] = _.map(intercomUser.tags.tags, "name").join(";");
+    ['companies', 'segments', 'tags'].forEach((k) => {
+      const list = intercomUser[k] && intercomUser[k][k];
+      if (list) {
+        hullTraits[`intercom/${k}`] = _.map(list, "name");  
+      }
+    })
 
     return hullTraits;
   }
