@@ -88,6 +88,9 @@ export default class UserMapping {
       return traits;
     }, {});
 
+
+    console.warn('getHullTraits: ', JSON.stringify({ intercomUser }));
+
     _.map(intercomUser.social_profiles.social_profiles, (social_profile) => {
       const spn = social_profile.name.toLowerCase();
       hullTraits[`intercom/${spn}_username`] = social_profile.username;
