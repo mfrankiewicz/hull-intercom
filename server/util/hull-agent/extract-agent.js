@@ -8,7 +8,6 @@ import Promise from "bluebird";
 
 /**
  * Class responsible for actions and operations on Hull side data - users
- * TODO integrate with HullAgent
  */
 export default class ExtractAgent {
 
