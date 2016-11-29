@@ -1,10 +1,6 @@
 import request from "superagent";
 import prefixPlugin from "superagent-prefix";
 import superagentPromisePlugin from "superagent-promise-plugin";
-import JSONStream from "JSONStream";
-import tar from "tar-stream";
-import zlib from "zlib";
-import es from "event-stream";
 import _ from "lodash";
 
 export default class IntercomClient {
@@ -65,41 +61,6 @@ export default class IntercomClient {
   delete(url) {
     const req = this.req.delete(url);
     return this.attach(req);
-  }
-
-  /**
-   * Method to handle Mailchimp batch response as a JSON stream
-   * @param  {String} { response_body_url }
-   * @return {Stream}
-   */
-  handleResponse({ response_body_url }) {
-    const extract = tar.extract();
-    const decoder = JSONStream.parse();
-
-    extract.on("entry", (header, stream, callback) => {
-      if (header.name.match(/\.json/)) {
-        stream.pipe(decoder, { end: false });
-      }
-
-      stream.on("end", () => callback()); // ready for next entry
-      stream.on("error", () => callback()); // ready for next entry
-
-      stream.resume();
-    });
-
-    extract.on("finish", () => decoder.end());
-    extract.on("error", () => decoder.end());
-
-    request(response_body_url)
-      .pipe(zlib.createGunzip())
-      .pipe(extract);
-
-    return decoder
-      .pipe(es.map(function write(data, callback) {
-        return data.map(r => {
-          return callback(null, r);
-        });
-      }));
   }
 
   handleError(err) {

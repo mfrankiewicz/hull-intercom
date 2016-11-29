@@ -1,8 +1,8 @@
-import WebApp from "./util/web-app";
-import ExitHandler from "./util/exit-handler";
-import BatchSyncHandler from "./util/batch-sync-handler";
-import StaticRouter from "./util/static-router";
-import KueRouter from "./util/kue-router";
+import WebApp from "./util/app/web";
+import ExitHandler from "./util/handler/exit";
+import BatchSyncHandler from "./util/handler/batch-sync";
+import StaticRouter from "./util/router/static";
+import KueRouter from "./util/router/kue";
 
 import bootstrap from "./bootstrap";
 import AppRouter from "./router/app";

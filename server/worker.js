@@ -1,5 +1,5 @@
-import WorkerApp from "./util/worker-app";
-import ExitHandler from "./util/exit-handler";
+import WorkerApp from "./util/app/worker";
+import ExitHandler from "./util/handler/exit";
 
 import bootstrap from "./bootstrap";
 

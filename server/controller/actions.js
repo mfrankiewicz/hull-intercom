@@ -1,6 +1,6 @@
 import _ from "lodash";
 
-import BatchSyncHandler from "../util/batch-sync-handler";
+import BatchSyncHandler from "../util/handler/batch-sync";
 
 export default class Actions {
 

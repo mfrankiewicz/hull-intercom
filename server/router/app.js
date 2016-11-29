@@ -3,8 +3,9 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import { NotifHandler } from "hull";
 
-import ResponseMiddleware from "../util/middleware/response";
-import RequireConfiguration from "../util/middleware/require-configuration";
+import responseMiddleware from "../util/middleware/response";
+import requireConfiguration from "../util/middleware/require-configuration";
+import tokenMiddleware from "../util/middleware/token";
 
 export default function AppRouter(deps) {
   const router = new Router();
@@ -24,10 +25,10 @@ export default function AppRouter(deps) {
   // router.use(deps.hullMiddleware);
   // router.use(AppMiddleware(deps));
 
-  const middlewareSet = [hullMiddleware, appMiddleware, RequireConfiguration, bodyParser.json()];
+  const middlewareSet = [tokenMiddleware, hullMiddleware, appMiddleware, requireConfiguration, bodyParser.json()];
 
-  router.post("/fetch-all", ...middlewareSet, Actions.fetchAll, ResponseMiddleware);
-  router.post("/batch", ...middlewareSet, Actions.batchHandler, ResponseMiddleware);
+  router.post("/fetch-all", ...middlewareSet, Actions.fetchAll, responseMiddleware);
+  router.post("/batch", ...middlewareSet, Actions.batchHandler, responseMiddleware);
   router.post("/notify", NotifHandler({
     hostSecret: deps.shipConfig.hostSecret,
     groupTraits: false,
@@ -41,9 +42,9 @@ export default function AppRouter(deps) {
   }));
 
   // FIXME: 404 for that endpoint?
-  router.post("/intercom", ...middlewareSet, Actions.webhook, ResponseMiddleware);
+  router.post("/intercom", ...middlewareSet, Actions.webhook, responseMiddleware);
 
-  router.post("/sync", ...middlewareSet, Actions.sync, ResponseMiddleware);
+  router.post("/sync", ...middlewareSet, Actions.sync, responseMiddleware);
 
   router.get("/schema/user_fields", cors(), ...middlewareSet, Actions.fields);
 
