@@ -79,4 +79,22 @@ export default class InstrumentationAgent {
       console.warn("error in librato.measure", err);
     }
   }
+
+  startMiddleware() {
+    if (this.raven) {
+      return raven.middleware.express.requestHandler(this.raven);
+    }
+    return (req, res, next) => {
+      next();
+    };
+  }
+
+  stopMiddleware() {
+    if (this.raven) {
+      return raven.middleware.express.errorHandler(this.raven);
+    }
+    return (req, res, next) => {
+      next();
+    };
+  }
 }

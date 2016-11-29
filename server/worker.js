@@ -1,5 +1,3 @@
-import Hull from "hull";
-
 import WorkerApp from "./util/worker-app";
 import ExitHandler from "./util/exit-handler";
 
@@ -15,6 +13,6 @@ workerApp
 
 workerApp.process();
 
-Hull.logger.info("workerApp.process");
+bootstrap.Hull.logger.info("workerApp.process");
 
 ExitHandler(queueAdapter.exit.bind(queueAdapter));
