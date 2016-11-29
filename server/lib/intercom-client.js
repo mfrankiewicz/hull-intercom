@@ -6,7 +6,6 @@ import tar from "tar-stream";
 import zlib from "zlib";
 import es from "event-stream";
 import _ from "lodash";
-import moment from "moment";
 
 export default class IntercomClient {
 

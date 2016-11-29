@@ -5,7 +5,7 @@ import BatchSyncHandler from "../util/batch-sync-handler";
 export default class NotifHandlers {
 
   static shipUpdateHandler(payload, { req }) {
-    const { syncAgent, hullAgent } = req.shipApp;
+    const { syncAgent } = req.shipApp;
     if (!syncAgent.isConfigured()) {
       req.hull.client.logger.info("ship is not configured");
       return Promise.resolve();
@@ -22,13 +22,13 @@ export default class NotifHandlers {
     }
 
     const segment = payload.message;
-    const fields = syncAgent.userMapping.getHullTraitsKeys()
+    const fields = syncAgent.userMapping.getHullTraitsKeys();
     return syncAgent.syncShip()
       .then(() => hullAgent.extractAgent.requestExtract({ segment, fields }));
   }
 
   static segmentDeleteHandler(payload, { req }) {
-    const { syncAgent, hullAgent } = req.shipApp;
+    const { syncAgent } = req.shipApp;
     if (!syncAgent.isConfigured()) {
       req.hull.client.logger.info("ship is not configured");
       return Promise.resolve();
@@ -38,7 +38,7 @@ export default class NotifHandlers {
   }
 
   static userUpdateHandler(payload, { req }) {
-    const { syncAgent, queueAgent, hullAgent } = req.shipApp;
+    const { syncAgent, queueAgent } = req.shipApp;
     if (!syncAgent.isConfigured()) {
       req.hull.client.logger.info("ship is not configured");
       return Promise.resolve();

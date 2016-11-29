@@ -50,7 +50,7 @@ export default function OAuthRouter(deps) {
       }
       return Promise.reject();
     },
-    onLogin: (req, { hull, ship }) => {
+    onLogin: () => {
       return Promise.resolve();
     },
     onAuthorize: (req, { hull, ship }) => {

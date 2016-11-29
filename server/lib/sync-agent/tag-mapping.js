@@ -93,6 +93,7 @@ export default class TagMapping {
           _.unset(this.mapping, segment.id);
           return Promise.resolve();
         }
+        return Promise.reject(fErr);
       });
   }
 }

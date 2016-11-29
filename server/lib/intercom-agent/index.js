@@ -81,7 +81,6 @@ export default class IntercomAgent {
 
     if (users.length < (process.env.MINMUM_BULK_SIZE || 10)
       || mode === "regular") {
-
       return Promise.map(body.items, item => {
         return this.intercomClient.post("/users")
           .send(item.data)
@@ -101,7 +100,7 @@ export default class IntercomAgent {
       .send(body)
       .catch(err => {
         const fErr = this.intercomClient.handleError(err);
-        thus.hullClient.logger.error("intercomAgent.saveUsers.bulkSubmit.error", fErr);
+        this.hullClient.logger.error("intercomAgent.saveUsers.bulkSubmit.error", fErr);
         return Promise.reject(fErr);
       });
   }

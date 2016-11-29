@@ -58,7 +58,7 @@ export default class SyncAgent {
       const email = _.get(error, "data.email");
       const errorDetails = _.get(error, "error", []);
       const errorMessage = errorDetails.map(e => e.message).join(" ");
-      if (_.find(errorDetails, { code: "conflict"})) {
+      if (_.find(errorDetails, { code: "conflict" })) {
         return _.find(users, { email });
       }
 
@@ -85,10 +85,10 @@ export default class SyncAgent {
     return this.hullAgent.getSegments()
       .then(segments => {
         const ops = _.reduce(users, (o, user) => {
-          let userOp = {};
+          const userOp = {};
           if (!_.isEmpty(user["traits_intercom/id"])) {
             userOp.id = user["traits_intercom/id"];
-          } else if(!_.isEmpty(user.email)) {
+          } else if (!_.isEmpty(user.email)) {
             userOp.email = user.email;
           } else {
             return o;
@@ -100,7 +100,7 @@ export default class SyncAgent {
               return o;
             }
             o[segment.name] = o[segment.name] || [];
-            o[segment.name].push(userOp);
+            return o[segment.name].push(userOp);
           });
           user.remove_segment_ids.map(segment_id => {
             const segment = _.find(segments, { id: segment_id });
@@ -109,7 +109,7 @@ export default class SyncAgent {
               return o;
             }
             o[segment.name] = o[segment.name] || [];
-            o[segment.name].push(_.merge({}, userOp, {
+            return o[segment.name].push(_.merge({}, userOp, {
               untag: true
             }));
           });

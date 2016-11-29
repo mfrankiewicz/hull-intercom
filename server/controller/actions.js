@@ -38,7 +38,7 @@ export default class Actions {
     return next("ok");
   }
 
-  static fields(req, res, next) {
+  static fields(req, res) {
     const fieldsMap = _.filter(req.shipApp.syncAgent.userMapping.map, f => !f.read_only)
       .map(f => f.name);
     const customAttributes = req.hull.ship.private_settings.custom_attributes;

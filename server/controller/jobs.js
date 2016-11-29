@@ -1,6 +1,5 @@
 import Promise from "bluebird";
 import _ from "lodash";
-import moment from "moment";
 
 export default class Jobs {
 
@@ -10,7 +9,7 @@ export default class Jobs {
    */
   static sendUsers(req) {
     const { users, mode = "bulk", setUserId = false } = req.payload;
-    const { syncAgent, hullAgent, intercomAgent, queueAgent } = req.shipApp;
+    const { syncAgent, intercomAgent, queueAgent } = req.shipApp;
 
     req.shipApp.instrumentationAgent.metricVal("send_users", users.length, req.hull.ship);
 
@@ -36,11 +35,12 @@ export default class Jobs {
           return syncAgent.groupUsersToTag(savedUsers)
             .then(groupedUsers => intercomAgent.tagUsers(groupedUsers))
             .then(() => syncAgent.handleUserErrors(groupedErrors, usersToSave))
-            .then(res => {
-              if (!_.isEmpty(res)) {
-                return queueAgent.create("sendUsers", { users: res, setUserId: true });
+            .then(errorRes => {
+              if (!_.isEmpty(errorRes)) {
+                return queueAgent.create("sendUsers", { users: errorRes, setUserId: true });
               }
-            })
+              return null;
+            });
         }
 
         if (_.get(res, "body.id")) {
@@ -52,11 +52,10 @@ export default class Jobs {
 
   static handleBulkJob(req) {
     const { id, users, attempt = 1 } = req.payload;
-    const { syncAgent, intercomAgent, queueAgent, hullAgent } = req.shipApp;
+    const { syncAgent, intercomAgent, queueAgent } = req.shipApp;
 
     return intercomAgent.getJob(id)
       .then(({ isCompleted, hasErrors }) => {
-
         if (isCompleted) {
           req.shipApp.instrumentationAgent.metricVal("bulk_job.attempt", attempt, req.hull.ship);
           return (() => {
@@ -67,12 +66,13 @@ export default class Jobs {
                   if (!_.isEmpty(res)) {
                     return queueAgent.create("sendUsers", { users: res, setUserId: true });
                   }
+                  return null;
                 });
             }
             return Promise.resolve();
           })()
             .then(() => syncAgent.groupUsersToTag(users))
-            .then(groupedUsers => intercomAgent.tagUsers(groupedUsers))
+            .then(groupedUsers => intercomAgent.tagUsers(groupedUsers));
         }
 
         if (attempt > 20) {
@@ -155,9 +155,8 @@ export default class Jobs {
   }
 
   static syncUsers(req) {
-    const { hullAgent, syncAgent, intercomAgent, queueAgent } = req.shipApp;
-    let { last_updated_at } = req.payload;
-    const { count, page = 1 } = req.payload;
+    const { syncAgent, intercomAgent, queueAgent } = req.shipApp;
+    const { last_updated_at, count, page = 1 } = req.payload;
 
     return (() => {
       if (_.isEmpty(last_updated_at)) {

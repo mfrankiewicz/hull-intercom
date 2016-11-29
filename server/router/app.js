@@ -1,6 +1,6 @@
 import { Router } from "express";
 import bodyParser from "body-parser";
-import cors from 'cors';
+import cors from "cors";
 
 import ParseMessageMiddleware from "../util/middleware/parse-message";
 import NotifHandler from "../util/notif-handler";
