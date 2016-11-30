@@ -25,6 +25,7 @@ export default class Actions {
       return BatchSyncHandler.getHandler({
         hull: req.hull,
         ship: req.hull.ship,
+        ns: "webhook",
         options: {
           maxSize: process.env.NOTIFY_BATCH_HANDLER_SIZE || 100,
           throttle: process.env.NOTIFY_BATCH_HANDLER_THROTTLE || 30000

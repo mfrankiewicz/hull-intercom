@@ -11,7 +11,7 @@ export default function WebApp() {
   app.use(timeout("25s"));
   app.engine("html", renderFile);
 
-  app.set("views", path.resolve(__dirname, "..", "..", "views"));
+  app.set("views", path.resolve(__dirname, "..", "..", "..", "views"));
   app.set("view engine", "ejs");
 
   return app;

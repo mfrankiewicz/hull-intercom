@@ -65,6 +65,7 @@ export default class NotifHandlers {
     return BatchSyncHandler.getHandler({
       hull: req.hull,
       ship: req.hull.ship,
+      ns: "notif",
       options: {
         maxSize: process.env.NOTIFY_BATCH_HANDLER_SIZE || 100,
         throttle: process.env.NOTIFY_BATCH_HANDLER_THROTTLE || 30000
