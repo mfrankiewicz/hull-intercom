@@ -1,6 +1,6 @@
 {
   "name": "Intercom",
-  "description": "Sync a Intercom Tag whenever a User enters or leaves a Segment",
+  "description": "Sync Users in Intercom with Hull",
   "tags": ["outgoing", "incoming", "batch", "oneColumn"],
   "admin" : "/auth/",
   "picture": "picture.png",
