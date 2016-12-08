@@ -35,7 +35,7 @@ export default function OAuthRouter(deps) {
 
       if (access_token || (api_key && app_id)) {
         // TODO: we have notices problems with syncing hull segments property
-        // after a Hubspot resync, there may be a problem with notification
+        // after a Intercom resync, there may be a problem with notification
         // subscription. Following two lines fixes that problem.
         AppMiddleware({ queueAdapter, shipCache, instrumentationAgent })(req, {}, () => {});
         // req.shipApp.hubspotAgent.syncContactProperties()
