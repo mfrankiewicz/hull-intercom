@@ -71,7 +71,7 @@
         var url = $(this).attr('data-href');
         swal({
           title: "Fetch all contacts",
-          text: "You are going to fetch all intercom contacts. This can generate a lot of traffic. Are you sure?",
+          text: "You are going to fetch all Intercom contacts. This can generate a lot of traffic. Are you sure?",
           type: "warning",
           showCancelButton: true,
           confirmButtonColor: "#DD6B55",
@@ -80,7 +80,7 @@
         }, function(isConfirm) {
           if (isConfirm) {
             $.post(url+window.location.search);
-            swal("Fetching started", "The intercom contacts will be fetched shortly.", "success");
+            swal("Fetching started", "The Intercom contacts will be fetched shortly.", "success");
           }
         });
       });

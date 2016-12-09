@@ -38,7 +38,7 @@ export default function OAuthRouter(deps) {
         // after a Intercom resync, there may be a problem with notification
         // subscription. Following two lines fixes that problem.
         AppMiddleware({ queueAdapter, shipCache, instrumentationAgent })(req, {}, () => {});
-        // req.shipApp.hubspotAgent.syncContactProperties()
+        // req.shipApp.intercomAgent.syncContactProperties()
         //   .catch((err) => hull.logger.error("Error in creating segments property", err));
 
         return hull.get(ship.id).then(s => {
