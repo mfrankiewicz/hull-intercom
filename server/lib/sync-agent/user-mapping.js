@@ -105,7 +105,7 @@ export default class UserMapping {
     ["companies", "segments", "tags"].forEach((k) => {
       const list = intercomUser[k] && intercomUser[k][k];
       if (list) {
-        hullTraits[`intercom/${k}`] = _.map(list, "name");
+        hullTraits[`intercom/${k}`] = _.sort(_.uniq(_.compact(_.map(list, "name"))));
       }
     });
 
