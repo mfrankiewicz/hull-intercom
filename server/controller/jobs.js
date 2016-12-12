@@ -186,4 +186,11 @@ export default class Jobs {
       });
   }
 
+  static trackEvents(req) {
+    const { syncAgent } = req.shipApp;
+    const { events = [] } = req.payload;
+
+    return Promise.all(events.map(e => syncAgent.eventsAgent.trackEvent(e)));
+  }
+
 }

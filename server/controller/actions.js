@@ -36,7 +36,18 @@ export default class Actions {
       .then(next, next);
     }
 
-    return next("ok");
+    return BatchSyncHandler.getHandler({
+      hull: req.hull,
+      ship: req.hull.ship,
+      ns: "webhook_events",
+      options: {
+        maxSize: process.env.NOTIFY_BATCH_HANDLER_SIZE || 100,
+        throttle: process.env.NOTIFY_BATCH_HANDLER_THROTTLE || 30000
+      }
+    })
+    .setCallback(events => req.shipApp.queueAgent.create("trackEvents", { events }))
+    .add(_.get(req, "body"))
+    .then(next, next);
   }
 
   static fields(req, res) {

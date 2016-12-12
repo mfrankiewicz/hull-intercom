@@ -30,7 +30,10 @@ export default class WebhookAgent {
     return this.intercomClient.post("/subscriptions")
       .send({
         service_type: "web",
-        topics: ["user.created", "user.deleted", "user.unsubscribed", "user.updated"],
+        topics: [
+          "user.created", "user.deleted", "user.unsubscribed",
+          "user.tag.created", "user.tag.deleted", "user.unsubscribed"
+        ],
         url
       })
       .catch(err => {
