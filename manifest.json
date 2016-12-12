@@ -1,6 +1,6 @@
 {
   "name": "Intercom",
-  "description": "Sync a Intercom Tag whenever a User enters or leaves a Segment",
+  "description": "Sync Users in Intercom with Hull",
   "tags": ["outgoing", "incoming", "batch", "oneColumn"],
   "admin" : "/auth/",
   "picture": "picture.png",
@@ -47,7 +47,7 @@
     },
     {
       "name" : "sync_fields_to_intercom",
-      "title" : "List of User fields to push to Intercom",
+      "title" : "List of User attributes to push to Intercom",
       "type" : "array",
       "format" : "table",
       "default": [],
@@ -57,12 +57,12 @@
           "hull" : {
             "type" : "string",
             "format" : "trait",
-            "title" : "Hull Field"
+            "title" : "Hull Attribute"
           },
           "name" : {
             "type" : "string",
             "format": "select",
-            "title" : "Intercom Field",
+            "title" : "Intercom Attribute",
             "options" : {
               "allowCreate": true,
               "loadOptions" : "/schema/user_fields"
@@ -92,7 +92,7 @@
           "name" : {
             "type" : "string",
             "format": "select",
-            "title" : "Intercom Field",
+            "title" : "Intercom Attributes",
             "options" : {
               "allowCreate": true,
               "loadOptions" : "/schema/user_fields"
@@ -101,7 +101,7 @@
           "hull" : {
             "type" : "string",
             "format" : "trait",
-            "title" : "Hull Field",
+            "title" : "Hull Attributes",
             "options": {
               "allowCreate": true
             }
