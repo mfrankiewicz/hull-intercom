@@ -9,43 +9,45 @@ export default class TagMapping {
     this.map = [
       {
         intercom: "user.tag.created",
-        hull: {
-          eventName: "Added Tag",
-          email: (event) => event.data.item.user.email,
-          props: (event) => {
-            return {
-              tag: event.data.item.tag.name,
-              topic: event.topic
-            };
-          },
-          event_type: "tag",
+        eventName: "Added Tag",
+        email: (event) => event.data.item.user.email,
+        props: (event) => {
+          return {
+            tag: event.data.item.tag.name,
+          };
+        },
+        context: (event) => {
+          return {
+            event_type: "tag",
+          };
         }
       },
       {
         intercom: "user.tag.deleted",
-        hull: {
-          eventName: "Removed Tag",
-          email: (event) => event.data.item.user.email,
-          props: (event) => {
-            return {
-              tag: event.data.item.tag.name,
-              topic: event.topic
-            };
-          },
-          event_type: "tag",
+        eventName: "Removed Tag",
+        email: (event) => event.data.item.user.email,
+        props: (event) => {
+          return {
+            tag: event.data.item.tag.name,
+          };
+        },
+        context: (event) => {
+          return {
+            event_type: "tag",
+          };
         }
       },
       {
         intercom: "user.unsubscribed",
-        hull: {
-          eventName: "Unsubscribed from emails",
-          email: (event) => event.data.item.email,
-          props: (event) => {
-            return {
-              topic: event.topic
-            };
-          },
-          event_type: "email",
+        eventName: "Unsubscribed from emails",
+        email: (event) => event.data.item.email,
+        props: (event) => {
+          return {};
+        },
+        context: (event) => {
+          return {
+            event_type: "email",
+          };
         }
       }
     ];
@@ -58,14 +60,18 @@ export default class TagMapping {
       return null;
     }
 
-    const props = mappedEvent.hull.props(event);
-    console.log("trackEvent", mappedEvent.hull.email(event), props);
-    return this.hullClient.as({
-      email: mappedEvent.hull.email(event)
-    }).track(mappedEvent.hull.eventName, props, {
+    const email = mappedEvent.email(event);
+    const eventName = mappedEvent.eventName;
+    const props = _.defaults(mappedEvent.props(event), {
+      topic: event.topic
+    });
+    const context = _.defaults(mappedEvent.context(event), {
       source: "intercom",
       event_id: event.id,
       created_at: event.created_at
     });
+
+    console.log("track", email, eventName, props, context)
+    return this.hullClient.as({ email }).track(eventName, props, context);
   }
 }
