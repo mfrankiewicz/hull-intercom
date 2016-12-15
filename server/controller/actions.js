@@ -21,6 +21,7 @@ export default class Actions {
   }
 
   static webhook(req, res, next) {
+    req.hull.client.logger.debug("intercom message", req.body);
     if (_.get(req, "body.topic") === "user.created") {
       return BatchSyncHandler.getHandler({
         hull: req.hull,
