@@ -1,5 +1,33 @@
+# Hull ♥ Intercom
 
-## Install
+Intercom let's you send messages to your contacts via email, website live chat and mobile push notifications. You can trigger and track all your messages and interactions back into your contacts profiles, and then use this data to trigger more messages.
+
+#### Intercom data includes:
+
+- Identities (name, email, company, location…)
+- Events (logged in, account created, subscribed…)
+- Page views (Viewed "Features" page, Viewed "Demo Request" page…)
+- Segments ("Leads", "New Paying Customers", "Job Title - CEOs")
+
+#### With Hull, you can power other tools with this Intercom data.
+
+Share and sync your contact and event data from Intercom to do things like:
+
+- Power Salesforce contact records
+- Trigger Slack notifications
+- Sync Intercom segments with Mailchimp
+- Sync Intercom segments with Optimizely
+
+You can also upgrade your Intercom operation with data from other tools and databases. You can use all your data together to create scores, trigger automations (like Intercom Campaigns and web chats) and define personalisation.
+
+- Upgrade Intercom with behavioural data from Mixpanel
+- Enrich Intercom profiles with data from Clearbit
+- Trigger Intercom Campaigns with Slack commands and buttons
+- Personalise Intercom web chat with data from Salesforce
+
+Hull also gives you more flexibility with your data in Intercom. Combine multiple sources of data to create advanced segments (without the limits to AND and OR) and user scores using all your data.
+
+## Installing
 
 Install the Ship
 
