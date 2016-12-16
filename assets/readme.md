@@ -27,6 +27,12 @@ You can also upgrade your Intercom operation with data from other tools and data
 
 Hull also gives you more flexibility with your data in Intercom. Combine multiple sources of data to create advanced segments (without the limits to AND and OR) and user scores using all your data.
 
+- No APIs to tap into
+- No code needed
+- No import/export
+- No complexity
+- No repetitive workflow or segment creation
+
 ## Installing
 
 Install the Ship
