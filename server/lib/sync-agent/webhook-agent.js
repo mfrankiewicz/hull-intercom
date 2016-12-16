@@ -31,8 +31,12 @@ export default class WebhookAgent {
       .send({
         service_type: "web",
         topics: [
-          "user.created", "user.deleted", "user.unsubscribed",
-          "user.tag.created", "user.tag.deleted", "user.unsubscribed"
+          "user.created", "user.deleted",
+          "user.tag.created", "user.tag.deleted", "user.unsubscribed",
+          "conversation.user.created", "conversation.user.replied",
+          "conversation.admin.replied", "conversation.admin.single.created",
+          "conversation.admin.assigned", "conversation.admin.opened",
+          "conversation.admin.closed", "user.email.updated"
         ],
         url
       })
