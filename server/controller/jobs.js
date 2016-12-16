@@ -96,9 +96,7 @@ export default class Jobs {
 
     const mappedUsers = users.map((u) => syncAgent.userMapping.getHullTraits(u));
 
-    return syncAgent.webhookAgent.ensureWebhook()
-      .then(() => hullAgent.getSegments())
-      .then((segments) => syncAgent.tagMapping.sync(segments))
+    return syncAgent.syncShip()
       .then(() => {
         return Promise.map(mappedUsers, (user) => {
           req.hull.client.logger.info("SAVE USER", user.email);

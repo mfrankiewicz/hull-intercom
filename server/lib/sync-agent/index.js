@@ -25,6 +25,10 @@ export default class SyncAgent {
     return this.intercomAgent.intercomClient.ifConfigured();
   }
 
+  /**
+   * Makes sure that the Intercom account basic settings is in sync with Hull.
+   * That means tags to represent segments and webhook for events capturing.
+   */
   syncShip() {
     return this.webhookAgent.ensureWebhook()
       .then(() => this.hullAgent.getSegments())
