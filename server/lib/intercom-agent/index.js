@@ -101,7 +101,7 @@ export default class IntercomAgent {
       .send(body)
       .catch(err => {
         const fErr = this.intercomClient.handleError(err);
-        thus.hullClient.logger.error("intercomAgent.saveUsers.bulkSubmit.error", fErr);
+        this.hullClient.logger.error("intercomAgent.saveUsers.bulkSubmit.error", fErr);
         return Promise.reject(fErr);
       });
   }

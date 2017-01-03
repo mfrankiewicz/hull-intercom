@@ -97,15 +97,19 @@ export default class UserMapping {
         hullTraits[`intercom/${spn}_username`] = social_profile.username;
         hullTraits[`intercom/${spn}_id`] = social_profile.id;
         hullTraits[`intercom/${spn}_url`] = social_profile.url;
-      });      
+      });
     }
 
     ['companies', 'segments', 'tags'].forEach((k) => {
       const list = intercomUser[k] && intercomUser[k][k];
       if (list) {
-        hullTraits[`intercom/${k}`] = _.map(list, "name");  
+        hullTraits[`intercom/${k}`] = _.map(list, "name");
       }
     })
+
+    if (!_.isEmpty(intercomUser.name)) {
+      hullTraits["name"] = { operation: "setIfNull", value: intercomUser.name };
+    }
 
     return hullTraits;
   }
