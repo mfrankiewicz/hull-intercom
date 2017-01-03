@@ -29,7 +29,7 @@ If you want Docker based development after setting `.env` file:
 
 ```sh
 docker-compose run npm install
-docker-compose up npm # with autoreloading enabled
+docker-compose run npm # with autoreloading enabled
 
 # run tests
 docker-compose run npm test
