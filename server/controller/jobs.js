@@ -99,6 +99,9 @@ export default class Jobs {
     return syncAgent.syncShip()
       .then(() => {
         return Promise.map(mappedUsers, (user) => {
+          if (_.isEmpty(user.email)) {
+            return null;
+          }
           req.hull.client.logger.info("SAVE USER", user.email);
           const ident = { email: user.email };
           if (user["intercom/id"]) {

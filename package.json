@@ -1,6 +1,6 @@
 {
   "name": "hull-intercom",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Hull Intercom integration",
   "main": "index.js",
   "scripts": {

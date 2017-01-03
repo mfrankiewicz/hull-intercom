@@ -28,7 +28,12 @@ npm run start:dev # for autoreloading after changes
 If you want Docker based development after setting `.env` file:
 
 ```sh
-docker-compose run install
-docker-compose up -d redis
-docker-compose up dev # with autoreloading enabled
+docker-compose run npm install
+docker-compose run npm # with autoreloading enabled
+
+# run tests
+docker-compose run npm test
+
+# install new dep
+docker-compose run npm install dep -s
 ```

@@ -113,6 +113,10 @@ export default class UserMapping {
       hullTraits["name"] = { operation: "setIfNull", value: intercomUser.name };
     }
 
+    if (!_.isEmpty(intercomUser.name)) {
+      hullTraits["name"] = { operation: "setIfNull", value: intercomUser.name };
+    }
+
     return hullTraits;
   }
 
