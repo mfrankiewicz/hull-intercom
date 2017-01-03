@@ -1,3 +1,7 @@
+/**
+ * [ExitHandler description]
+ * @param {[type]} promise [description]
+ */
 export default function ExitHandler(promise) {
   function exitNow() {
     console.warn("Exiting now !");

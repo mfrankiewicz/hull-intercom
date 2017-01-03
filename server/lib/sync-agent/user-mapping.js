@@ -4,6 +4,7 @@ export default class UserMapping {
 
   constructor(ship) {
     this.ship = ship;
+    /* eslint-disable quote-props, no-multi-spaces, key-spacing */
     this.map = [
       { "name": "email",   "hull":"email",                "type": "string", "read_only": false },
       { "name": "id",      "hull":"traits_intercom/id",   "type": "string", "read_only": true  },
@@ -14,7 +15,7 @@ export default class UserMapping {
       { "name": "last_request_at", "hull":"traits_intercom/last_request_at",           "type": "date",      "read_only": false },
       { "name": "signed_up_at",    "hull":"traits_intercom/signed_up_at",              "type": "date",      "read_only": false },
       { "name": "created_at",      "hull":"traits_intercom/created_at",                "type": "date",      "read_only": false },
-      { "name": "last_seen_ip" ,   "hull":"traits_intercom/last_seen_ip",              "type": "string",    "read_only": false },
+      { "name": "last_seen_ip",    "hull":"traits_intercom/last_seen_ip",              "type": "string",    "read_only": false },
 
       { "name": "unsubscribed_from_emails", "hull":"traits_intercom/unsubscribed_from_emails",  "type": "boolean",   "read_only": false },
       { "name": "session_count",            "hull":"traits_intercom/session_count",             "type": "number",    "read_only": true  },
@@ -33,16 +34,17 @@ export default class UserMapping {
       { "name": "location_data.region_name",    "hull":"traits_intercom/location_region_name",      "type": "string",    "read_only": true },
       { "name": "location_data.timezone",       "hull":"traits_intercom/location_timezone",         "type": "string",    "read_only": true }
     ];
+    /* eslint-enable quote-props, no-multi-spaces, key-spacing */
   }
 
   computeHullTraits() {
     const fields = this.map.slice();
-    const addFields = _.get(this.ship, 'private_settings.sync_fields_to_hull');
+    const addFields = _.get(this.ship, "private_settings.sync_fields_to_hull");
 
     if (addFields && addFields.length > 0) {
-      addFields.map(({ name, hull }) => {
+      _.map(addFields, ({ name, hull }) => {
         if (name && hull) {
-          fields.push({ name: `custom_attributes.${name}`, hull: hull });
+          fields.push({ name: `custom_attributes.${name}`, hull });
         }
       });
     }
@@ -58,7 +60,7 @@ export default class UserMapping {
       let name = `custom_attributes.${f.name}`;
 
       // selected field is standard one -> save it as standard
-      const writableFields = _.filter(this.map, (f) => !f.read_only);
+      const writableFields = _.filter(this.map, (writF) => !writF.read_only);
       if (_.find(writableFields, { name: f.name })) {
         name = f.name;
       }
@@ -89,7 +91,7 @@ export default class UserMapping {
     }, {});
 
 
-    const social_profiles = _.get(intercomUser, 'social_profiles.social_profiles');
+    const social_profiles = _.get(intercomUser, "social_profiles.social_profiles");
 
     if (social_profiles) {
       _.map(social_profiles, (social_profile) => {
@@ -100,12 +102,16 @@ export default class UserMapping {
       });
     }
 
-    ['companies', 'segments', 'tags'].forEach((k) => {
+    ["companies", "segments", "tags"].forEach((k) => {
       const list = intercomUser[k] && intercomUser[k][k];
       if (list) {
-        hullTraits[`intercom/${k}`] = _.map(list, "name");
+        hullTraits[`intercom/${k}`] = _.uniq(_.compact(_.map(list, "name")));
       }
-    })
+    });
+
+    if (!_.isEmpty(intercomUser.name)) {
+      hullTraits["name"] = { operation: "setIfNull", value: intercomUser.name };
+    }
 
     if (!_.isEmpty(intercomUser.name)) {
       hullTraits["name"] = { operation: "setIfNull", value: intercomUser.name };

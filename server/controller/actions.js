@@ -1,6 +1,6 @@
 import _ from "lodash";
 
-import BatchSyncHandler from "../util/batch-sync-handler";
+import BatchSyncHandler from "../util/handler/batch-sync";
 
 export default class Actions {
 
@@ -21,10 +21,12 @@ export default class Actions {
   }
 
   static webhook(req, res, next) {
+    req.hull.client.logger.debug("intercom message", req.body);
     if (_.get(req, "body.topic") === "user.created") {
       return BatchSyncHandler.getHandler({
         hull: req.hull,
         ship: req.hull.ship,
+        ns: "webhook",
         options: {
           maxSize: process.env.NOTIFY_BATCH_HANDLER_SIZE || 100,
           throttle: process.env.NOTIFY_BATCH_HANDLER_THROTTLE || 30000
@@ -35,10 +37,21 @@ export default class Actions {
       .then(next, next);
     }
 
-    return next("ok");
+    return BatchSyncHandler.getHandler({
+      hull: req.hull,
+      ship: req.hull.ship,
+      ns: "webhook_events",
+      options: {
+        maxSize: process.env.NOTIFY_BATCH_HANDLER_SIZE || 100,
+        throttle: process.env.NOTIFY_BATCH_HANDLER_THROTTLE || 30000
+      }
+    })
+    .setCallback(events => req.shipApp.queueAgent.create("trackEvents", { events }))
+    .add(_.get(req, "body"))
+    .then(next, next);
   }
 
-  static fields(req, res, next) {
+  static fields(req, res) {
     const fieldsMap = _.filter(req.shipApp.syncAgent.userMapping.map, f => !f.read_only)
       .map(f => f.name);
     const customAttributes = req.hull.ship.private_settings.custom_attributes;

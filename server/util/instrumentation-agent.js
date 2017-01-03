@@ -19,18 +19,18 @@ export default class InstrumentationAgent {
     }
 
     if (process.env.LIBRATO_TOKEN && process.env.LIBRATO_USER) {
-     console.log("starting librato");
-     this.librato = require("librato-node"); // eslint-disable-line global-require
+      console.log("starting librato");
+      this.librato = require("librato-node"); // eslint-disable-line global-require
 
-     this.librato.configure({
-       email: process.env.LIBRATO_USER,
-       token: process.env.LIBRATO_TOKEN
-     });
-     this.librato.start();
-     this.librato.on("error", function onError(err) {
-       console.error("librato", err);
-     });
-   }
+      this.librato.configure({
+        email: process.env.LIBRATO_USER,
+        token: process.env.LIBRATO_TOKEN
+      });
+      this.librato.start();
+      this.librato.on("error", function onError(err) {
+        console.error("librato", err);
+      });
+    }
   }
 
   startTransaction(jobName, callback) {
@@ -78,5 +78,23 @@ export default class InstrumentationAgent {
     } catch (err) {
       console.warn("error in librato.measure", err);
     }
+  }
+
+  startMiddleware() {
+    if (this.raven) {
+      return raven.middleware.express.requestHandler(this.raven);
+    }
+    return (req, res, next) => {
+      next();
+    };
+  }
+
+  stopMiddleware() {
+    if (this.raven) {
+      return raven.middleware.express.errorHandler(this.raven);
+    }
+    return (req, res, next) => {
+      next();
+    };
   }
 }
