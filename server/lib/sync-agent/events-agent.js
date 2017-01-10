@@ -1,22 +1,24 @@
 import _ from "lodash";
+import Promise from "bluebird";
 
 export default class TagMapping {
 
-  constructor(hullAgent, ship) {
+  constructor(hullAgent, tagMapping, ship) {
     this.ship = ship;
     this.hullClient = hullAgent.hullClient;
+    this.tagMapping = tagMapping;
 
     this.map = [
       {
         intercom: "conversation.user.created",
         eventName: "User started conversation",
         user: (event) => _.pick(_.get(event, "data.item.user"), ["email", "id"]),
-        props: (event) => {
+        props: (_event) => {
           return {
             initiated: "user"
           };
         },
-        context: (event) => {
+        context: (_event) => {
           return {
             event_type: "conversation",
           };
@@ -26,12 +28,12 @@ export default class TagMapping {
         intercom: "conversation.user.replied",
         eventName: "User replied to conversation",
         user: (event) => _.pick(_.get(event, "data.item.user"), ["email", "id"]),
-        props: (event) => {
+        props: (_event) => {
           return {
             initiated: "user"
           };
         },
-        context: (event) => {
+        context: (_event) => {
           return {
             event_type: "conversation",
           };
@@ -41,12 +43,12 @@ export default class TagMapping {
         intercom: "conversation.admin.replied",
         eventName: "Admin replied to conversation",
         user: (event) => _.pick(_.get(event, "data.item.user"), ["email", "id"]),
-        props: (event) => {
+        props: (_event) => {
           return {
             initiated: "admin"
           };
         },
-        context: (event) => {
+        context: (_event) => {
           return {
             event_type: "conversation",
           };
@@ -56,12 +58,12 @@ export default class TagMapping {
         intercom: "conversation.admin.single.created",
         eventName: "Admin started conversation",
         user: (event) => _.pick(_.get(event, "data.item.user"), ["email", "id"]),
-        props: (event) => {
+        props: (_event) => {
           return {
             initiated: "admin"
           };
         },
-        context: (event) => {
+        context: (_event) => {
           return {
             event_type: "conversation",
           };
@@ -78,7 +80,7 @@ export default class TagMapping {
             initiated: "admin"
           };
         },
-        context: (event) => {
+        context: (_event) => {
           return {
             event_type: "conversation",
           };
@@ -93,7 +95,7 @@ export default class TagMapping {
             admin: _.get(event, "data.item.assignee.id")
           };
         },
-        context: (event) => {
+        context: (_event) => {
           return {
             event_type: "conversation",
           };
@@ -108,7 +110,7 @@ export default class TagMapping {
             admin: _.get(event, "data.item.assignee.id")
           };
         },
-        context: (event) => {
+        context: (_event) => {
           return {
             event_type: "conversation",
           };
@@ -123,7 +125,7 @@ export default class TagMapping {
             tag: _.get(event, "data.item.tag.name"),
           };
         },
-        context: (event) => {
+        context: (_event) => {
           return {
             event_type: "tag",
           };
@@ -138,7 +140,7 @@ export default class TagMapping {
             tag: _.get(event, "data.item.tag.name"),
           };
         },
-        context: (event) => {
+        context: (_event) => {
           return {
             event_type: "tag",
           };
@@ -148,10 +150,10 @@ export default class TagMapping {
         intercom: "user.unsubscribed",
         eventName: "Unsubscribed from emails",
         user: (event) => _.pick(_.get(event, "data.item"), ["email", "id"]),
-        props: (event) => {
+        props: (_event) => {
           return {};
         },
-        context: (event) => {
+        context: (_event) => {
           return {
             event_type: "email",
           };
@@ -161,10 +163,10 @@ export default class TagMapping {
         intercom: "user.email.updated",
         eventName: "Updated email address",
         user: (event) => _.pick(_.get(event, "data.item"), ["email", "id"]),
-        props: (event) => {
+        props: (_event) => {
           return {};
         },
-        context: (event) => {
+        context: (_event) => {
           return {
             event_type: "email",
           };
@@ -178,6 +180,18 @@ export default class TagMapping {
 
     if (!mappedEvent) {
       return null;
+    }
+
+    // FIXME: refactor these constraints
+    if (_.includes(["user.tag.created", "user.tag.deleted"], event.topic)
+      && _.includes(this.tagMapping.getTagIds(), event.data.item.tag.id)) {
+      // skipping this event
+      this.hullClient.logger.debug("skipping tag event", {
+        user: event.data.item.user.email,
+        topic: event.topic,
+        tag: event.data.item.tag.name
+      });
+      return Promise.resolve();
     }
 
     const user = mappedEvent.user(event);

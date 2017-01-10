@@ -38,8 +38,13 @@ export default class IntercomClient {
         //   .diff(moment(), "seconds");
         // x-runtime
         this.instrumentationAgent.metricInc("api_call", 1, this.ship);
-        this.instrumentationAgent.metricVal("ratelimit_remaining", remaining, this.ship);
-        this.instrumentationAgent.metricVal("ratelimit_limit", limit, this.ship);
+        if (remaining) {
+          this.instrumentationAgent.metricVal("ratelimit_remaining", remaining, this.ship);
+        }
+
+        if (limit) {
+          this.instrumentationAgent.metricVal("ratelimit_limit", limit, this.ship);
+        }
       });
 
     if (this.accessToken) {
