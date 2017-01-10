@@ -183,11 +183,15 @@ export default class TagMapping {
     }
 
     // FIXME: refactor these constraints
-    if (_.includes(["user.tag.created", "user.tag.deleted"], event.topic)) {
-      if (_.includes(this.tagMapping.getTagIds(), event.data.item.tag.id)) {
-        // skipping this event
-        return Promise.resolve();
-      }
+    if (_.includes(["user.tag.created", "user.tag.deleted"], event.topic)
+      && _.includes(this.tagMapping.getTagIds(), event.data.item.tag.id)) {
+      // skipping this event
+      this.hullClient.logger.debug("skipping tag event", {
+        user: event.data.item.user.email,
+        topic: event.topic,
+        tag: event.data.item.tag.name
+      });
+      return Promise.resolve();
     }
 
     const user = mappedEvent.user(event);
