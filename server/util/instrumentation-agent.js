@@ -14,7 +14,9 @@ export default class InstrumentationAgent {
 
     if (process.env.SENTRY_URL) {
       console.log("starting raven");
-      this.raven = new raven.Client(process.env.SENTRY_URL);
+      this.raven = new raven.Client(process.env.SENTRY_URL, {
+        release: require(`${process.cwd()}/package.json`).version // eslint-disable-line global-require
+      });
       this.raven.patchGlobal();
     }
 
