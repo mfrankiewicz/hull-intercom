@@ -17,6 +17,10 @@ export default class TagMapping {
     return _.keys(this.mapping);
   }
 
+  getTagIds() {
+    return _.values(this.mapping);
+  }
+
   /**
    * @return Promise
    */

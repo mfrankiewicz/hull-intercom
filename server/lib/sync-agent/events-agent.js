@@ -2,9 +2,10 @@ import _ from "lodash";
 
 export default class TagMapping {
 
-  constructor(hullAgent, ship) {
+  constructor(hullAgent, tagMapping, ship) {
     this.ship = ship;
     this.hullClient = hullAgent.hullClient;
+    this.tagMapping = tagMapping;
 
     this.map = [
       {
@@ -178,6 +179,13 @@ export default class TagMapping {
 
     if (!mappedEvent) {
       return null;
+    }
+
+    // FIXME: refactor these constraints
+    if (_.includes(["user.tag.created", "user.tag.deleted"], event.topic)) {
+      if (_.includes(this.tagMapping.getTagIds(), event.data.item.tag.id)) {
+        return console.log("HULL SEGMENT TAG MODIFIED", _.omit(event.data.item, ["user"]));
+      }
     }
 
     const user = mappedEvent.user(event);

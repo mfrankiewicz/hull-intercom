@@ -18,7 +18,7 @@ export default class SyncAgent {
     this.tagMapping = new TagMapping(intercomAgent, hullAgent, ship);
     this.userMapping = new UserMapping(ship);
     this.webhookAgent = new WebhookAgent(intercomAgent, hullAgent, ship, hostname);
-    this.eventsAgent = new EventsAgent(hullAgent, ship);
+    this.eventsAgent = new EventsAgent(hullAgent, this.tagMapping, ship);
   }
 
   isConfigured() {
