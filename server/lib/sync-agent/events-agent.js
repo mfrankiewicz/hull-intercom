@@ -11,12 +11,12 @@ export default class TagMapping {
         intercom: "conversation.user.created",
         eventName: "User started conversation",
         user: (event) => _.pick(_.get(event, "data.item.user"), ["email", "id"]),
-        props: (event) => {
+        props: (_event) => {
           return {
             initiated: "user"
           };
         },
-        context: (event) => {
+        context: (_event) => {
           return {
             event_type: "conversation",
           };
@@ -26,12 +26,12 @@ export default class TagMapping {
         intercom: "conversation.user.replied",
         eventName: "User replied to conversation",
         user: (event) => _.pick(_.get(event, "data.item.user"), ["email", "id"]),
-        props: (event) => {
+        props: (_event) => {
           return {
             initiated: "user"
           };
         },
-        context: (event) => {
+        context: (_event) => {
           return {
             event_type: "conversation",
           };
@@ -41,12 +41,12 @@ export default class TagMapping {
         intercom: "conversation.admin.replied",
         eventName: "Admin replied to conversation",
         user: (event) => _.pick(_.get(event, "data.item.user"), ["email", "id"]),
-        props: (event) => {
+        props: (_event) => {
           return {
             initiated: "admin"
           };
         },
-        context: (event) => {
+        context: (_event) => {
           return {
             event_type: "conversation",
           };
@@ -56,12 +56,12 @@ export default class TagMapping {
         intercom: "conversation.admin.single.created",
         eventName: "Admin started conversation",
         user: (event) => _.pick(_.get(event, "data.item.user"), ["email", "id"]),
-        props: (event) => {
+        props: (_event) => {
           return {
             initiated: "admin"
           };
         },
-        context: (event) => {
+        context: (_event) => {
           return {
             event_type: "conversation",
           };
@@ -78,7 +78,7 @@ export default class TagMapping {
             initiated: "admin"
           };
         },
-        context: (event) => {
+        context: (_event) => {
           return {
             event_type: "conversation",
           };
@@ -88,12 +88,12 @@ export default class TagMapping {
         intercom: "conversation.admin.closed",
         eventName: "Admin closed conversation",
         user: (event) => _.pick(_.get(event, "data.item.user"), ["email", "id"]),
-        props: (event) => {
+        props: (_event) => {
           return {
             admin: _.get(event, "data.item.assignee.id")
           };
         },
-        context: (event) => {
+        context: (_event) => {
           return {
             event_type: "conversation",
           };
@@ -108,7 +108,7 @@ export default class TagMapping {
             admin: _.get(event, "data.item.assignee.id")
           };
         },
-        context: (event) => {
+        context: (_event) => {
           return {
             event_type: "conversation",
           };
@@ -123,7 +123,7 @@ export default class TagMapping {
             tag: _.get(event, "data.item.tag.name"),
           };
         },
-        context: (event) => {
+        context: (_event) => {
           return {
             event_type: "tag",
           };
@@ -138,7 +138,7 @@ export default class TagMapping {
             tag: _.get(event, "data.item.tag.name"),
           };
         },
-        context: (event) => {
+        context: (_event) => {
           return {
             event_type: "tag",
           };
@@ -148,10 +148,10 @@ export default class TagMapping {
         intercom: "user.unsubscribed",
         eventName: "Unsubscribed from emails",
         user: (event) => _.pick(_.get(event, "data.item"), ["email", "id"]),
-        props: (event) => {
+        props: (_event) => {
           return {};
         },
-        context: (event) => {
+        context: (_event) => {
           return {
             event_type: "email",
           };
@@ -161,10 +161,10 @@ export default class TagMapping {
         intercom: "user.email.updated",
         eventName: "Updated email address",
         user: (event) => _.pick(_.get(event, "data.item"), ["email", "id"]),
-        props: (event) => {
+        props: (_event) => {
           return {};
         },
-        context: (event) => {
+        context: (_event) => {
           return {
             event_type: "email",
           };
