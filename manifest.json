@@ -46,6 +46,12 @@
       "format": "hidden"
     },
     {
+      "name": "events_to_intercom",
+      "description": "Push those events to Intercom",
+      "format": "event",
+      "type": "array"
+    },
+    {
       "name" : "sync_fields_to_intercom",
       "title" : "List of User attributes to push to Intercom",
       "type" : "array",

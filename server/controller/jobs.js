@@ -1,5 +1,6 @@
 import Promise from "bluebird";
 import _ from "lodash";
+import moment from "moment";
 
 export default class Jobs {
 
@@ -192,6 +193,29 @@ export default class Jobs {
     const { events = [] } = req.payload;
 
     return Promise.all(events.map(e => syncAgent.eventsAgent.trackEvent(e)));
+  }
+
+  static sendEvents(req) {
+    const { syncAgent } = req.shipApp;
+    const { events = [] } = req.payload;
+
+    return events.map(ev => {
+      const data = {
+        event_name: ev.event,
+        created_at: moment(ev.created_at).format("X"),
+        id: ev.user["traits_intercom/id"],
+        metadata: ev.properties
+      };
+      req.hull.client.logger.info("outgoing.event", data);
+
+      return req.shipApp.intercomClient
+        .post("/events")
+        .send(data)
+        .catch((err) => {
+          req.hull.client.error.info("outgoing.event.error", req.shipApp.intercomClient.handleError(err));
+        });
+    })
+
   }
 
 }

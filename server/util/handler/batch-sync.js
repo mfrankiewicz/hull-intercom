@@ -16,7 +16,7 @@ export default class BatchSyncHandler {
   }
 
   static getHandler(args) {
-    const name = this.ns + args.ship.id;
+    const name = args.ns + args.ship.id;
     return HANDLERS[name] = HANDLERS[name] || new BatchSyncHandler(args); // eslint-disable-line no-return-assign
   }
 
