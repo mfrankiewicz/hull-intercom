@@ -1,4 +1,5 @@
 import _ from "lodash";
+import Promise from "bluebird";
 
 export default class TagMapping {
 
@@ -184,7 +185,8 @@ export default class TagMapping {
     // FIXME: refactor these constraints
     if (_.includes(["user.tag.created", "user.tag.deleted"], event.topic)) {
       if (_.includes(this.tagMapping.getTagIds(), event.data.item.tag.id)) {
-        return console.log("HULL SEGMENT TAG MODIFIED", _.omit(event.data.item, ["user"]));
+        // skipping this event
+        return Promise.resolve();
       }
     }
 
