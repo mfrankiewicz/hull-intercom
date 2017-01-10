@@ -36,5 +36,6 @@ export default {
   hullMiddleware,
   shipConfig,
   appMiddleware,
-  controllers
+  controllers,
+  Hull
 };

@@ -1,15 +1,12 @@
 import { Strategy as IntercomStrategy } from "passport-intercom";
 import moment from "moment";
 
-import AppMiddleware from "../lib/app-middleware";
-
 export default function OAuthRouter(deps) {
   const {
     Hull,
     shipConfig,
-    queueAdapter,
     shipCache,
-    instrumentationAgent
+    appMiddleware
   } = deps;
 
   const {
@@ -34,10 +31,10 @@ export default function OAuthRouter(deps) {
       const { access_token, api_key, app_id } = ship.private_settings || {};
 
       if (access_token || (api_key && app_id)) {
-        // TODO: we have notices problems with syncing hull segments property
+        // TODO: we have noticed problems with syncing hull segments property
         // after a Intercom resync, there may be a problem with notification
         // subscription. Following two lines fixes that problem.
-        AppMiddleware({ queueAdapter, shipCache, instrumentationAgent })(req, {}, () => {});
+        appMiddleware(req, {}, () => {});
         // req.shipApp.intercomAgent.syncContactProperties()
         //   .catch((err) => hull.logger.error("Error in creating segments property", err));
 
@@ -50,7 +47,7 @@ export default function OAuthRouter(deps) {
       }
       return Promise.reject();
     },
-    onLogin: (req, { hull, ship }) => {
+    onLogin: () => {
       return Promise.resolve();
     },
     onAuthorize: (req, { hull, ship }) => {

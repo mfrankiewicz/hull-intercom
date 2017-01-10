@@ -1,38 +1,29 @@
-import Hull from "hull";
-import raven from "raven";
-
-import WebApp from "./util/web-app";
-import ExitHandler from "./util/exit-handler";
-import BatchSyncHandler from "./util/batch-sync-handler";
-import StaticRouter from "./util/static-router";
-import KueRouter from "./util/kue-router";
+import WebApp from "./util/app/web";
+import ExitHandler from "./util/handler/exit";
+import BatchSyncHandler from "./util/handler/batch-sync";
+import StaticRouter from "./util/router/static";
+import KueRouter from "./util/router/kue";
 
 import bootstrap from "./bootstrap";
 import AppRouter from "./router/app";
 import OAuthRouter from "./router/oauth";
 
-const { queueAdapter, instrumentationAgent } = bootstrap;
+const { instrumentationAgent } = bootstrap;
 
 const port = process.env.PORT || 8082;
 
 const app = WebApp();
 
-if (instrumentationAgent.raven) {
-  app.use(raven.middleware.express.requestHandler(instrumentationAgent.raven));
-}
-
 app
-  .use("/", AppRouter({ Hull, ...bootstrap }))
-  .use("/", StaticRouter({ Hull }))
-  .use("/auth", OAuthRouter({ Hull, ...bootstrap }))
-  .use("/kue", KueRouter({ hostSecret: bootstrap.shipConfig.hostSecret, queueAdapter }));
-
-if (instrumentationAgent.raven) {
-  app.use(raven.middleware.express.errorHandler(instrumentationAgent.raven));
-}
+  .use(instrumentationAgent.startMiddleware())
+  .use("/", AppRouter(bootstrap))
+  .use("/", StaticRouter(bootstrap))
+  .use("/auth", OAuthRouter(bootstrap))
+  .use("/kue", KueRouter(bootstrap))
+  .use(instrumentationAgent.stopMiddleware());
 
 app.listen(port, () => {
-  Hull.logger.info("webApp.listen", port);
+  bootstrap.Hull.logger.info("webApp.listen", port);
 });
 
 ExitHandler(BatchSyncHandler.exit.bind(BatchSyncHandler));

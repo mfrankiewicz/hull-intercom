@@ -17,6 +17,10 @@ export default class TagMapping {
     return _.keys(this.mapping);
   }
 
+  getTagIds() {
+    return _.values(this.mapping);
+  }
+
   /**
    * @return Promise
    */
@@ -93,6 +97,7 @@ export default class TagMapping {
           _.unset(this.mapping, segment.id);
           return Promise.resolve();
         }
+        return Promise.reject(fErr);
       });
   }
 }

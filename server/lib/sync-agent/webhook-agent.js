@@ -12,6 +12,15 @@ export default class WebhookAgent {
     this.hostname = hostname;
 
     this.webhookId = _.get(this.ship, "private_settings.webhook_id");
+
+    this.topics = [
+      "user.created", "user.deleted",
+      "user.tag.created", "user.tag.deleted", "user.unsubscribed",
+      "conversation.user.created", "conversation.user.replied",
+      "conversation.admin.replied", "conversation.admin.single.created",
+      "conversation.admin.assigned", "conversation.admin.opened",
+      "conversation.admin.closed", "user.email.updated"
+    ];
   }
 
   /**
@@ -19,18 +28,34 @@ export default class WebhookAgent {
    */
   ensureWebhook() {
     if (this.webhookId) {
-      return Promise.resolve(this.webhookId);
+      return this.intercomClient.get(`/subscriptions/${this.webhookId}`)
+        .then(({ body }) => {
+          const missingTopics = _.difference(this.topics, body.topics);
+          if (_.isEmpty(missingTopics)) {
+            return Promise.resolve(this.webhookId);
+          }
+          return this.createWebhook(this.webhookId);
+        }, (error) => {
+          if (error.response.statusCode === 404) {
+            return this.createWebhook();
+          }
+          return Promise.reject(error);
+        });
     }
     return this.createWebhook();
   }
 
-  createWebhook() {
+  /**
+   * Creates or updates webhook
+   * @type {String} webhookId optional id of existing webhook
+   */
+  createWebhook(webhookId = "") {
     const url = this.getWebhookUrl();
 
-    return this.intercomClient.post("/subscriptions")
+    return this.intercomClient.post(`/subscriptions/${webhookId}`)
       .send({
         service_type: "web",
-        topics: ["user.created", "user.deleted", "user.unsubscribed", "user.updated"],
+        topics: this.topics,
         url
       })
       .catch(err => {

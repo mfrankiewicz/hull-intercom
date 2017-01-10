@@ -5,7 +5,7 @@ import _ from "lodash";
  * @param  {Object}   res
  * @param  {Function} next
  */
-export default function ResponseMiddleware(result, req, res, next) {
+export default function responseMiddleware(result, req, res, next) {
   if (_.isError(result)) {
     res.status(500);
   } else {
