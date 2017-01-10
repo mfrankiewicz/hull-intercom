@@ -88,7 +88,7 @@ export default class TagMapping {
         intercom: "conversation.admin.closed",
         eventName: "Admin closed conversation",
         user: (event) => _.pick(_.get(event, "data.item.user"), ["email", "id"]),
-        props: (_event) => {
+        props: (event) => {
           return {
             admin: _.get(event, "data.item.assignee.id")
           };
