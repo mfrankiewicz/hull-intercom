@@ -46,10 +46,19 @@
       "format": "hidden"
     },
     {
-      "name": "events_to_intercom",
-      "description": "Push those events to Intercom",
+      "name": "send_events_enabled",
+      "title": "Enable sending events",
+      "description": "Allow sending events to Intercom",
+      "type" : "boolean",
+      "default" : false
+    },
+    {
+      "name": "send_events",
+      "title": "Events to send",
+      "description": "Send Events to Intercom",
       "format": "event",
-      "type": "array"
+      "type": "array",
+      "default": ["Entered segment", "Left segment"]
     },
     {
       "name" : "sync_fields_to_intercom",

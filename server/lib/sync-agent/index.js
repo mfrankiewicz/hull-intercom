@@ -172,6 +172,10 @@ export default class SyncAgent {
    * @return {Promise}
    */
   sendEvents(users) {
+    if (this.ship.private_settings.send_events_enabled !== true) {
+      return Promise.resolve();
+    }
+
     const events = _.chain(users)
       .filter(u => !_.isUndefined(u["traits_intercom/id"]))
       .map(u => {
@@ -183,7 +187,7 @@ export default class SyncAgent {
         });
       })
       .flatten()
-      .filter(e => _.includes(this.ship.private_settings.events_to_intercom, e.event))
+      .filter(e => _.includes(this.ship.private_settings.send_events, e.event))
       .value();
 
     return Promise.map(events, ev => {
