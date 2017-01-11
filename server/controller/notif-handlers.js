@@ -62,40 +62,17 @@ export default class NotifHandlers {
       return Promise.resolve();
     }
 
-    const promises = [
-      BatchSyncHandler.getHandler({
-        hull: req.hull,
-        ship: req.hull.ship,
-        ns: "notif",
-        options: {
-          maxSize: process.env.NOTIFY_BATCH_HANDLER_SIZE || 100,
-          throttle: process.env.NOTIFY_BATCH_HANDLER_THROTTLE || 30000
-        }
-      }).setCallback(users => queueAgent.create("sendUsers", { users }))
-      .add(filteredUser)
-    ];
+    filteredUser.events = events || [];
 
-    const filteredEvents = events.filter(e => {
-      return _.includes(req.hull.ship.private_settings.events_to_intercom, e.event)
-        && user["traits_intercom/id"];
-    }).map(e => {
-      e.user = user;
-      return e;
-    });
-
-    if (filteredEvents) {
-      promises.push(BatchSyncHandler.getHandler({
-        hull: req.hull,
-        ship: req.hull.ship,
-        ns: "notif-events",
-        options: {
-          maxSize: process.env.NOTIFY_BATCH_HANDLER_SIZE || 100,
-          throttle: process.env.NOTIFY_BATCH_HANDLER_THROTTLE || 30000
-        }
-      }).setCallback(events => queueAgent.create("sendEvents", { events: _.flatten(events) }))
-      .add(filteredEvents));
-    }
-
-    return Promise.all(promises);
+    return BatchSyncHandler.getHandler({
+      hull: req.hull,
+      ship: req.hull.ship,
+      ns: "notif",
+      options: {
+        maxSize: process.env.NOTIFY_BATCH_HANDLER_SIZE || 100,
+        throttle: process.env.NOTIFY_BATCH_HANDLER_THROTTLE || 30000
+      }
+    }).setCallback(users => queueAgent.create("sendUsers", { users }))
+    .add(filteredUser);
   }
 }

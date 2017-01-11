@@ -175,7 +175,7 @@ export default class TagMapping {
     ];
   }
 
-  trackEvent(event) {
+  saveEvent(event) {
     const mappedEvent = _.find(this.map, { intercom: event.topic });
 
     if (!mappedEvent) {
@@ -205,7 +205,7 @@ export default class TagMapping {
       created_at: event.created_at
     });
 
-    this.hullClient.logger.info("track", user, eventName, props, context);
+    this.hullClient.logger.info("incoming.event", user, eventName, props, context);
     return this.hullClient.as({ email: user.email }).track(eventName, props, context);
   }
 }

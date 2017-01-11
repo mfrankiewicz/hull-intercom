@@ -1,12 +1,11 @@
 import Promise from "bluebird";
 import _ from "lodash";
-import moment from "moment";
 
 export default class Jobs {
 
   /**
-   * Takes incoming list of users with fields and segment_ids set.
-   * Performing the
+   * Takes list of users with fields and segment_ids set,
+   * sends them to Intercom and tags them.
    */
   static sendUsers(req) {
     const { users, mode = "bulk", setUserId = false } = req.payload;
@@ -21,7 +20,12 @@ export default class Jobs {
       .then(() => intercomAgent.saveUsers(intercomUsersToSave, mode))
       .then(res => {
         if (_.isArray(res)) {
-          const savedUsers = _.intersectionBy(usersToSave, res, "email");
+          const savedUsers = _.intersectionBy(usersToSave, res, "email")
+            .map(u => {
+              const intercomData = _.find(res, { email: u.email });
+              u["traits_intercom/id"] = intercomData.id;
+              return u;
+            });
           const errors = _.filter(res, { body: { type: "error.list" } });
 
           req.hull.client.logger.error("ERRORS", errors.map(r => r.body.errors));
@@ -33,7 +37,8 @@ export default class Jobs {
             };
           });
 
-          return syncAgent.groupUsersToTag(savedUsers)
+          return syncAgent.sendEvents(savedUsers)
+            .then(() => syncAgent.groupUsersToTag(savedUsers))
             .then(groupedUsers => intercomAgent.tagUsers(groupedUsers))
             .then(() => syncAgent.handleUserErrors(groupedErrors, usersToSave))
             .then(errorRes => {
@@ -89,6 +94,12 @@ export default class Jobs {
       });
   }
 
+
+  /**
+   * Saves users incoming from Intercom API
+   * @param  {Object} req
+   * @return {Promise}
+   */
   static saveUsers(req) {
     const { users } = req.payload;
     const { syncAgent, hullAgent } = req.shipApp;
@@ -188,34 +199,10 @@ export default class Jobs {
       });
   }
 
-  static trackEvents(req) {
+  static saveEvents(req) {
     const { syncAgent } = req.shipApp;
     const { events = [] } = req.payload;
 
-    return Promise.all(events.map(e => syncAgent.eventsAgent.trackEvent(e)));
+    return Promise.all(events.map(e => syncAgent.eventsAgent.saveEvent(e)));
   }
-
-  static sendEvents(req) {
-    const { syncAgent } = req.shipApp;
-    const { events = [] } = req.payload;
-
-    return events.map(ev => {
-      const data = {
-        event_name: ev.event,
-        created_at: moment(ev.created_at).format("X"),
-        id: ev.user["traits_intercom/id"],
-        metadata: ev.properties
-      };
-      req.hull.client.logger.info("outgoing.event", data);
-
-      return req.shipApp.intercomClient
-        .post("/events")
-        .send(data)
-        .catch((err) => {
-          req.hull.client.error.info("outgoing.event.error", req.shipApp.intercomClient.handleError(err));
-        });
-    })
-
-  }
-
 }

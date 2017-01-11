@@ -165,4 +165,41 @@ export default class SyncAgent {
     });
   }
 
+  /**
+   * Sends Hull events to Intercom. Only for users with `traits_intercom/id` and events matching
+   * the set filter.
+   * @param  {Array} users Hull users with `events` property supplied
+   * @return {Promise}
+   */
+  sendEvents(users) {
+    const events = _.chain(users)
+      .filter(u => !_.isUndefined(u["traits_intercom/id"]))
+      .map(u => {
+        return u.events.map(e => {
+          e.user = {
+            id: u["traits_intercom/id"]
+          };
+          return e;
+        });
+      })
+      .flatten()
+      .filter(e => _.includes(this.ship.private_settings.events_to_intercom, e.event))
+      .value();
+
+    return Promise.map(events, ev => {
+      const data = {
+        event_name: ev.event,
+        created_at: moment(ev.created_at).format("X"),
+        id: ev.user.id,
+        metadata: ev.properties
+      };
+      this.hullClient.logger.info("outgoing.event", data);
+      return this.intercomAgent.sendEvent(data)
+        .catch(err => {
+          this.hullClient.error.info("outgoing.event.error", err);
+          return Promise.reject(err);
+        });
+    }, { concurrency: 3 });
+  }
+
 }

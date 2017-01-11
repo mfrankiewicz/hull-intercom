@@ -172,4 +172,18 @@ export default class IntercomAgent {
       });
   }
 
+  /**
+   * @see https://developers.intercom.com/reference#submitting-events
+   * @param  {Object} eventData
+   * @return {Promise}
+   */
+  sendEvent(eventData) {
+    return this.intercomClient
+      .post("/events")
+      .send(eventData)
+      .catch((err) => {
+        return Promise.reject(this.intercomClient.handleError(err));
+      });
+  }
+
 }
