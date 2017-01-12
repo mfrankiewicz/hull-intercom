@@ -14,6 +14,7 @@ export default class SyncAgent {
     this.hullAgent = hullAgent;
     this.intercomAgent = intercomAgent;
     this.hullClient = hullClient;
+    this.logger = hullClient.logger;
 
     this.tagMapping = new TagMapping(intercomAgent, hullAgent, ship);
     this.userMapping = new UserMapping(ship);
@@ -173,11 +174,14 @@ export default class SyncAgent {
    */
   sendEvents(users) {
     if (this.ship.private_settings.send_events_enabled !== true) {
+      this.logger.debug("sendEvents.send_events_enabled", this.ship.private_settings.send_events_enabled);
       return Promise.resolve();
     }
 
     const events = _.chain(users)
+      .tap(users => this.logger.debug("sendEvents.users", users.length))
       .filter(u => !_.isUndefined(u["traits_intercom/id"]))
+      .tap(users => this.logger.debug("sendEvents.users.filtered", users.length))
       .map(u => {
         return u.events.map(e => {
           e.user = {
@@ -187,8 +191,10 @@ export default class SyncAgent {
         });
       })
       .flatten()
+      .tap(events => this.logger.debug("sendEvents.events", events.length))
       .filter(e => _.includes(this.ship.private_settings.send_events, e.event))
       .filter(e => e.event_source !== "intercom")
+      .tap(events => this.logger.debug("sendEvents.events.filtered", events.length))
       .map(ev => {
         const data = {
           event_name: ev.event,
@@ -196,14 +202,14 @@ export default class SyncAgent {
           id: ev.user.id,
           metadata: ev.properties
         };
-        this.hullClient.logger.info("outgoing.event", data);
+        this.logger.info("outgoing.event", data);
         return data;
       })
       .value();
 
     return this.intercomAgent.sendEvents(events)
       .catch(err => {
-        this.hullClient.error.info("outgoing.event.error", err);
+        this.logger.error("outgoing.event.error", err);
         return Promise.reject(err);
       });
   }

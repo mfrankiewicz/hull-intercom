@@ -1,7 +1,7 @@
 import _ from "lodash";
 import Promise from "bluebird";
 
-export default class TagMapping {
+export default class EventsAgent {
 
   constructor(hullAgent, tagMapping, ship) {
     this.ship = ship;
@@ -206,6 +206,11 @@ export default class TagMapping {
     });
 
     this.hullClient.logger.info("incoming.event", user, eventName, props, context);
-    return this.hullClient.as({ email: user.email }).track(eventName, props, context);
+
+    const ident = {
+      email: user.email,
+      anonymous_id: user.id
+    };
+    return this.hullClient.as(ident).track(eventName, props, context);
   }
 }
