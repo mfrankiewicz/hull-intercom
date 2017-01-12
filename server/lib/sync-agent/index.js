@@ -188,22 +188,24 @@ export default class SyncAgent {
       })
       .flatten()
       .filter(e => _.includes(this.ship.private_settings.send_events, e.event))
+      .filter(e => e.event_source !== "intercom")
+      .map(ev => {
+        const data = {
+          event_name: ev.event,
+          created_at: moment(ev.created_at).format("X"),
+          id: ev.user.id,
+          metadata: ev.properties
+        };
+        this.hullClient.logger.info("outgoing.event", data);
+        return data;
+      })
       .value();
 
-    return Promise.map(events, ev => {
-      const data = {
-        event_name: ev.event,
-        created_at: moment(ev.created_at).format("X"),
-        id: ev.user.id,
-        metadata: ev.properties
-      };
-      this.hullClient.logger.info("outgoing.event", data);
-      return this.intercomAgent.sendEvent(data)
-        .catch(err => {
-          this.hullClient.error.info("outgoing.event.error", err);
-          return Promise.reject(err);
-        });
-    }, { concurrency: 3 });
+    return this.intercomAgent.sendEvents(events)
+      .catch(err => {
+        this.hullClient.error.info("outgoing.event.error", err);
+        return Promise.reject(err);
+      });
   }
 
 }
