@@ -8,6 +8,10 @@ import bootstrap from "./bootstrap";
 import AppRouter from "./router/app";
 import OAuthRouter from "./router/oauth";
 
+if (process.env.COMBINED) {
+  require("./worker"); // eslint-disable-line global-require
+}
+
 const { instrumentationAgent } = bootstrap;
 
 const port = process.env.PORT || 8082;

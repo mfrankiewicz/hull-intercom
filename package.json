@@ -6,8 +6,8 @@
   "scripts": {
     "build": "npm run clean && npm run build:server",
     "build:server": "babel server -d build",
-    "start": "nf start",
-    "start:dev": "nf -j Procfile.dev start",
+    "start": "npm run build && COMBINED=true node build/web",
+    "start:dev": "NODE_ENV=development COMBINED=true babel-watch -L server/web",
     "test": "NODE_ENV=test mocha --require babel-register -R spec ./tests",
     "test:lint": "eslint server tests",
     "clean": "rm -rf build",
@@ -48,7 +48,6 @@
     "csv-stream": "^0.1.3",
     "ejs": "^2.4.1",
     "express": "^4.13.4",
-    "foreman": "^2.0.0",
     "hull": "0.10.2",
     "kue": "^0.11.1",
     "kue-ui": "^0.1.0",
