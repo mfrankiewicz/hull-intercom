@@ -183,7 +183,7 @@ export default class SyncAgent {
       .filter(u => !_.isUndefined(u["traits_intercom/id"]))
       .tap(u => this.logger.debug("sendEvents.users.filtered", u.length))
       .map(u => {
-        return u.events.map(e => {
+        return _.get(u, "events", []).map(e => {
           e.user = {
             id: u["traits_intercom/id"]
           };
