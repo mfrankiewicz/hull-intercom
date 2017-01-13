@@ -12,6 +12,7 @@ export default class IntercomAgent {
     this.queueAgent = queueAgent;
     this.ship = ship;
     this.hullClient = hullClient;
+    this.logger = hullClient.logger;
     this.instrumentationAgent = instrumentationAgent;
   }
 
@@ -68,10 +69,11 @@ export default class IntercomAgent {
       return Promise.resolve();
     }
 
-    this.hullClient.logger.info("SAVING", users.length);
+    this.logger.info("SAVING", users.length);
 
     const body = {
       items: users.map(u => {
+        this.logger.debug("outgoing.user", u);
         return {
           method: "post",
           data_type: "user",

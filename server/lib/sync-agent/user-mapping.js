@@ -117,6 +117,7 @@ export default class UserMapping {
   }
 
   getIntercomFields(hullUser, { setUserId = false } = {}) {
+    console.log("!", hullUser);
     const intercomFields = _.reduce(this.computeIntercomFields(), (fields, prop) => {
       if (_.get(hullUser, prop.hull)) {
         // if field is standard and should not be overwritten
@@ -135,7 +136,7 @@ export default class UserMapping {
     _.set(intercomFields, "email", _.get(hullUser, "email"));
 
     if (setUserId) {
-      _.set(intercomFields, "user_id", _.get(hullUser, "id"));
+      _.set(intercomFields, "user_id", _.get(hullUser, "external_id"));
     }
 
     return intercomFields;
