@@ -46,7 +46,7 @@ export default class Actions {
         throttle: process.env.NOTIFY_BATCH_HANDLER_THROTTLE || 30000
       }
     })
-    .setCallback(events => req.shipApp.queueAgent.create("trackEvents", { events }))
+    .setCallback(events => req.shipApp.queueAgent.create("saveEvents", { events }))
     .add(_.get(req, "body"))
     .then(next, next);
   }

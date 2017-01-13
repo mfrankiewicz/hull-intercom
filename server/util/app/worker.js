@@ -38,6 +38,8 @@ export default class WorkerApp {
       console.error(err.message);
       return Promise.reject(err);
     }
+
+    const startTime = process.hrtime();
     return Promise.fromCallback((callback) => {
       this.instrumentationAgent.startTransaction(jobName, () => {
         this.runMiddleware(req, res)
@@ -61,6 +63,9 @@ export default class WorkerApp {
           })
           .finally(() => {
             this.instrumentationAgent.endTransaction();
+            const duration = process.hrtime(startTime);
+            const ms = duration[0] * 1000 + duration[1] / 1000000;
+            this.instrumentationAgent.metricVal(`job.duration.${jobName}`, ms);
           });
       });
     });

@@ -9,16 +9,17 @@ import EventsAgent from "./events-agent";
 
 export default class SyncAgent {
 
-  constructor(intercomAgent, hullAgent, ship, hostname, hullClient) {
+  constructor(intercomAgent, hullAgent, ship, hostname, hullClient, instrumentationAgent) {
     this.ship = ship;
     this.hullAgent = hullAgent;
     this.intercomAgent = intercomAgent;
     this.hullClient = hullClient;
+    this.logger = hullClient.logger;
 
     this.tagMapping = new TagMapping(intercomAgent, hullAgent, ship);
     this.userMapping = new UserMapping(ship);
     this.webhookAgent = new WebhookAgent(intercomAgent, hullAgent, ship, hostname);
-    this.eventsAgent = new EventsAgent(hullAgent, this.tagMapping, ship);
+    this.eventsAgent = new EventsAgent(hullAgent, this.tagMapping, ship, instrumentationAgent);
   }
 
   isConfigured() {
@@ -163,6 +164,54 @@ export default class SyncAgent {
     .catch(() => {
       return Promise.resolve(moment().utc().format());
     });
+  }
+
+  /**
+   * Sends Hull events to Intercom. Only for users with `traits_intercom/id` and events matching
+   * the set filter.
+   * @param  {Array} users Hull users with `events` property supplied
+   * @return {Promise}
+   */
+  sendEvents(users) {
+    if (this.ship.private_settings.send_events_enabled !== true) {
+      this.logger.debug("sendEvents.send_events_enabled", this.ship.private_settings.send_events_enabled);
+      return Promise.resolve();
+    }
+
+    const events = _.chain(users)
+      .tap(u => this.logger.debug("sendEvents.users", u.length))
+      .filter(u => !_.isUndefined(u["traits_intercom/id"]))
+      .tap(u => this.logger.debug("sendEvents.users.filtered", u.length))
+      .map(u => {
+        return _.get(u, "events", []).map(e => {
+          e.user = {
+            id: u["traits_intercom/id"]
+          };
+          return e;
+        });
+      })
+      .flatten()
+      .tap(e => this.logger.debug("sendEvents.events", e.length))
+      .filter(e => _.includes(this.ship.private_settings.send_events, e.event))
+      .filter(e => e.event_source !== "intercom")
+      .tap(e => this.logger.debug("sendEvents.events.filtered", e.length))
+      .map(ev => {
+        const data = {
+          event_name: ev.event,
+          created_at: moment(ev.created_at).format("X"),
+          id: ev.user.id,
+          metadata: ev.properties
+        };
+        this.logger.info("outgoing.event", data);
+        return data;
+      })
+      .value();
+
+    return this.intercomAgent.sendEvents(events)
+      .catch(err => {
+        this.logger.error("outgoing.event.error", err);
+        return Promise.reject(err);
+      });
   }
 
 }

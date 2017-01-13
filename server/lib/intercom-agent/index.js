@@ -7,11 +7,12 @@ import moment from "moment";
  */
 export default class IntercomAgent {
 
-  constructor(intercomClient, queueAgent, ship, hullClient) {
+  constructor(intercomClient, queueAgent, ship, hullClient, instrumentationAgent) {
     this.intercomClient = intercomClient;
     this.queueAgent = queueAgent;
     this.ship = ship;
     this.hullClient = hullClient;
+    this.instrumentationAgent = instrumentationAgent;
   }
 
   getJob(id) {
@@ -172,4 +173,55 @@ export default class IntercomAgent {
       });
   }
 
+  /**
+   * @see https://developers.intercom.com/reference#event-model
+   * @see https://developers.intercom.com/reference#bulk-event-ops
+   * @see https://developers.intercom.com/reference#submitting-events
+   * @param  {Array} array of events data
+   * @return {Promise}
+   */
+  sendEvents(events) {
+    this.instrumentationAgent.metricInc("outgoing.events", events.length);
+    // FIXME: enable bulk jobs and remove `true` here, when we can match the user by `id`,
+    // look at error logged below
+    if (true || events.length <= 10) { // eslint-disable-line no-constant-condition
+      return Promise.map(events, (event) => {
+        return this.intercomClient
+        .post("/events")
+        .send(event)
+        .catch((err) => {
+          return Promise.reject(this.intercomClient.handleError(err));
+        });
+      }, { concurrency: 3 });
+    }
+
+    const wrappedEvents = events.map(e => {
+      return {
+        method: "post",
+        data_type: "event",
+        data: e
+      };
+    });
+
+    const batches = _.chunk(wrappedEvents, 100);
+
+    return Promise.map(batches, (batch) => {
+      return this.intercomClient
+        .post("/bulk/events")
+        .send({
+          items: batch
+        })
+        .then(({ body }) => {
+          return this.intercomClient
+            .get(body.links.error)
+            .then((res) => {
+              // FIXME: place to verify if the error still persists
+              console.error(res.body.items[0].error);
+            });
+        })
+        .catch((err) => {
+          return Promise.reject(this.intercomClient.handleError(err));
+        });
+    }, { concurrency: 3 });
+  }
 }
