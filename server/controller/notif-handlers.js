@@ -45,7 +45,7 @@ export default class NotifHandlers {
       return Promise.resolve();
     }
 
-    const { user, changes = {}, segments = [] } = payload.message;
+    const { user, changes = {}, segments = [], events = [] } = payload.message;
     const { left = [] } = _.get(changes, "segments", {});
 
     if (!_.isEmpty(_.get(changes, "user['traits_intercom/id'][1]"))) {
@@ -61,6 +61,8 @@ export default class NotifHandlers {
     if (!filteredUser) {
       return Promise.resolve();
     }
+
+    filteredUser.events = events || [];
 
     return BatchSyncHandler.getHandler({
       hull: req.hull,

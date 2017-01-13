@@ -1,12 +1,13 @@
 import _ from "lodash";
 import Promise from "bluebird";
 
-export default class TagMapping {
+export default class EventsAgent {
 
-  constructor(hullAgent, tagMapping, ship) {
+  constructor(hullAgent, tagMapping, ship, instrumentationAgent) {
     this.ship = ship;
     this.hullClient = hullAgent.hullClient;
     this.tagMapping = tagMapping;
+    this.instrumentationAgent = instrumentationAgent;
 
     this.map = [
       {
@@ -175,7 +176,7 @@ export default class TagMapping {
     ];
   }
 
-  trackEvent(event) {
+  saveEvent(event) {
     const mappedEvent = _.find(this.map, { intercom: event.topic });
 
     if (!mappedEvent) {
@@ -205,7 +206,13 @@ export default class TagMapping {
       created_at: event.created_at
     });
 
-    this.hullClient.logger.info("track", user, eventName, props, context);
-    return this.hullClient.as({ email: user.email }).track(eventName, props, context);
+    this.hullClient.logger.info("incoming.event", user, eventName, props, context);
+    this.instrumentationAgent.metricInc("incoming.events");
+
+    const ident = {
+      email: user.email,
+      anonymous_id: `intercom:${user.id}`
+    };
+    return this.hullClient.as(ident).track(eventName, props, context);
   }
 }

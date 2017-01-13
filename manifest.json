@@ -46,6 +46,21 @@
       "format": "hidden"
     },
     {
+      "name": "send_events_enabled",
+      "title": "Enable sending events",
+      "description": "Allow sending events to Intercom",
+      "type" : "boolean",
+      "default" : false
+    },
+    {
+      "name": "send_events",
+      "title": "Events to send",
+      "description": "Send following Events to Intercom. Empty sends nothing.",
+      "format": "event",
+      "type": "array",
+      "default": ["Entered segment", "Left segment"]
+    },
+    {
       "name" : "sync_fields_to_intercom",
       "title" : "List of User attributes to push to Intercom",
       "type" : "array",

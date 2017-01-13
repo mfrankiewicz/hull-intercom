@@ -65,21 +65,25 @@ export default class InstrumentationAgent {
   metricVal(metric = "", value = 1, ship = {}) {
     try {
       if (this.librato) {
-        this.librato.measure(`${this.name}.${metric}`, parseFloat(value), Object.assign({}, { source: ship.id }));
+        return this.librato.measure(`${this.name}.${metric}`, parseFloat(value), Object.assign({}, { source: ship.id }));
       }
+      console.log("librato.measure", `${this.name}.${metric}`, parseFloat(value));
     } catch (err) {
       console.warn("error in librato.measure", err);
     }
+    return null;
   }
 
   metricInc(metric = "", value = 1, ship = {}) {
     try {
       if (this.librato) {
-        this.librato.increment(`${this.name}.${metric}`, parseFloat(value), Object.assign({}, { source: ship.id }));
+        return this.librato.increment(`${this.name}.${metric}`, parseFloat(value), Object.assign({}, { source: ship.id }));
       }
+      console.log("librato.increment", `${this.name}.${metric}`, parseFloat(value));
     } catch (err) {
-      console.warn("error in librato.measure", err);
+      console.warn("error in librato.increment", err);
     }
+    return null;
   }
 
   startMiddleware() {
