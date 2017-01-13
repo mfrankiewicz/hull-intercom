@@ -55,7 +55,7 @@
     {
       "name": "send_events",
       "title": "Events to send",
-      "description": "Send Events to Intercom",
+      "description": "Send following Events to Intercom. Empty sends nothing.",
       "format": "event",
       "type": "array",
       "default": ["Entered segment", "Left segment"]
