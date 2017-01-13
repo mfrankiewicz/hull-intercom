@@ -179,9 +179,9 @@ export default class SyncAgent {
     }
 
     const events = _.chain(users)
-      .tap(users => this.logger.debug("sendEvents.users", users.length))
+      .tap(u => this.logger.debug("sendEvents.users", u.length))
       .filter(u => !_.isUndefined(u["traits_intercom/id"]))
-      .tap(users => this.logger.debug("sendEvents.users.filtered", users.length))
+      .tap(u => this.logger.debug("sendEvents.users.filtered", u.length))
       .map(u => {
         return u.events.map(e => {
           e.user = {
@@ -191,10 +191,10 @@ export default class SyncAgent {
         });
       })
       .flatten()
-      .tap(events => this.logger.debug("sendEvents.events", events.length))
+      .tap(e => this.logger.debug("sendEvents.events", e.length))
       .filter(e => _.includes(this.ship.private_settings.send_events, e.event))
       .filter(e => e.event_source !== "intercom")
-      .tap(events => this.logger.debug("sendEvents.events.filtered", events.length))
+      .tap(e => this.logger.debug("sendEvents.events.filtered", e.length))
       .map(ev => {
         const data = {
           event_name: ev.event,
