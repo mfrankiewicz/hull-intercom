@@ -71,6 +71,7 @@ export default class InstrumentationAgent {
     } catch (err) {
       console.warn("error in librato.measure", err);
     }
+    return null;
   }
 
   metricInc(metric = "", value = 1, ship = {}) {
@@ -82,6 +83,7 @@ export default class InstrumentationAgent {
     } catch (err) {
       console.warn("error in librato.increment", err);
     }
+    return null;
   }
 
   startMiddleware() {
