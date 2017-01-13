@@ -65,7 +65,7 @@ export default class WorkerApp {
             this.instrumentationAgent.endTransaction();
             const duration = process.hrtime(startTime);
             const ms = duration[0] * 1000 + duration[1] / 1000000;
-            this.instrumentationAgent.metricVal(`job.duration.${jobName}`, ms);
+            this.instrumentationAgent.metricVal(`job.duration.${jobName}`, ms, req.hull.ship);
           });
       });
     });
