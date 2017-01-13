@@ -3,10 +3,11 @@ import Promise from "bluebird";
 
 export default class EventsAgent {
 
-  constructor(hullAgent, tagMapping, ship) {
+  constructor(hullAgent, tagMapping, ship, instrumentationAgent) {
     this.ship = ship;
     this.hullClient = hullAgent.hullClient;
     this.tagMapping = tagMapping;
+    this.instrumentationAgent = instrumentationAgent;
 
     this.map = [
       {
@@ -206,6 +207,7 @@ export default class EventsAgent {
     });
 
     this.hullClient.logger.info("incoming.event", user, eventName, props, context);
+    this.instrumentationAgent.metricInc("incoming.events");
 
     const ident = {
       email: user.email,

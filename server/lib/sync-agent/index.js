@@ -9,7 +9,7 @@ import EventsAgent from "./events-agent";
 
 export default class SyncAgent {
 
-  constructor(intercomAgent, hullAgent, ship, hostname, hullClient) {
+  constructor(intercomAgent, hullAgent, ship, hostname, hullClient, instrumentationAgent) {
     this.ship = ship;
     this.hullAgent = hullAgent;
     this.intercomAgent = intercomAgent;
@@ -19,7 +19,7 @@ export default class SyncAgent {
     this.tagMapping = new TagMapping(intercomAgent, hullAgent, ship);
     this.userMapping = new UserMapping(ship);
     this.webhookAgent = new WebhookAgent(intercomAgent, hullAgent, ship, hostname);
-    this.eventsAgent = new EventsAgent(hullAgent, this.tagMapping, ship);
+    this.eventsAgent = new EventsAgent(hullAgent, this.tagMapping, ship, instrumentationAgent);
   }
 
   isConfigured() {
