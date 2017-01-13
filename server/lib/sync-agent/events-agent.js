@@ -211,7 +211,7 @@ export default class EventsAgent {
 
     const ident = {
       email: user.email,
-      anonymous_id: user.id
+      anonymous_id: `intercom:${user.id}`
     };
     return this.hullClient.as(ident).track(eventName, props, context);
   }
