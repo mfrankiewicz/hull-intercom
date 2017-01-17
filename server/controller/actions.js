@@ -5,7 +5,7 @@ import BatchSyncHandler from "../util/handler/batch-sync";
 export default class Actions {
 
   static fetchAll(req, res, next) {
-    req.shipApp.queueAgent.create("importUsers")
+    req.shipApp.queueAgent.create("fetchUsers")
       .then(next, next);
   }
 
