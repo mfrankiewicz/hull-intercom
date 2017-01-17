@@ -116,8 +116,13 @@ export default class UserMapping {
     return hullTraits;
   }
 
-  getIntercomFields(hullUser, { setUserId = false } = {}) {
-    console.log("!", hullUser);
+  /**
+   * Build a object of attributes to send to Intercom
+   * @see https://developers.intercom.com/reference#user-model
+   * @param  {Object} hullUser
+   * @return {Object}
+   */
+  getIntercomFields(hullUser) {
     const intercomFields = _.reduce(this.computeIntercomFields(), (fields, prop) => {
       if (_.get(hullUser, prop.hull)) {
         // if field is standard and should not be overwritten
@@ -134,11 +139,53 @@ export default class UserMapping {
 
     _.set(intercomFields, "id", _.get(hullUser, "traits_intercom/id"));
     _.set(intercomFields, "email", _.get(hullUser, "email"));
-
-    if (setUserId) {
-      _.set(intercomFields, "user_id", _.get(hullUser, "external_id"));
-    }
+    _.set(intercomFields, "user_id", _.get(hullUser, "external_id"));
 
     return intercomFields;
+  }
+
+  /**
+   * @see https://developers.intercom.com/reference#section-user-object
+   * @param  {Object} user Intercom User
+   * @return {Object}
+   */
+  getIdentFromIntercom(user) {
+    const ident = {};
+
+    if (_.get(user, "email")) {
+      ident.email = user.email;
+    }
+
+    if (_.get(user, "id")) {
+      ident.anonymous_id = `intercom:${user.id}`;
+    }
+
+    if (_.get(user, "user_id")) {
+      ident.external_id = user.user_id;
+    }
+
+    return ident;
+  }
+
+  /**
+   * @param  {Object} user Hull user object
+   * @return {Object}
+   */
+  getIdentFromHull(user) {
+    const ident = {};
+
+    if (_.get(user, "email")) {
+      ident.email = user.email;
+    }
+
+    if (_.get(user, "external_id")) {
+      ident.external_id = user.external_id;
+    }
+
+    if (_.get(user, "user['intercom/id']")) {
+      ident.anonymous_id = `intercom:${user["intercom/id"]}`;
+    }
+
+    return ident;
   }
 }

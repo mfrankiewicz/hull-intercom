@@ -8,13 +8,13 @@ export default class Jobs {
    * sends them to Intercom and tags them.
    */
   static sendUsers(req) {
-    const { users, mode = "bulk", setUserId = false } = req.payload;
+    const { users, mode = "bulk" } = req.payload;
     const { syncAgent, intercomAgent, queueAgent } = req.shipApp;
 
     req.shipApp.instrumentationAgent.metricVal("send_users", users.length, req.hull.ship);
 
     const usersToSave = syncAgent.getUsersToSave(users);
-    const intercomUsersToSave = usersToSave.map(u => syncAgent.userMapping.getIntercomFields(u, { setUserId }));
+    const intercomUsersToSave = usersToSave.map(u => syncAgent.userMapping.getIntercomFields(u));
 
     return syncAgent.syncShip()
       .then(() => intercomAgent.saveUsers(intercomUsersToSave, mode))
@@ -40,13 +40,7 @@ export default class Jobs {
           return syncAgent.sendEvents(savedUsers)
             .then(() => syncAgent.groupUsersToTag(savedUsers))
             .then(groupedUsers => intercomAgent.tagUsers(groupedUsers))
-            .then(() => syncAgent.handleUserErrors(groupedErrors, usersToSave))
-            .then(errorRes => {
-              if (!_.isEmpty(errorRes)) {
-                return queueAgent.create("sendUsers", { users: errorRes, setUserId: true });
-              }
-              return null;
-            });
+            .then(() => syncAgent.handleUserErrors(groupedErrors));
         }
 
         if (_.get(res, "body.id")) {
@@ -67,13 +61,7 @@ export default class Jobs {
           return (() => {
             if (hasErrors) {
               return intercomAgent.getJobErrors(id)
-                .then(data => syncAgent.handleUserErrors(data, users))
-                .then(res => {
-                  if (!_.isEmpty(res)) {
-                    return queueAgent.create("sendUsers", { users: res, setUserId: true });
-                  }
-                  return null;
-                });
+                .then(data => syncAgent.handleUserErrors(data));
             }
             return Promise.resolve();
           })()
@@ -106,20 +94,13 @@ export default class Jobs {
 
     req.shipApp.instrumentationAgent.metricVal("save_users", users.length, req.hull.ship);
 
-    const mappedUsers = users.map((u) => syncAgent.userMapping.getHullTraits(u));
-
     return syncAgent.syncShip()
       .then(() => {
-        return Promise.map(mappedUsers, (user) => {
-          if (_.isEmpty(user.email)) {
-            return null;
-          }
-          req.hull.client.logger.info("SAVE USER", user.email);
-          const ident = { email: user.email };
-          if (user["intercom/id"]) {
-            ident.anonymous_id = `intercom:${user["intercom/id"]}`;
-          }
-          return req.hull.client.as(ident).traits(user);
+        return Promise.map(users, (intercomUser) => {
+          req.hull.client.logger.info("incoming.user", intercomUser);
+          const ident = syncAgent.userMapping.getIdentFromIntercom(intercomUser);
+          const traits = syncAgent.userMapping.getHullTraits(intercomUser);
+          return req.hull.client.as(ident).traits(traits);
         });
       })
       .then(() => {

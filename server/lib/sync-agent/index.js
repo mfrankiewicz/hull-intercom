@@ -19,7 +19,7 @@ export default class SyncAgent {
     this.tagMapping = new TagMapping(intercomAgent, hullAgent, ship);
     this.userMapping = new UserMapping(ship);
     this.webhookAgent = new WebhookAgent(intercomAgent, hullAgent, ship, hostname);
-    this.eventsAgent = new EventsAgent(hullAgent, this.tagMapping, ship, instrumentationAgent);
+    this.eventsAgent = new EventsAgent(hullAgent, this.tagMapping, ship, instrumentationAgent, this.userMapping);
   }
 
   isConfigured() {
@@ -51,7 +51,7 @@ export default class SyncAgent {
   }
 
   /**
-   * error {Array} [{
+   * @param {Array} error [{
    *  data: {
    *    email: "email"
    *  },
@@ -59,21 +59,23 @@ export default class SyncAgent {
    *    message: "message"
    *  ]
    * }]
+   * @param {Object} users
+   * @return {Promise}
    */
-  handleUserErrors(errors, users) {
+  handleUserErrors(errors) {
     return Promise.map(errors, error => {
-      const email = _.get(error, "data.email");
       const errorDetails = _.get(error, "error", []);
       const errorMessage = errorDetails.map(e => e.message).join(" ");
+
       if (_.find(errorDetails, { code: "conflict" })) {
-        return _.find(users, { email });
+        this.hullClient.logger.error("saving user error", { errorDetails });
       }
 
-      return this.hullAgent.hullClient.as({ email }).traits({
+      const ident = this.userMapping.getIdentFromIntercom(error.data);
+      return this.hullClient.as(ident).traits({
         "intercom/import_error": errorMessage
-      })
-      .then(() => false);
-    }).then(res => _.filter(res));
+      });
+    });
   }
 
   getUsersToSave(users) {
