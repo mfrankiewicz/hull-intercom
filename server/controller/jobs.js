@@ -17,7 +17,7 @@ export default class Jobs {
     const intercomUsersToSave = usersToSave.map(u => syncAgent.userMapping.getIntercomFields(u));
 
     return syncAgent.syncShip()
-      .then(() => intercomAgent.saveUsers(intercomUsersToSave, mode))
+      .then(() => intercomAgent.sendUsers(intercomUsersToSave, mode))
       .then(res => {
         if (_.isArray(res)) {
           const savedUsers = _.intersectionBy(usersToSave, res, "email")

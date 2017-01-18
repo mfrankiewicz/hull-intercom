@@ -63,16 +63,16 @@ export default class IntercomAgent {
     });
   }
 
-  saveUsers(users, mode = "bulk") {
+  sendUsers(users, mode = "bulk") {
     if (_.isEmpty(users)) {
       return Promise.resolve();
     }
 
-    this.logger.info("SAVING", users.length);
+    this.logger.info("sendUsers", users.length);
 
     const body = {
       items: users.map(u => {
-        this.logger.debug("incoming.user", u);
+        this.logger.debug("outgoing.user", u);
         return {
           method: "post",
           data_type: "user",
@@ -91,7 +91,7 @@ export default class IntercomAgent {
           })
           .catch(err => {
             const fErr = this.intercomClient.handleError(err);
-            this.logger.error("intercomAgent.saveUsers.microbatch.error", fErr);
+            this.logger.error("intercomAgent.sendUsers.microbatch.error", fErr);
             return Promise.resolve(fErr);
           });
       }, { concurrency: 5 });
@@ -102,7 +102,7 @@ export default class IntercomAgent {
       .send(body)
       .catch(err => {
         const fErr = this.intercomClient.handleError(err);
-        this.logger.error("intercomAgent.saveUsers.bulkSubmit.error", fErr);
+        this.logger.error("intercomAgent.sendUsers.bulkSubmit.error", fErr);
         return Promise.reject(fErr);
       });
   }

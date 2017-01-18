@@ -19,8 +19,8 @@ export default class WorkerApp {
       this.queueAdapter.inactiveCount(),
       this.queueAdapter.failedCount()
     ]).spread((inactiveCount, failedCount) => {
-      this.instrumentationAgent.metricVal("job.waiting", inactiveCount);
-      this.instrumentationAgent.metricVal("job.failed", failedCount);
+      this.instrumentationAgent.metricVal("ship.queue.waiting", inactiveCount);
+      this.instrumentationAgent.metricVal("ship.queue.failed", failedCount);
     });
   }
 
@@ -57,14 +57,14 @@ export default class WorkerApp {
       this.instrumentationAgent.startTransaction(jobName, () => {
         this.runMiddleware(req, res)
           .then(() => {
-            this.instrumentationAgent.metricInc("job.start", 1, req.hull.client.configuration());
+            this.instrumentationAgent.metricInc(`ship.job.${jobName}.start`, 1, req.hull.client.configuration());
             return this.controllers.Jobs[jobName].call(job, req, res);
           })
           .then((jobRes) => {
             callback(null, jobRes);
           }, (err) => {
             console.error(err.message);
-            this.instrumentationAgent.metricInc("job.error", 1, req.hull.client.configuration());
+            this.instrumentationAgent.metricInc(`ship.job.${jobName}.error`, 1, req.hull.client.configuration());
             this.instrumentationAgent.catchError(err, {
               job_id: job.id
             }, {
@@ -78,7 +78,7 @@ export default class WorkerApp {
             this.instrumentationAgent.endTransaction();
             const duration = process.hrtime(startTime);
             const ms = duration[0] * 1000 + duration[1] / 1000000;
-            this.instrumentationAgent.metricVal(`job.duration.${jobName}`, ms, req.hull.client.configuration());
+            this.instrumentationAgent.metricVal(`ship.job.${jobName}.duration`, ms, req.hull.client.configuration());
           });
       });
     });
