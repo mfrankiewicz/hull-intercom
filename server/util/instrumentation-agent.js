@@ -92,7 +92,7 @@ export default class InstrumentationAgent {
     if (id) {
       tags.push(`ship:${id}`);
     }
-    return tags
+    return tags;
   }
 
   metricEvent({ title, text = "", properties = {}, context }) {

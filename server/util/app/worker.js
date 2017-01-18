@@ -11,7 +11,7 @@ export default class WorkerApp {
     this.supply = new Supply();
 
     // instrument jobs between 1 and 5 minutes
-    setInterval(this.metricJobs.bind(this), _.random(60000, 300000))
+    setInterval(this.metricJobs.bind(this), _.random(60000, 300000));
   }
 
   metricJobs() {

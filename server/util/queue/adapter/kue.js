@@ -15,7 +15,7 @@ export default class KueAdapter {
     this.queue.watchStuckJobs();
     this.app = kue.app;
 
-    ["inactiveCount", "activeCount", "completeCount", "failedCount", "delayedCount"].map(name => {
+    ["inactiveCount", "activeCount", "completeCount", "failedCount", "delayedCount"].forEach(name => {
       this[name] = Promise.promisify(this.queue[name]).bind(this.queue);
     });
   }
