@@ -137,9 +137,17 @@ export default class UserMapping {
       return fields;
     }, {});
 
-    _.set(intercomFields, "id", _.get(hullUser, "traits_intercom/id"));
-    _.set(intercomFields, "email", _.get(hullUser, "email"));
-    _.set(intercomFields, "user_id", _.get(hullUser, "external_id"));
+    if (_.get(hullUser, "traits_intercom/id")) {
+      _.set(intercomFields, "id", _.get(hullUser, "traits_intercom/id"));
+    }
+
+    if (_.get(hullUser, "email")) {
+      _.set(intercomFields, "email", _.get(hullUser, "email"));
+    }
+
+    if (_.get(hullUser, "external_id")) {
+      _.set(intercomFields, "user_id", _.get(hullUser, "external_id"));
+    }
 
     return intercomFields;
   }

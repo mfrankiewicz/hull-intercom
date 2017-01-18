@@ -65,11 +65,7 @@
       "title" : "List of User attributes to push to Intercom",
       "type" : "array",
       "format" : "table",
-      "default": [{
-        "name": "user_id",
-        "hull": "external_id",
-        "overwrite": false
-      }],
+      "default": [],
       "items" : {
         "type" : "object",
         "properties" : {
