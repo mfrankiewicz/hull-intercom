@@ -181,7 +181,7 @@ export default class IntercomAgent {
    * @return {Promise}
    */
   sendEvents(events) {
-    this.instrumentationAgent.metricInc("outgoing.events", events.length, this.hull.client.configuration());
+    this.instrumentationAgent.metricInc("ship.outgoing.events", events.length, this.hull.client.configuration());
     // FIXME: enable bulk jobs and remove `true` here, when we can match the user by `id`,
     // look at error logged below
     if (true || events.length <= 10) { // eslint-disable-line no-constant-condition

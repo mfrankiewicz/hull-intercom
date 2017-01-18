@@ -65,7 +65,7 @@ export default class InstrumentationAgent {
       return null;
     }
     try {
-      return this.metrics.gauge(`ship.${metric}`, parseFloat(value), this.getMetricTags(context));
+      return this.metrics.gauge(metric, parseFloat(value), this.getMetricTags(context));
     } catch (err) {
       console.warn("metricVal.error", err);
     }
@@ -77,7 +77,7 @@ export default class InstrumentationAgent {
       return null;
     }
     try {
-      return this.metrics.increment(`ship.${metric}`, parseFloat(value), this.getMetricTags(context));
+      return this.metrics.increment(metric, parseFloat(value), this.getMetricTags(context));
     } catch (err) {
       console.warn("metricInc.error", err);
     }
@@ -99,7 +99,7 @@ export default class InstrumentationAgent {
     if (!this.dogapi) {
       return null;
     }
-    return this.dogapi.event.create(`ship.${title}`, text, _.merge(properties, {
+    return this.dogapi.event.create(`${this.manifest.name}.${title}`, text, _.merge(properties, {
       tags: this.getMetricTags(context)
     }));
   }

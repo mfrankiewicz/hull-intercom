@@ -37,13 +37,13 @@ export default class IntercomClient {
         // const remainingSeconds = moment(_.get(res.header, "x-ratelimit-reset"), "X")
         //   .diff(moment(), "seconds");
         // x-runtime
-        this.instrumentationAgent.metricInc("service_api.call", 1, this.hull.client.configuration());
+        this.instrumentationAgent.metricInc("ship.service_api.call", 1, this.hull.client.configuration());
         if (remaining) {
-          this.instrumentationAgent.metricVal("service_api.remaining", remaining, this.hull.client.configuration());
+          this.instrumentationAgent.metricVal("ship.service_api.remaining", remaining, this.hull.client.configuration());
         }
 
         if (limit) {
-          this.instrumentationAgent.metricVal("service_api.limit", limit, this.hull.client.configuration());
+          this.instrumentationAgent.metricVal("ship.service_api.limit", limit, this.hull.client.configuration());
         }
       });
 

@@ -207,7 +207,7 @@ export default class EventsAgent {
     });
 
     this.logger.info("incoming.event", user, eventName, props, context);
-    this.instrumentationAgent.metricInc("incoming.events", 1, this.hull.client.configuration());
+    this.instrumentationAgent.metricInc("ship.incoming.events", 1, this.hull.client.configuration());
 
     const ident = {
       email: user.email,
