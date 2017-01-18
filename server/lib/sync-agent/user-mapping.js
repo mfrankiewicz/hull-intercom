@@ -174,26 +174,4 @@ export default class UserMapping {
 
     return ident;
   }
-
-  /**
-   * @param  {Object} user Hull user object
-   * @return {Object}
-   */
-  getIdentFromHull(user) {
-    const ident = {};
-
-    if (_.get(user, "email")) {
-      ident.email = user.email;
-    }
-
-    if (_.get(user, "external_id")) {
-      ident.external_id = user.external_id;
-    }
-
-    if (_.get(user, "user['intercom/id']")) {
-      ident.anonymous_id = `intercom:${user["intercom/id"]}`;
-    }
-
-    return ident;
-  }
 }
