@@ -152,6 +152,7 @@ export default class SyncAgent {
    * @return {Promise}
    */
   getLastUpdatedAt() {
+    const defaultValue = moment().subtract(1, "hour").format();
     return this.hullAgent.hullClient.get("/search/user_reports", {
       include: ["traits_intercom/updated_at"],
       sort: {
@@ -161,10 +162,16 @@ export default class SyncAgent {
       page: 1
     })
     .then((r) => {
+      if (!_.get(r, "data[0]['traits_intercom/updated_at']")) {
+        return defaultValue;
+      }
       return r.data[0]["traits_intercom/updated_at"];
     })
-    .catch(() => {
-      return Promise.resolve(moment().utc().format());
+    .catch((err) => {
+      if (err.status === 400) {
+        return Promise.resolve(defaultValue);
+      }
+      return Promise.reject(err);
     });
   }
 

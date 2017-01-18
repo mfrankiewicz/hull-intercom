@@ -120,7 +120,7 @@ export default class Jobs {
     const { intercomAgent, queueAgent, instrumentationAgent } = req.shipApp;
     if (_.isEmpty(scroll_param)) {
       instrumentationAgent.metricEvent({
-        title: "fetchUsers", context: req.hull.client.configuration(),
+        title: "fetchAllUsers", context: req.hull.client.configuration(),
       });
     }
     return intercomAgent.importUsers(scroll_param)
