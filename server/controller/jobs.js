@@ -134,7 +134,7 @@ export default class Jobs {
       });
   }
 
-  static fetchUsers(req) {
+  static fetchAllUsers(req) {
     const { scroll_param } = req.payload;
     const { intercomAgent, queueAgent, instrumentationAgent } = req.shipApp;
     if (_.isEmpty(scroll_param)) {
@@ -154,7 +154,7 @@ export default class Jobs {
         // expires it cannot be recovered.
         // @see https://developers.intercom.com/reference#iterating-over-all-users
         return Promise.all([
-          queueAgent.create("fetchUsers", { scroll_param: next_scroll_param }, { priority: "high" }),
+          queueAgent.create("fetchAllUsers", { scroll_param: next_scroll_param }, { priority: "high" }),
           queueAgent.create("saveUsers", { users })
         ]);
       });
@@ -174,7 +174,7 @@ export default class Jobs {
     });
   }
 
-  static syncUsers(req) {
+  static fetchUsers(req) {
     const { syncAgent, intercomAgent, queueAgent } = req.shipApp;
     const { last_updated_at, count, page = 1 } = req.payload;
 
