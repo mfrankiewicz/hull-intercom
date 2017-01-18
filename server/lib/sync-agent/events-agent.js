@@ -3,9 +3,9 @@ import Promise from "bluebird";
 
 export default class EventsAgent {
 
-  constructor(hullAgent, tagMapping, ship, instrumentationAgent, userMapping) {
-    this.ship = ship;
-    this.hullClient = hullAgent.hullClient;
+  constructor(tagMapping, hull, instrumentationAgent, userMapping) {
+    this.hull = hull;
+    this.logger = hull.client.logger;
     this.tagMapping = tagMapping;
     this.instrumentationAgent = instrumentationAgent;
     this.userMapping = userMapping;
@@ -188,7 +188,7 @@ export default class EventsAgent {
     if (_.includes(["user.tag.created", "user.tag.deleted"], event.topic)
       && _.includes(this.tagMapping.getTagIds(), event.data.item.tag.id)) {
       // skipping this event
-      this.hullClient.logger.debug("skipping tag event", {
+      this.logger.debug("skipping tag event", {
         user: event.data.item.user.email,
         topic: event.topic,
         tag: event.data.item.tag.name
@@ -207,10 +207,10 @@ export default class EventsAgent {
       created_at: event.created_at
     });
 
-    this.hullClient.logger.info("incoming.event", user, eventName, props, context);
-    this.instrumentationAgent.metricInc("incoming.events");
+    this.logger.info("incoming.event", user, eventName, props, context);
+    this.instrumentationAgent.metricInc("ship.incoming.events", 1, this.hull.client.configuration());
 
     const ident = this.userMapping.getIdentFromIntercom(user);
-    return this.hullClient.as(ident).track(eventName, props, context);
+    return this.hull.client.as(ident).track(eventName, props, context);
   }
 }

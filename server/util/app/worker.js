@@ -9,6 +9,19 @@ export default class WorkerApp {
     this.controllers = controllers;
 
     this.supply = new Supply();
+
+    // instrument jobs between 1 and 5 minutes
+    setInterval(this.metricJobs.bind(this), _.random(60000, 300000));
+  }
+
+  metricJobs() {
+    return Promise.all([
+      this.queueAdapter.inactiveCount(),
+      this.queueAdapter.failedCount()
+    ]).spread((inactiveCount, failedCount) => {
+      this.instrumentationAgent.metricVal("job.waiting", inactiveCount);
+      this.instrumentationAgent.metricVal("job.failed", failedCount);
+    });
   }
 
   use(middleware) {
@@ -44,14 +57,14 @@ export default class WorkerApp {
       this.instrumentationAgent.startTransaction(jobName, () => {
         this.runMiddleware(req, res)
           .then(() => {
-            this.instrumentationAgent.metricInc("job.start", 1, req.hull.ship);
+            this.instrumentationAgent.metricInc("job.start", 1, req.hull.client.configuration());
             return this.controllers.Jobs[jobName].call(job, req, res);
           })
           .then((jobRes) => {
             callback(null, jobRes);
           }, (err) => {
             console.error(err.message);
-            this.instrumentationAgent.metricInc("job.error", 1, req.hull.ship);
+            this.instrumentationAgent.metricInc("job.error", 1, req.hull.client.configuration());
             this.instrumentationAgent.catchError(err, {
               job_id: job.id
             }, {
@@ -65,7 +78,7 @@ export default class WorkerApp {
             this.instrumentationAgent.endTransaction();
             const duration = process.hrtime(startTime);
             const ms = duration[0] * 1000 + duration[1] / 1000000;
-            this.instrumentationAgent.metricVal(`job.duration.${jobName}`, ms);
+            this.instrumentationAgent.metricVal(`job.duration.${jobName}`, ms, req.hull.client.configuration());
           });
       });
     });

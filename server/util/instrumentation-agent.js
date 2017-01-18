@@ -1,37 +1,35 @@
 import util from "util";
 import raven from "raven";
+import metrics from "datadog-metrics";
+import dogapi from "dogapi";
+import _ from "lodash";
 
 export default class InstrumentationAgent {
 
-  constructor(name) {
+  constructor() {
     this.nr = null;
     this.raven = null;
-    this.name = name;
+    this.manifest = require(`${process.cwd()}/manifest.json`); // eslint-disable-line global-require
 
     if (process.env.NEW_RELIC_LICENSE_KEY) {
       this.nr = require("newrelic"); // eslint-disable-line global-require
     }
 
+    if (process.env.DATADOG_API_KEY) {
+      this.metrics = metrics;
+      metrics.init({
+        host: process.env.HOST,
+      });
+      this.dogapi = dogapi;
+    }
+
+
     if (process.env.SENTRY_URL) {
       console.log("starting raven");
       this.raven = new raven.Client(process.env.SENTRY_URL, {
-        release: require(`${process.cwd()}/package.json`).version // eslint-disable-line global-require
+        release: this.manifest.version
       });
       this.raven.patchGlobal();
-    }
-
-    if (process.env.LIBRATO_TOKEN && process.env.LIBRATO_USER) {
-      console.log("starting librato");
-      this.librato = require("librato-node"); // eslint-disable-line global-require
-
-      this.librato.configure({
-        email: process.env.LIBRATO_USER,
-        token: process.env.LIBRATO_TOKEN
-      });
-      this.librato.start();
-      this.librato.on("error", function onError(err) {
-        console.error("librato", err);
-      });
     }
   }
 
@@ -62,28 +60,48 @@ export default class InstrumentationAgent {
     return console.error(util.inspect(err, { depth: 10 }));
   }
 
-  metricVal(metric = "", value = 1, ship = {}) {
+  metricVal(metric, value = 1, context) {
+    if (!this.metrics) {
+      return null;
+    }
     try {
-      if (this.librato) {
-        return this.librato.measure(`${this.name}.${metric}`, parseFloat(value), Object.assign({}, { source: ship.id }));
-      }
-      console.log("librato.measure", `${this.name}.${metric}`, parseFloat(value));
+      return this.metrics.gauge(metric, parseFloat(value), this.getMetricTags(context));
     } catch (err) {
-      console.warn("error in librato.measure", err);
+      console.warn("metricVal.error", err);
     }
     return null;
   }
 
-  metricInc(metric = "", value = 1, ship = {}) {
+  metricInc(metric, value = 1, context) {
+    if (!this.metrics) {
+      return null;
+    }
     try {
-      if (this.librato) {
-        return this.librato.increment(`${this.name}.${metric}`, parseFloat(value), Object.assign({}, { source: ship.id }));
-      }
-      console.log("librato.increment", `${this.name}.${metric}`, parseFloat(value));
+      return this.metrics.increment(metric, parseFloat(value), this.getMetricTags(context));
     } catch (err) {
-      console.warn("error in librato.increment", err);
+      console.warn("metricInc.error", err);
     }
     return null;
+  }
+
+  getMetricTags({ organization, id } = {}) {
+    const tags = ["source:ship", `ship_version:${this.manifest.version}`, `ship_name:${this.manifest.name}`];
+    if (organization) {
+      tags.push(`organization:${organization}`);
+    }
+    if (id) {
+      tags.push(`ship:${id}`);
+    }
+    return tags;
+  }
+
+  metricEvent({ title, text = "", properties = {}, context }) {
+    if (!this.dogapi) {
+      return null;
+    }
+    return this.dogapi.event.create(`${this.manifest.name}.${title}`, text, _.merge(properties, {
+      tags: this.getMetricTags(context)
+    }));
   }
 
   startMiddleware() {
