@@ -9,17 +9,17 @@ import EventsAgent from "./events-agent";
 
 export default class SyncAgent {
 
-  constructor(intercomAgent, hullAgent, ship, hostname, hullClient, instrumentationAgent) {
-    this.ship = ship;
+  constructor(intercomAgent, hullAgent, hull, hostname, instrumentationAgent) {
+    this.ship = hull.ship;
     this.hullAgent = hullAgent;
     this.intercomAgent = intercomAgent;
-    this.hullClient = hullClient;
-    this.logger = hullClient.logger;
+    this.hullClient = hull.client;
+    this.logger = hull.client.logger;
 
-    this.tagMapping = new TagMapping(intercomAgent, hullAgent, ship);
-    this.userMapping = new UserMapping(ship);
-    this.webhookAgent = new WebhookAgent(intercomAgent, hullAgent, ship, hostname);
-    this.eventsAgent = new EventsAgent(hullAgent, this.tagMapping, ship, instrumentationAgent);
+    this.tagMapping = new TagMapping(intercomAgent, hullAgent, hull.ship);
+    this.userMapping = new UserMapping(hull.ship);
+    this.webhookAgent = new WebhookAgent(intercomAgent, hullAgent, hull.ship, hostname);
+    this.eventsAgent = new EventsAgent(this.tagMapping, hull, instrumentationAgent, this.userMapping);
   }
 
   isConfigured() {
@@ -51,7 +51,7 @@ export default class SyncAgent {
   }
 
   /**
-   * error {Array} [{
+   * @param {Array} error [{
    *  data: {
    *    email: "email"
    *  },
@@ -59,21 +59,23 @@ export default class SyncAgent {
    *    message: "message"
    *  ]
    * }]
+   * @param {Object} users
+   * @return {Promise}
    */
-  handleUserErrors(errors, users) {
+  handleUserErrors(errors) {
     return Promise.map(errors, error => {
-      const email = _.get(error, "data.email");
       const errorDetails = _.get(error, "error", []);
       const errorMessage = errorDetails.map(e => e.message).join(" ");
+
       if (_.find(errorDetails, { code: "conflict" })) {
-        return _.find(users, { email });
+        this.hullClient.logger.error("saving user error", { errorDetails });
       }
 
-      return this.hullAgent.hullClient.as({ email }).traits({
+      const ident = this.userMapping.getIdentFromIntercom(error.data);
+      return this.hullClient.as(ident).traits({
         "intercom/import_error": errorMessage
-      })
-      .then(() => false);
-    }).then(res => _.filter(res));
+      });
+    });
   }
 
   getUsersToSave(users) {
@@ -150,6 +152,7 @@ export default class SyncAgent {
    * @return {Promise}
    */
   getLastUpdatedAt() {
+    const defaultValue = moment().subtract(1, "hour").format();
     return this.hullAgent.hullClient.get("/search/user_reports", {
       include: ["traits_intercom/updated_at"],
       sort: {
@@ -159,10 +162,16 @@ export default class SyncAgent {
       page: 1
     })
     .then((r) => {
+      if (!_.get(r, "data[0]['traits_intercom/updated_at']")) {
+        return defaultValue;
+      }
       return r.data[0]["traits_intercom/updated_at"];
     })
-    .catch(() => {
-      return Promise.resolve(moment().utc().format());
+    .catch((err) => {
+      if (err.status === 400) {
+        return Promise.resolve(defaultValue);
+      }
+      return Promise.reject(err);
     });
   }
 

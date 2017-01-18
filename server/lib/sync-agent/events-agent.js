@@ -3,17 +3,18 @@ import Promise from "bluebird";
 
 export default class EventsAgent {
 
-  constructor(hullAgent, tagMapping, ship, instrumentationAgent) {
-    this.ship = ship;
-    this.hullClient = hullAgent.hullClient;
+  constructor(tagMapping, hull, instrumentationAgent, userMapping) {
+    this.hull = hull;
+    this.logger = hull.client.logger;
     this.tagMapping = tagMapping;
     this.instrumentationAgent = instrumentationAgent;
+    this.userMapping = userMapping;
 
     this.map = [
       {
         intercom: "conversation.user.created",
         eventName: "User started conversation",
-        user: (event) => _.pick(_.get(event, "data.item.user"), ["email", "id"]),
+        user: (event) => _.pick(_.get(event, "data.item.user"), ["email", "id", "user_id"]),
         props: (_event) => {
           return {
             initiated: "user"
@@ -28,7 +29,7 @@ export default class EventsAgent {
       {
         intercom: "conversation.user.replied",
         eventName: "User replied to conversation",
-        user: (event) => _.pick(_.get(event, "data.item.user"), ["email", "id"]),
+        user: (event) => _.pick(_.get(event, "data.item.user"), ["email", "id", "user_id"]),
         props: (_event) => {
           return {
             initiated: "user"
@@ -43,7 +44,7 @@ export default class EventsAgent {
       {
         intercom: "conversation.admin.replied",
         eventName: "Admin replied to conversation",
-        user: (event) => _.pick(_.get(event, "data.item.user"), ["email", "id"]),
+        user: (event) => _.pick(_.get(event, "data.item.user"), ["email", "id", "user_id"]),
         props: (_event) => {
           return {
             initiated: "admin"
@@ -58,7 +59,7 @@ export default class EventsAgent {
       {
         intercom: "conversation.admin.single.created",
         eventName: "Admin started conversation",
-        user: (event) => _.pick(_.get(event, "data.item.user"), ["email", "id"]),
+        user: (event) => _.pick(_.get(event, "data.item.user"), ["email", "id", "user_id"]),
         props: (_event) => {
           return {
             initiated: "admin"
@@ -73,7 +74,7 @@ export default class EventsAgent {
       {
         intercom: "conversation.admin.assigned",
         eventName: "Admin assigned conversation",
-        user: (event) => _.pick(_.get(event, "data.item.user"), ["email", "id"]),
+        user: (event) => _.pick(_.get(event, "data.item.user"), ["email", "id", "user_id"]),
         props: (event) => {
           return {
             to: _.get(event, "data.item.user.id"),
@@ -90,7 +91,7 @@ export default class EventsAgent {
       {
         intercom: "conversation.admin.closed",
         eventName: "Admin closed conversation",
-        user: (event) => _.pick(_.get(event, "data.item.user"), ["email", "id"]),
+        user: (event) => _.pick(_.get(event, "data.item.user"), ["email", "id", "user_id"]),
         props: (event) => {
           return {
             admin: _.get(event, "data.item.assignee.id")
@@ -105,7 +106,7 @@ export default class EventsAgent {
       {
         intercom: "conversation.admin.opened",
         eventName: "Admin opened conversation",
-        user: (event) => _.pick(_.get(event, "data.item.user"), ["email", "id"]),
+        user: (event) => _.pick(_.get(event, "data.item.user"), ["email", "id", "user_id"]),
         props: (event) => {
           return {
             admin: _.get(event, "data.item.assignee.id")
@@ -120,7 +121,7 @@ export default class EventsAgent {
       {
         intercom: "user.tag.created",
         eventName: "Added Tag",
-        user: (event) => _.pick(_.get(event, "data.item.user"), ["email", "id"]),
+        user: (event) => _.pick(_.get(event, "data.item.user"), ["email", "id", "user_id"]),
         props: (event) => {
           return {
             tag: _.get(event, "data.item.tag.name"),
@@ -135,7 +136,7 @@ export default class EventsAgent {
       {
         intercom: "user.tag.deleted",
         eventName: "Removed Tag",
-        user: (event) => _.pick(_.get(event, "data.item.user"), ["email", "id"]),
+        user: (event) => _.pick(_.get(event, "data.item.user"), ["email", "id", "user_id"]),
         props: (event) => {
           return {
             tag: _.get(event, "data.item.tag.name"),
@@ -150,7 +151,7 @@ export default class EventsAgent {
       {
         intercom: "user.unsubscribed",
         eventName: "Unsubscribed from emails",
-        user: (event) => _.pick(_.get(event, "data.item"), ["email", "id"]),
+        user: (event) => _.pick(_.get(event, "data.item"), ["email", "id", "user_id"]),
         props: (_event) => {
           return {};
         },
@@ -163,7 +164,7 @@ export default class EventsAgent {
       {
         intercom: "user.email.updated",
         eventName: "Updated email address",
-        user: (event) => _.pick(_.get(event, "data.item"), ["email", "id"]),
+        user: (event) => _.pick(_.get(event, "data.item"), ["email", "id", "user_id"]),
         props: (_event) => {
           return {};
         },
@@ -187,7 +188,7 @@ export default class EventsAgent {
     if (_.includes(["user.tag.created", "user.tag.deleted"], event.topic)
       && _.includes(this.tagMapping.getTagIds(), event.data.item.tag.id)) {
       // skipping this event
-      this.hullClient.logger.debug("skipping tag event", {
+      this.logger.debug("skipping tag event", {
         user: event.data.item.user.email,
         topic: event.topic,
         tag: event.data.item.tag.name
@@ -206,13 +207,10 @@ export default class EventsAgent {
       created_at: event.created_at
     });
 
-    this.hullClient.logger.info("incoming.event", user, eventName, props, context);
-    this.instrumentationAgent.metricInc("incoming.events", 1, this.ship);
+    this.logger.info("incoming.event", user, eventName, props, context);
+    this.instrumentationAgent.metricInc("ship.incoming.events", 1, this.hull.client.configuration());
 
-    const ident = {
-      email: user.email,
-      anonymous_id: `intercom:${user.id}`
-    };
-    return this.hullClient.as(ident).track(eventName, props, context);
+    const ident = this.userMapping.getIdentFromIntercom(user);
+    return this.hull.client.as(ident).track(eventName, props, context);
   }
 }

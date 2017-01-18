@@ -7,11 +7,11 @@ import moment from "moment";
  */
 export default class IntercomAgent {
 
-  constructor(intercomClient, queueAgent, ship, hullClient, instrumentationAgent) {
+  constructor(intercomClient, queueAgent, hull, instrumentationAgent) {
     this.intercomClient = intercomClient;
     this.queueAgent = queueAgent;
-    this.ship = ship;
-    this.hullClient = hullClient;
+    this.hull = hull;
+    this.logger = hull.client.logger;
     this.instrumentationAgent = instrumentationAgent;
   }
 
@@ -49,12 +49,12 @@ export default class IntercomAgent {
       const fErr = this.intercomClient.handleError(err);
 
       if (_.get(fErr, "extra.body.errors[0].code") === "scroll_exists") {
-        this.hullClient.logger.error("Trying to perform two separate scrolls");
+        this.logger.error("Trying to perform two separate scrolls");
         return Promise.resolve([]);
       }
 
       if (_.get(fErr, "extra.body.errors[0].code") === "not_found") {
-        this.hullClient.logger.error("Scroll expired, should start it again");
+        this.logger.error("Scroll expired, should start it again");
         return Promise.resolve([]);
       }
 
@@ -63,15 +63,16 @@ export default class IntercomAgent {
     });
   }
 
-  saveUsers(users, mode = "bulk") {
+  sendUsers(users, mode = "bulk") {
     if (_.isEmpty(users)) {
       return Promise.resolve();
     }
 
-    this.hullClient.logger.info("SAVING", users.length);
+    this.logger.info("sendUsers", users.length);
 
     const body = {
       items: users.map(u => {
+        this.logger.debug("outgoing.user", u);
         return {
           method: "post",
           data_type: "user",
@@ -90,7 +91,7 @@ export default class IntercomAgent {
           })
           .catch(err => {
             const fErr = this.intercomClient.handleError(err);
-            this.hullClient.logger.error("intercomAgent.saveUsers.microbatch.error", fErr);
+            this.logger.error("intercomAgent.sendUsers.microbatch.error", fErr);
             return Promise.resolve(fErr);
           });
       }, { concurrency: 5 });
@@ -101,7 +102,7 @@ export default class IntercomAgent {
       .send(body)
       .catch(err => {
         const fErr = this.intercomClient.handleError(err);
-        this.hullClient.logger.error("intercomAgent.saveUsers.bulkSubmit.error", fErr);
+        this.logger.error("intercomAgent.sendUsers.bulkSubmit.error", fErr);
         return Promise.reject(fErr);
       });
   }
@@ -119,7 +120,7 @@ export default class IntercomAgent {
         .send(op)
         .catch(err => {
           const fErr = this.intercomClient.handleError(err);
-          this.hullClient.logger.error("intercomAgent.tagUsers.error", fErr);
+          this.logger.error("intercomAgent.tagUsers.error", fErr);
           return Promise.reject(fErr);
         });
     }, { concurrency: 3 });
@@ -136,7 +137,7 @@ export default class IntercomAgent {
       })
       .catch(err => {
         const fErr = this.intercomClient.handleError(err);
-        this.hullClient.logger.error("getUsersTotalCount.error", fErr);
+        this.logger.error("getUsersTotalCount.error", fErr);
         return Promise.reject(fErr);
       });
   }
@@ -155,7 +156,7 @@ export default class IntercomAgent {
           return moment(u.updated_at, "X")
             .isAfter(last_updated_at);
         });
-        this.hullClient.logger.info("getRecentUsers.count", {
+        this.logger.info("getRecentUsers.count", {
           total: originalUsers.length,
           filtered: users.length
         });
@@ -168,7 +169,7 @@ export default class IntercomAgent {
       })
       .catch(err => {
         const fErr = this.intercomClient.handleError(err);
-        this.hullClient.logger.error("getRecentUsers.error", fErr);
+        this.logger.error("getRecentUsers.error", fErr);
         return Promise.reject(fErr);
       });
   }
@@ -181,7 +182,7 @@ export default class IntercomAgent {
    * @return {Promise}
    */
   sendEvents(events) {
-    this.instrumentationAgent.metricInc("outgoing.events", events.length, this.ship);
+    this.instrumentationAgent.metricInc("ship.outgoing.events", events.length, this.hull.client.configuration());
     // FIXME: enable bulk jobs and remove `true` here, when we can match the user by `id`,
     // look at error logged below
     if (true || events.length <= 10) { // eslint-disable-line no-constant-condition

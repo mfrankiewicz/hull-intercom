@@ -14,11 +14,11 @@ export default function AppMiddleware({ queueAdapter, instrumentationAgent, ship
       return next();
     }
 
-    const intercomClient = new IntercomClient(req.hull.ship, instrumentationAgent);
+    const intercomClient = new IntercomClient(req.hull, instrumentationAgent);
     const queueAgent = new QueueAgent(queueAdapter, req);
-    const intercomAgent = new IntercomAgent(intercomClient, queueAgent, req.hull.ship, req.hull.client, instrumentationAgent);
+    const intercomAgent = new IntercomAgent(intercomClient, queueAgent, req.hull, instrumentationAgent);
     const hullAgent = new HullAgent(req.hull.ship, req.hull.client, shipCache, _.pick(req, ["hostname", "query"]));
-    const syncAgent = new SyncAgent(intercomAgent, hullAgent, req.hull.ship, req.hostname, req.hull.client, instrumentationAgent);
+    const syncAgent = new SyncAgent(intercomAgent, hullAgent, req.hull, req.hostname, instrumentationAgent);
 
     req.shipApp = {
       intercomClient,
