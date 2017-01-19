@@ -11,10 +11,10 @@ export default class Jobs {
     const { users, mode = "bulk" } = req.payload;
     const { syncAgent, intercomAgent, queueAgent } = req.shipApp;
 
-    req.shipApp.instrumentationAgent.metricVal("ship.outgoing.users", users.length, req.hull.client.configuration());
-
     const usersToSave = syncAgent.getUsersToSave(users);
     const intercomUsersToSave = usersToSave.map(u => syncAgent.userMapping.getIntercomFields(u));
+
+    req.shipApp.instrumentationAgent.metricVal("ship.outgoing.users", intercomUsersToSave.length, req.hull.client.configuration());
 
     return syncAgent.syncShip()
       .then(() => intercomAgent.sendUsers(intercomUsersToSave, mode))
@@ -166,12 +166,12 @@ export default class Jobs {
       return Promise.resolve(last_updated_at);
     })()
       .then((new_last_updated_at) => {
-        req.hull.client.logger.info("syncUsers", { new_last_updated_at, page });
+        req.hull.client.logger.info("fetchUsers", { new_last_updated_at, page });
         return intercomAgent.getRecentUsers(new_last_updated_at, count, page)
           .then(({ users, hasMore }) => {
             const promises = [];
             if (hasMore) {
-              promises.push(queueAgent.create("syncUsers", {
+              promises.push(queueAgent.create("fetchUsers", {
                 last_updated_at: new_last_updated_at,
                 count,
                 page: page + 1
