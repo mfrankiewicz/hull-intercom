@@ -4,7 +4,7 @@ import IntercomClient from "../server/lib/intercom-client";
 
 const hullMock = {
   ship: {
-      private_settings: {
+    private_settings: {
       api_key: process.env.API_KEY,
       app_id: process.env.APP_ID
     }
@@ -12,7 +12,6 @@ const hullMock = {
   client: {
     configuration: () => {}
   }
-
 };
 
 const instrumentationAgent = {

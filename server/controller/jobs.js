@@ -11,9 +11,11 @@ export default class Jobs {
     const { users, mode = "bulk" } = req.payload;
     const { syncAgent, intercomAgent, queueAgent } = req.shipApp;
 
+    req.hull.client.logger.info("sendUsers.preFilter", users.length);
     const usersToSave = syncAgent.getUsersToSave(users);
     const intercomUsersToSave = usersToSave.map(u => syncAgent.userMapping.getIntercomFields(u));
 
+    req.hull.client.logger.info("sendUsers.filtered", intercomUsersToSave.length);
     req.shipApp.instrumentationAgent.metricVal("ship.outgoing.users", intercomUsersToSave.length, req.hull.client.configuration());
 
     return syncAgent.syncShip()
