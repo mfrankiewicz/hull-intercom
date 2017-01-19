@@ -16,7 +16,7 @@ const instrumentationAgent = {
 
 describe("Intercom Client", () => {
   it("should allow for get api calls", () => {
-    const intercomClient = new IntercomClient(shipMock, instrumentationAgent);
+    const intercomClient = new IntercomClient({ ship: shipMock }, instrumentationAgent);
 
     return intercomClient.get("/users")
       .then(res => {
@@ -25,7 +25,7 @@ describe("Intercom Client", () => {
   });
 
   it("should provide error handling helper", () => {
-    const intercomClient = new IntercomClient(shipMock, instrumentationAgent);
+    const intercomClient = new IntercomClient({ ship: shipMock }, instrumentationAgent);
 
     return intercomClient.get("/non-existing-api")
       .catch(err => {
