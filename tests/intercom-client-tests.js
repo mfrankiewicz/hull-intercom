@@ -2,11 +2,17 @@
 import assert from "assert";
 import IntercomClient from "../server/lib/intercom-client";
 
-const shipMock = {
-  private_settings: {
-    api_key: process.env.API_KEY,
-    app_id: process.env.APP_ID
+const hullMock = {
+  ship: {
+      private_settings: {
+      api_key: process.env.API_KEY,
+      app_id: process.env.APP_ID
+    }
+  },
+  client: {
+    configuration: () => {}
   }
+
 };
 
 const instrumentationAgent = {
@@ -16,7 +22,7 @@ const instrumentationAgent = {
 
 describe("Intercom Client", () => {
   it("should allow for get api calls", () => {
-    const intercomClient = new IntercomClient({ ship: shipMock }, instrumentationAgent);
+    const intercomClient = new IntercomClient(hullMock, instrumentationAgent);
 
     return intercomClient.get("/users")
       .then(res => {
@@ -25,7 +31,7 @@ describe("Intercom Client", () => {
   });
 
   it("should provide error handling helper", () => {
-    const intercomClient = new IntercomClient({ ship: shipMock }, instrumentationAgent);
+    const intercomClient = new IntercomClient(hullMock, instrumentationAgent);
 
     return intercomClient.get("/non-existing-api")
       .catch(err => {
