@@ -49,7 +49,7 @@ export default class NotifHandlers {
     const { left = [] } = _.get(changes, "segments", {});
 
     if (!_.isEmpty(_.get(changes, "user['traits_intercom/id'][1]"))) {
-      req.hull.client.logger.info("user skipped");
+      req.hull.client.logger.info("user skipped", user.id);
       return Promise.resolve();
     }
 
@@ -63,7 +63,7 @@ export default class NotifHandlers {
     }
 
     filteredUser.events = events || [];
-
+    req.hull.client.logger.debug("userUpdate.user", user);
     return BatchSyncHandler.getHandler({
       hull: req.hull,
       ship: req.hull.ship,
