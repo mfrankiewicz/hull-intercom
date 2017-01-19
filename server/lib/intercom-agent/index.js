@@ -65,7 +65,7 @@ export default class IntercomAgent {
 
   sendUsers(users, mode = "bulk") {
     if (_.isEmpty(users)) {
-      this.logger.info("sendUsers.emptyList", users.length);
+      this.logger.info("sendUsers.emptyList");
       return Promise.resolve();
     }
 
