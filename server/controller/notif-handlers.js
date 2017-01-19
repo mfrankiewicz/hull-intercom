@@ -52,6 +52,7 @@ export default class NotifHandlers {
       req.hull.client.logger.info("user skipped", user.id);
       return Promise.resolve();
     }
+    user.segment_ids = user.segment_ids || segments.map(s => s.id);
 
     const filteredUser = syncAgent.updateUserSegments(user, {
       add_segment_ids: segments.map(s => s.id),
