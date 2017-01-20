@@ -84,7 +84,7 @@ export default class UserMapping {
    */
   getHullTraits(intercomUser = {}) {
     const hullTraits = _.reduce(this.computeHullTraits(), (traits, prop) => {
-      if (_.get(intercomUser, prop.name)) {
+      if (_.get(intercomUser, prop.name) && prop.hull !== "external_id") {
         traits[prop.hull.replace(/^traits_/, "")] = _.get(intercomUser, prop.name);
       }
       return traits;
