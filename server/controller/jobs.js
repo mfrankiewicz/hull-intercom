@@ -101,7 +101,11 @@ export default class Jobs {
           req.hull.client.logger.info("incoming.user", intercomUser);
           const ident = syncAgent.userMapping.getIdentFromIntercom(intercomUser);
           const traits = syncAgent.userMapping.getHullTraits(intercomUser);
-          return req.hull.client.as(ident).traits(traits);
+          if (ident.email) {
+            return req.hull.client.as(ident).traits(traits);
+          } else {
+            req.hull.client.logger.info("incoming.user.skip", intercomUser);
+          }
         });
       })
       .then(() => {
