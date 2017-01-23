@@ -30,7 +30,7 @@ const cacheManager = CacheManager.caching({
 });
 
 const shipCache = new Hull.ShipCache(cacheManager, process.env.SHIP_CACHE_PREFIX || "hull-intercom");
-const hullMiddleware = new Hull.Middleware({ hostSecret: shipConfig.hostSecret, shipCache });
+const hullMiddleware = new Hull.Middleware({ hostSecret: shipConfig.hostSecret, shipCache, clientConfig: { flushAt: 100, flushAfter: 500 } });
 const appMiddleware = new AppMiddleware({ queueAdapter, shipCache, instrumentationAgent });
 
 export default {

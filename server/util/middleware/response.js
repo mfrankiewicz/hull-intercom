@@ -8,9 +8,9 @@ import _ from "lodash";
 export default function responseMiddleware(result, req, res, next) {
   if (_.isError(result)) {
     try {
-      req.hull.client.logger("response.error", result);
+      req.hull.client.logger.error("action.error", result);
     } catch (e) {
-      console.error("response.error", result);
+      console.error("action.error", result);
     }
     res.status(500);
   } else {
