@@ -84,7 +84,7 @@ export default class UserMapping {
    */
   getHullTraits(intercomUser = {}) {
     const hullTraits = _.reduce(this.computeHullTraits(), (traits, prop) => {
-      if (_.get(intercomUser, prop.name) && prop.hull !== "external_id") {
+      if (_.has(intercomUser, prop.name) && prop.hull !== "external_id") {
         traits[prop.hull.replace(/^traits_/, "")] = _.get(intercomUser, prop.name);
       }
       return traits;
@@ -124,15 +124,20 @@ export default class UserMapping {
    */
   getIntercomFields(hullUser) {
     const intercomFields = _.reduce(this.computeIntercomFields(), (fields, prop) => {
-      if (_.get(hullUser, prop.hull)) {
+      if (_.has(hullUser, prop.hull)) {
+        let value = "";
         // if field is standard and should not be overwritten
         const writableFields = _.filter(this.map, (f) => !f.read_only);
         if (!_.get(prop, "overwrite") && _.find(writableFields, { name: prop.name })) {
           const traitsIntercomField = _.find(writableFields, { name: prop.name }).hull;
-          _.set(fields, prop.name, _.get(hullUser, traitsIntercomField) || _.get(hullUser, prop.hull));
+          value = _.get(hullUser, traitsIntercomField) || _.get(hullUser, prop.hull);
         } else {
-          _.set(fields, prop.name, _.get(hullUser, prop.hull));
+          value = _.get(hullUser, prop.hull);
         }
+        if (_.isArray(value)) {
+          value = value.join(",");
+        }
+        _.set(fields, prop.name, value);
       }
       return fields;
     }, {});

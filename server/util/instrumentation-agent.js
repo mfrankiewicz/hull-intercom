@@ -48,7 +48,7 @@ export default class InstrumentationAgent {
 
   catchError(err, extra = {}, tags = {}) {
     if (this.raven && err) {
-      return this.raven.captureException(err, {
+      this.raven.captureException(err, {
         extra,
         tags,
         fingerprint: [
@@ -84,14 +84,13 @@ export default class InstrumentationAgent {
     return null;
   }
 
-  getMetricTags({ organization, id } = {}) {
-    const tags = ["source:ship", `ship_version:${this.manifest.version}`, `ship_name:${this.manifest.name}`];
-    if (organization) {
-      tags.push(`organization:${organization}`);
-    }
-    if (id) {
-      tags.push(`ship:${id}`);
-    }
+  getMetricTags({ organization = "none", id = "none" } = {}) {
+    const hullHost = organization.split(".").slice(1).join(".");
+    const tags = [
+      "source:ship", `ship_version:${this.manifest.version}`, `ship_name:${this.manifest.name}`,
+      `ship_env:${process.env.NODE_ENV || "production"}`, `hull_host:${hullHost}`,
+      `organization:${organization}`, `ship:${id}`
+    ];
     return tags;
   }
 
