@@ -30,6 +30,11 @@ export default class IntercomAgent {
       });
   }
 
+  /**
+   * @see https://developers.intercom.com/reference#bulk-job-feeds
+   * @param  {String} id
+   * @return {Array} items param of the job feed
+   */
   getJobErrors(id) {
     return this.intercomClient.get(`/jobs/${id}/error`)
       .then(res => {

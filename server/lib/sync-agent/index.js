@@ -64,7 +64,11 @@ export default class SyncAgent {
    */
   handleUserErrors(errors) {
     return Promise.map(errors, error => {
-      const errorDetails = _.get(error, "error", []);
+      let errorDetails = _.get(error, "error", []);
+      if (!_.isArray(errorDetails)) {
+        errorDetails = [errorDetails];
+      }
+
       const errorMessage = errorDetails.map(e => e.message).join(" ");
 
       if (_.find(errorDetails, { code: "conflict" })) {
