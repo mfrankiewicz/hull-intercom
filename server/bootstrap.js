@@ -41,5 +41,6 @@ export default {
   shipConfig,
   appMiddleware,
   controllers,
+  jobs: controllers.Jobs,
   Hull
 };
