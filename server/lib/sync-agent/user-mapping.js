@@ -124,7 +124,7 @@ export default class UserMapping {
    */
   getIntercomFields(hullUser) {
     const intercomFields = _.reduce(this.computeIntercomFields(), (fields, prop) => {
-      if (_.get(hullUser, prop.hull)) {
+      if (!_.isUndefined(_.get(hullUser, prop.hull))) {
         let value = "";
         // if field is standard and should not be overwritten
         const writableFields = _.filter(this.map, (f) => !f.read_only);
