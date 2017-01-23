@@ -84,7 +84,7 @@ export default class UserMapping {
    */
   getHullTraits(intercomUser = {}) {
     const hullTraits = _.reduce(this.computeHullTraits(), (traits, prop) => {
-      if (_.get(intercomUser, prop.name) && prop.hull !== "external_id") {
+      if (_.has(intercomUser, prop.name) && prop.hull !== "external_id") {
         traits[prop.hull.replace(/^traits_/, "")] = _.get(intercomUser, prop.name);
       }
       return traits;
@@ -124,7 +124,7 @@ export default class UserMapping {
    */
   getIntercomFields(hullUser) {
     const intercomFields = _.reduce(this.computeIntercomFields(), (fields, prop) => {
-      if (!_.isUndefined(_.get(hullUser, prop.hull))) {
+      if (_.has(hullUser, prop.hull)) {
         let value = "";
         // if field is standard and should not be overwritten
         const writableFields = _.filter(this.map, (f) => !f.read_only);
