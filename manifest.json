@@ -109,7 +109,6 @@
             "format": "select",
             "title" : "Intercom Attributes",
             "options" : {
-              "allowCreate": true,
               "loadOptions" : "/schema/user_fields"
             }
           },
