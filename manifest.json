@@ -109,7 +109,6 @@
             "format": "select",
             "title" : "Intercom Attributes",
             "options" : {
-              "allowCreate": true,
               "loadOptions" : "/schema/user_fields"
             }
           },
@@ -118,7 +117,8 @@
             "format" : "trait",
             "title" : "Hull Attributes",
             "options": {
-              "allowCreate": true
+              "allowCreate": true,
+              "source": "intercom"
             }
           }
         },
