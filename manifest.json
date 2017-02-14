@@ -118,7 +118,8 @@
             "format" : "trait",
             "title" : "Hull Attributes",
             "options": {
-              "allowCreate": true
+              "allowCreate": true,
+              "source": "intercom"
             }
           }
         },
