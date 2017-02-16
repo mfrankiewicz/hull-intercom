@@ -28,6 +28,10 @@
           <h5>Last Sync <small class="pull-right"><strong><%=settings.fetch_count || 0%> Users</strong> on <span data-time>Friday, September 8 @ 12h30</span></small></h5>
           <% } %>
 
+          <% if ((settings.custom_attributes || []).length === 0) { %>
+            <p>The Intercom's custom attributes will appear in settings dropdowns after first users are processed. Use the "Fetch All" button below to start the processing.</p>
+          <% } %>
+
           <% if (total_count) { %>
           <h5>Users to fetch <small class="pull-right"><strong><%=total_count || 0%></strong></small></h5>
           <% } %>

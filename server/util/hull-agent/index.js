@@ -36,13 +36,10 @@ export default class HullAgent {
   }
 
   /**
-   *
+   * Checks if the user belongs to any of the set segments
    */
   userWhitelisted(user) {
     const segmentIds = _.get(this.ship, "private_settings.synchronized_segments", []);
-    if (segmentIds.length === 0) {
-      return true;
-    }
     return _.intersection(segmentIds, user.segment_ids).length > 0;
   }
 
