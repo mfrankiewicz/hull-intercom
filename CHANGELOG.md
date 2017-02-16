@@ -1,10 +1,11 @@
 # Changelog
 
 ## 0.3.0
-- change the filtering - send no one by default
-- store created attributes in the intercom group
-- don't allow "create new values" in the Intercom attribute selector (Hull -> Intercom mapping)
-- message the customer about custom attributes behavior
+- change the segment filtering - send no one by default
+- store created attributes in the `intercom` group (Intercom -> Hull mapping)
+- don't allow "create new values" in the Intercom attribute selector (Intercom -> Hull mapping)
+- message the customer about custom attributes list behavior (they are available right after first
+incoming user is processed by the ship)
 
 ## 0.1.0
 - capturing basic events from Intercom (skipping events for Hull Segments Tags)
