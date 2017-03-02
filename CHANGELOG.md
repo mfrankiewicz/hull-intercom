@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.3.1
+- hotfix error handling
+
 ## 0.3.0
 - change the segment filtering - send no one by default
 - store created attributes in the `intercom` group (Intercom -> Hull mapping)
