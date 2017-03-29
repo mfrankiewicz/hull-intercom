@@ -10,7 +10,7 @@
     {
       "name": "synchronized_segments",
       "title": "Segments",
-      "description": "Post to Intercom when users match these segments (Empty to send everyone)",
+      "description": "Post to Intercom when users match these segments",
       "default": [],
       "type": "array",
       "format": "segment"
