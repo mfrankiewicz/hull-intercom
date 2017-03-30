@@ -40,6 +40,7 @@ export default class NotifHandlers {
 
   static userUpdateHandler(payload, { req }) {
     const { syncAgent, queueAgent } = req.shipApp;
+    const { logger } = req.hull.client;
     if (!syncAgent.isConfigured()) {
       req.hull.client.logger.info("ship is not configured");
       return Promise.resolve();
@@ -48,8 +49,10 @@ export default class NotifHandlers {
     const { user, changes = {}, segments = [], events = [] } = payload.message;
     const { left = [] } = _.get(changes, "segments", {});
 
+    logger.info("outgoing.user.start", _.pick(user, ["email", "id"]));
+
     if (!_.isEmpty(_.get(changes, "user['traits_intercom/id'][1]"))) {
-      req.hull.client.logger.info("user skipped", user.id);
+      logger.info("outgoing.user.skip", _.pick(user, ["email", "id"]));
       return Promise.resolve();
     }
     user.segment_ids = user.segment_ids || segments.map(s => s.id);
@@ -60,11 +63,11 @@ export default class NotifHandlers {
     });
 
     if (!filteredUser) {
+      logger.info("outgoing.user.skip", _.pick(user, ["email", "id"]));
       return Promise.resolve();
     }
 
     filteredUser.events = events || [];
-    req.hull.client.logger.debug("userUpdate.user", user);
     return BatchSyncHandler.getHandler({
       hull: req.hull,
       ship: req.hull.ship,

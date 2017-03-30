@@ -26,6 +26,8 @@ export default class Jobs {
             .map(u => {
               const intercomData = _.find(res, { email: u.email });
               u["traits_intercom/id"] = intercomData.id;
+
+              req.hull.client.logger.info("outgoing.user.success", _.pick(u, ["email", "id"]));
               return u;
             });
           const errors = _.filter(res, { body: { type: "error.list" } });
@@ -66,6 +68,11 @@ export default class Jobs {
             }
             return Promise.resolve();
           })()
+            .then(() => {
+              users.map(u => {
+                req.hull.client.logger.info("outgoing.user.success", _.pick(u, ["email", "id"]));
+              });
+            })
             .then(() => syncAgent.groupUsersToTag(users))
             .then(groupedUsers => intercomAgent.tagUsers(groupedUsers));
         }
@@ -150,12 +157,17 @@ export default class Jobs {
     const { hullAgent, syncAgent, instrumentationAgent } = req.shipApp;
     const { body, segmentId } = req.payload;
     instrumentationAgent.metricEvent({
-      title: "batch", context: req.hull.client.configuration(),
+      title: "batch",
+      context: req.hull.client.configuration(),
+      properties: req.payload
     });
     return hullAgent.extractAgent.handleExtract(body, 100, (users) => {
       users = _.filter(users.map(u => {
         return syncAgent.updateUserSegments(u, { add_segment_ids: [segmentId] });
       }));
+
+      users.map(u => req.hull.client.logger.info("outgoing.user.start", _.pick(u, ["email", "id"])));
+
       return req.shipApp.queueAgent.create("sendUsers", { users });
     });
   }

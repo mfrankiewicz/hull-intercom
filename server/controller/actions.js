@@ -23,6 +23,8 @@ export default class Actions {
   static webhook(req, res, next) {
     req.hull.client.logger.debug("intercom message", req.body);
     if (_.get(req, "body.topic") === "user.created") {
+
+      // map the users to get only mapped fields
       return BatchSyncHandler.getHandler({
         hull: req.hull,
         ship: req.hull.ship,
