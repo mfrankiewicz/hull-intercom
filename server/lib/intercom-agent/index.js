@@ -78,7 +78,7 @@ export default class IntercomAgent {
 
     const body = {
       items: users.map(u => {
-        this.logger.debug("outgoing.user", u);
+        this.logger.debug("outgoing.user.payload", u);
         return {
           method: "post",
           data_type: "user",
