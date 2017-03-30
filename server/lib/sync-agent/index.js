@@ -140,12 +140,7 @@ export default class SyncAgent {
       user.segment_ids = _.uniq(_.concat(user.segment_ids || [], _.filter(add_segment_ids)));
       user.remove_segment_ids = _.filter(remove_segment_ids);
     } else {
-      if (this.userAdded(user)) {
-        user.segment_ids = [];
-        user.remove_segment_ids = this.tagMapping.getSegmentIds();
-      } else {
-        return null;
-      }
+      return null;
     }
     return user;
   }

@@ -159,7 +159,7 @@ export default class Jobs {
     instrumentationAgent.metricEvent({
       title: "batch",
       context: req.hull.client.configuration(),
-      properties: req.payload
+      text: JSON.stringify(req.payload.body)
     });
     return hullAgent.extractAgent.handleExtract(body, 100, (users) => {
       users = _.filter(users.map(u => {
