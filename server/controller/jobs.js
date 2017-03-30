@@ -70,7 +70,7 @@ export default class Jobs {
           })()
             .then(() => {
               users.map(u => {
-                req.hull.client.logger.info("outgoing.user.success", _.pick(u, ["email", "id"]));
+                return req.hull.client.logger.info("outgoing.user.success", _.pick(u, ["email", "id"]));
               });
             })
             .then(() => syncAgent.groupUsersToTag(users))
@@ -155,15 +155,17 @@ export default class Jobs {
 
   static handleBatch(req) {
     const { hullAgent, syncAgent, instrumentationAgent } = req.shipApp;
-    const { body, segmentId } = req.payload;
+    const { body, segmentId, source } = req.payload;
     instrumentationAgent.metricEvent({
       title: "batch",
       context: req.hull.client.configuration(),
       text: JSON.stringify(req.payload.body)
     });
+
     return hullAgent.extractAgent.handleExtract(body, 100, (users) => {
+      const ignoreFilter = (source !== "connector");
       users = _.filter(users.map(u => {
-        return syncAgent.updateUserSegments(u, { add_segment_ids: [segmentId] });
+        return syncAgent.updateUserSegments(u, { add_segment_ids: [segmentId] }, ignoreFilter);
       }));
 
       users.map(u => req.hull.client.logger.info("outgoing.user.start", _.pick(u, ["email", "id"])));
