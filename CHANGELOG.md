@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.4.0
+- manual batch is NOT filtering users based on segment information
+
 ## 0.3.1
 - hotfix error handling
 
