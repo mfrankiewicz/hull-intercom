@@ -2,6 +2,8 @@
 
 ## 0.4.0
 - manual batch is NOT filtering users based on segment information
+- fix NodeJS version to 6.10.0
+- improve logging for user going through and for manual/automatic batch events
 
 ## 0.3.1
 - hotfix error handling
