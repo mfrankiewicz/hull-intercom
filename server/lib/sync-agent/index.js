@@ -135,17 +135,12 @@ export default class SyncAgent {
    * When the user is within the
    * @type {Array}
    */
-  updateUserSegments(user, { add_segment_ids = [], remove_segment_ids = [] }) {
-    if (this.hullAgent.userWhitelisted(user)) {
+  updateUserSegments(user, { add_segment_ids = [], remove_segment_ids = [] }, ignoreFilter = false) {
+    if (this.hullAgent.userWhitelisted(user) || ignoreFilter === true) {
       user.segment_ids = _.uniq(_.concat(user.segment_ids || [], _.filter(add_segment_ids)));
       user.remove_segment_ids = _.filter(remove_segment_ids);
     } else {
-      if (this.userAdded(user)) {
-        user.segment_ids = [];
-        user.remove_segment_ids = this.tagMapping.getSegmentIds();
-      } else {
-        return null;
-      }
+      return null;
     }
     return user;
   }

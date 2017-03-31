@@ -20,7 +20,6 @@ const instrumentationAgent = {
 };
 
 describe("Intercom Client", () => {
-
   if (!process.env.API_KEY || process.env.APP_ID) {
     return null;
   }
@@ -44,4 +43,5 @@ describe("Intercom Client", () => {
         assert.equal("not_found", fErr.body.errors[0].code);
       });
   });
+  return null;
 });

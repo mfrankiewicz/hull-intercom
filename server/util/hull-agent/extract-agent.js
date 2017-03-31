@@ -52,6 +52,7 @@ export default class ExtractAgent {
   requestExtract({ segment = null, format = "json", path = "batch", fields = [] }) {
     const { hostname } = this.req;
     const search = (this.req.query || {});
+    search.source = "connector";
     if (segment) {
       search.segment_id = segment.id;
     }
