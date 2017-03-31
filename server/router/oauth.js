@@ -22,6 +22,7 @@ export default function OAuthRouter(deps) {
     hostSecret,
     name: "Intercom",
     Strategy: IntercomStrategy,
+    tokenInUrl: false,
     options: {
       clientID,
       clientSecret
