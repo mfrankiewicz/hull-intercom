@@ -4,6 +4,8 @@
 - save user tags after events coming from Intercom
 - don't tag or untag user for particular segment tag based on `intercom/tags` trait values (don't untag if the segment user left is not present there, don't tag if the segment users should be in is already there)
 - set event `ip` context param to Intercom event `last_seen_ip` field
+- updates `hull-node`
+- switch the default log format to json
 
 ## 0.4.0
 - manual batch is NOT filtering users based on segment information
