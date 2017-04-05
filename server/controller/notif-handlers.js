@@ -51,7 +51,8 @@ export default class NotifHandlers {
 
     logger.info("outgoing.user.start", _.pick(user, ["email", "id"]));
 
-    if (!_.isEmpty(_.get(changes, "user['traits_intercom/id'][1]"))) {
+    if (!_.isEmpty(_.get(changes, "user['traits_intercom/id'][1]"))
+      || !_.isEmpty(_.get(changes, "user['traits_intercom/tags'][1]"))) {
       logger.info("outgoing.user.skip", _.pick(user, ["email", "id"]));
       return Promise.resolve();
     }

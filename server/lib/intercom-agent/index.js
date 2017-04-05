@@ -231,4 +231,11 @@ export default class IntercomAgent {
         });
     }, { concurrency: 3 });
   }
+
+  getTags() {
+    return this.intercomClient.get("/tags")
+      .then(res => {
+        return _.get(res, "body.tags", []);
+      });
+  }
 }

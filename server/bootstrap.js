@@ -10,6 +10,8 @@ if (process.env.LOG_LEVEL) {
   Hull.logger.transports.console.level = process.env.LOG_LEVEL;
 }
 
+Hull.logger.transports.console.json = true;
+
 const shipConfig = {
   hostSecret: process.env.SECRET || "1234",
   clientID: process.env.CLIENT_ID,

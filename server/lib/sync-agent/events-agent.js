@@ -20,9 +20,10 @@ export default class EventsAgent {
             initiated: "user"
           };
         },
-        context: (_event) => {
+        context: (event) => {
           return {
-            event_type: "conversation",
+            ip: _.get(event, "data.item.user.last_seen_ip", "0"),
+            event_type: "conversation"
           };
         }
       },
@@ -35,9 +36,10 @@ export default class EventsAgent {
             initiated: "user"
           };
         },
-        context: (_event) => {
+        context: (event) => {
           return {
-            event_type: "conversation",
+            ip: _.get(event, "data.item.user.last_seen_ip", "0"),
+            event_type: "conversation"
           };
         }
       },
@@ -50,9 +52,10 @@ export default class EventsAgent {
             initiated: "admin"
           };
         },
-        context: (_event) => {
+        context: (event) => {
           return {
-            event_type: "conversation",
+            ip: _.get(event, "data.item.user.last_seen_ip", "0"),
+            event_type: "conversation"
           };
         }
       },
@@ -65,9 +68,10 @@ export default class EventsAgent {
             initiated: "admin"
           };
         },
-        context: (_event) => {
+        context: (event) => {
           return {
-            event_type: "conversation",
+            ip: _.get(event, "data.item.user.last_seen_ip", "0"),
+            event_type: "conversation"
           };
         }
       },
@@ -82,9 +86,10 @@ export default class EventsAgent {
             initiated: "admin"
           };
         },
-        context: (_event) => {
+        context: (event) => {
           return {
-            event_type: "conversation",
+            ip: _.get(event, "data.item.user.last_seen_ip", "0"),
+            event_type: "conversation"
           };
         }
       },
@@ -97,9 +102,10 @@ export default class EventsAgent {
             admin: _.get(event, "data.item.assignee.id")
           };
         },
-        context: (_event) => {
+        context: (event) => {
           return {
-            event_type: "conversation",
+            ip: _.get(event, "data.item.user.last_seen_ip", "0"),
+            event_type: "conversation"
           };
         }
       },
@@ -112,9 +118,10 @@ export default class EventsAgent {
             admin: _.get(event, "data.item.assignee.id")
           };
         },
-        context: (_event) => {
+        context: (event) => {
           return {
-            event_type: "conversation",
+            ip: _.get(event, "data.item.user.last_seen_ip", "0"),
+            event_type: "conversation"
           };
         }
       },
@@ -127,9 +134,10 @@ export default class EventsAgent {
             tag: _.get(event, "data.item.tag.name"),
           };
         },
-        context: (_event) => {
+        context: (event) => {
           return {
-            event_type: "tag",
+            ip: _.get(event, "data.item.user.last_seen_ip", "0"),
+            event_type: "tag"
           };
         }
       },
@@ -142,9 +150,10 @@ export default class EventsAgent {
             tag: _.get(event, "data.item.tag.name"),
           };
         },
-        context: (_event) => {
+        context: (event) => {
           return {
-            event_type: "tag",
+            ip: _.get(event, "data.item.user.last_seen_ip", "0"),
+            event_type: "tag"
           };
         }
       },
@@ -155,9 +164,10 @@ export default class EventsAgent {
         props: (_event) => {
           return {};
         },
-        context: (_event) => {
+        context: (event) => {
           return {
-            event_type: "email",
+            ip: _.get(event, "data.item.last_seen_ip", "0"),
+            event_type: "email"
           };
         }
       },
@@ -170,7 +180,8 @@ export default class EventsAgent {
         },
         context: (_event) => {
           return {
-            event_type: "email",
+            ip: _.get(event, "data.item.last_seen_ip", "0"),
+            event_type: "email"
           };
         }
       }
@@ -204,7 +215,7 @@ export default class EventsAgent {
     const context = _.defaults(mappedEvent.context(event), {
       source: "intercom",
       event_id: [user.id, event.topic, event.created_at].join("-"),
-      created_at: event.created_at
+      created_at: event.created_at,
     });
 
     this.logger.info("incoming.event", user, eventName, props, context);
