@@ -97,6 +97,8 @@ export default class SyncAgent {
     return this.hullAgent.getSegments()
       .then(segments => {
         const ops = _.reduce(users, (o, user) => {
+          const existingUserTags = _.intersection(user["traits_intercom/tags"], segments.map(s => s.name));
+
           const userOp = {};
           if (!_.isEmpty(user["traits_intercom/id"])) {
             userOp.id = user["traits_intercom/id"];
@@ -111,6 +113,10 @@ export default class SyncAgent {
               this.hullClient.logger.error("segment not found", segment);
               return o;
             }
+            if (_.includes(existingUserTags, segment.name)) {
+              this.hullClient.logger.debug("user.add_segment.skip", segment.name);
+              return null;
+            }
             o[segment.name] = o[segment.name] || [];
             return o[segment.name].push(userOp);
           });
@@ -119,6 +125,10 @@ export default class SyncAgent {
             if (_.isEmpty(segment)) {
               this.hullClient.logger.error("segment not found", segment);
               return o;
+            }
+            if (!_.includes(existingUserTags, segment.name)) {
+              this.hullClient.logger.debug("user.remove_segment.skip", segment.name);
+              return null;
             }
             o[segment.name] = o[segment.name] || [];
             return o[segment.name].push(_.merge({}, userOp, {

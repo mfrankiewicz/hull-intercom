@@ -207,8 +207,34 @@ export default class Jobs {
   }
 
   static saveEvents(req) {
-    const { syncAgent } = req.shipApp;
+    const { syncAgent, hullAgent } = req.shipApp;
     const { events = [] } = req.payload;
-    return Promise.all(events.map(e => syncAgent.eventsAgent.saveEvent(e)));
+    return Promise.all(events.map(e => syncAgent.eventsAgent.saveEvent(e)))
+      .then(() => hullAgent.getSegments())
+      .then((segments) => {
+        return Promise.all(events.map(e => {
+          if (_.get(e, "data.item.user")) {
+            const user = _.get(e, "data.item.user");
+            const ident = syncAgent.userMapping.getIdentFromIntercom(user);
+            const tagMapping = req.hull.ship.private_settings.tag_mapping;
+            const tags = user.tags.tags.map(t => {
+              if (!t.name) {
+                const segmentId = _.invert(tagMapping)[t.id];
+                const segment = _.find(segments, { id: segmentId });
+                if (segment && segment.name) {
+                  return segment.name;
+                }
+              }
+              return t.name;
+            });
+            if (ident.email) {
+              const traits = {};
+              traits["intercom/tags"] = tags;
+              return req.hull.client.as(ident).traits(traits);
+            }
+          }
+          return null;
+        }));
+      });
   }
 }
