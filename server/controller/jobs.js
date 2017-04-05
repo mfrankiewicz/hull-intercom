@@ -26,6 +26,7 @@ export default class Jobs {
             .map(u => {
               const intercomData = _.find(res, { email: u.email });
               u["traits_intercom/id"] = intercomData.id;
+              u["traits_intercom/tags"] = intercomData.tags.tags.map(t => t.name);
 
               req.hull.client.logger.info("outgoing.user.success", _.pick(u, ["email", "id"]));
               return u;
@@ -207,23 +208,19 @@ export default class Jobs {
   }
 
   static saveEvents(req) {
-    const { syncAgent, hullAgent } = req.shipApp;
+    const { syncAgent, intercomAgent } = req.shipApp;
     const { events = [] } = req.payload;
     return Promise.all(events.map(e => syncAgent.eventsAgent.saveEvent(e)))
-      .then(() => hullAgent.getSegments())
-      .then((segments) => {
+      .then(() => intercomAgent.getTags())
+      .then((allTags) => {
         return Promise.all(events.map(e => {
-          if (_.get(e, "data.item.user")) {
+          if ((e.topic === "user.tag.created" || e.topic === "user.tag.deleted")
+            && _.get(e, "data.item.user")) {
             const user = _.get(e, "data.item.user");
             const ident = syncAgent.userMapping.getIdentFromIntercom(user);
-            const tagMapping = req.hull.ship.private_settings.tag_mapping;
             const tags = user.tags.tags.map(t => {
               if (!t.name) {
-                const segmentId = _.invert(tagMapping)[t.id];
-                const segment = _.find(segments, { id: segmentId });
-                if (segment && segment.name) {
-                  return segment.name;
-                }
+                t = _.find(allTags, { id: t.id });
               }
               return t.name;
             });
