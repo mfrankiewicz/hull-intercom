@@ -178,7 +178,7 @@ export default class EventsAgent {
         props: (_event) => {
           return {};
         },
-        context: (_event) => {
+        context: (event) => {
           return {
             ip: _.get(event, "data.item.last_seen_ip", "0"),
             event_type: "email"
