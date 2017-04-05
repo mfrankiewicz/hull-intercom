@@ -207,7 +207,7 @@ export default class Jobs {
   }
 
   static saveEvents(req) {
-    const { syncAgent, queueAgent, hullAgent } = req.shipApp;
+    const { syncAgent, hullAgent } = req.shipApp;
     const { events = [] } = req.payload;
     return Promise.all(events.map(e => syncAgent.eventsAgent.saveEvent(e)))
       .then(() => hullAgent.getSegments())
