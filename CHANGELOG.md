@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.5.1
+- hotfix variable name
+
 ## 0.5.0
 - save user tags after events coming from Intercom
 - don't tag or untag user for particular segment tag based on `intercom/tags` trait values (don't untag if the segment user left is not present there, don't tag if the segment users should be in is already there)
