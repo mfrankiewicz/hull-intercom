@@ -70,11 +70,11 @@ export default class IntercomAgent {
 
   sendUsers(users, mode = "bulk") {
     if (_.isEmpty(users)) {
-      this.logger.info("sendUsers.emptyList");
+      this.logger.debug("sendUsers.emptyList");
       return Promise.resolve();
     }
 
-    this.logger.info("sendUsers", users.length);
+    this.logger.debug("sendUsers", users.length);
 
     const body = {
       items: users.map(u => {
