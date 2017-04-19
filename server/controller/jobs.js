@@ -11,11 +11,11 @@ export default class Jobs {
     const { users, mode = "bulk" } = req.payload;
     const { syncAgent, intercomAgent, queueAgent } = req.shipApp;
 
-    req.hull.client.logger.info("sendUsers.preFilter", users.length);
+    req.hull.client.logger.debug("sendUsers.preFilter", users.length);
     const usersToSave = syncAgent.getUsersToSave(users);
     const intercomUsersToSave = usersToSave.map(u => syncAgent.userMapping.getIntercomFields(u));
 
-    req.hull.client.logger.info("sendUsers.filtered", intercomUsersToSave.length);
+    req.hull.client.logger.debug("sendUsers.filtered", intercomUsersToSave.length);
     req.shipApp.instrumentationAgent.metricVal("ship.outgoing.users", intercomUsersToSave.length, req.hull.client.configuration());
 
     return syncAgent.syncShip()
@@ -33,7 +33,7 @@ export default class Jobs {
             });
           const errors = _.filter(res, { body: { type: "error.list" } });
 
-          req.hull.client.logger.error("ERRORS", errors.map(r => r.body.errors));
+          req.hull.client.logger.debug("ERRORS", errors.map(r => r.body.errors));
 
           const groupedErrors = errors.map(errorReq => {
             return {
@@ -186,7 +186,7 @@ export default class Jobs {
       return Promise.resolve(last_updated_at);
     })()
       .then((new_last_updated_at) => {
-        req.hull.client.logger.info("fetchUsers", { new_last_updated_at, page });
+        req.hull.client.logger.debug("fetchUsers", { new_last_updated_at, page });
         return intercomAgent.getRecentUsers(new_last_updated_at, count, page)
           .then(({ users, hasMore }) => {
             const promises = [];

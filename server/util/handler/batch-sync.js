@@ -38,7 +38,7 @@ export default class BatchSyncHandler {
 
   add(message) {
     this.messages.push(message);
-    this.hull.client.logger.info("batchSyncHandler.added", this.messages.length);
+    this.hull.client.logger.debug("batchSyncHandler.added", this.messages.length);
     const { maxSize } = this.options;
     if (this.messages.length >= maxSize) {
       this.flush();
@@ -50,11 +50,11 @@ export default class BatchSyncHandler {
 
   flush() {
     const messages = this.messages;
-    this.hull.client.logger.info("batchSyncHandler.flush", messages.length);
+    this.hull.client.logger.debug("batchSyncHandler.flush", messages.length);
     this.messages = [];
     return this.callback(messages)
       .then(() => {
-        this.hull.client.logger.info("batchSyncHandler.flush.sucess");
+        this.hull.client.logger.debug("batchSyncHandler.flush.sucess");
       }, (err) => {
         console.error(err);
         this.hull.client.logger.error("batchSyncHandler.flush.error", err);
