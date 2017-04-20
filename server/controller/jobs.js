@@ -28,12 +28,10 @@ export default class Jobs {
               u["traits_intercom/id"] = intercomData.id;
               u["traits_intercom/tags"] = intercomData.tags.tags.map(t => t.name);
 
-              req.hull.client.logger.info("outgoing.user.success", _.pick(u, ["email", "id"]));
+              req.hull.client.logger.info("outgoing.user.success", _.pick(u, ["email", "id", "external_id"]));
               return u;
             });
           const errors = _.filter(res, { body: { type: "error.list" } });
-
-          req.hull.client.logger.debug("ERRORS", errors.map(r => r.body.errors));
 
           const groupedErrors = errors.map(errorReq => {
             return {
@@ -169,7 +167,7 @@ export default class Jobs {
         return syncAgent.updateUserSegments(u, { add_segment_ids: [segmentId] }, ignoreFilter);
       }));
 
-      users.map(u => req.hull.client.logger.info("outgoing.user.start", _.pick(u, ["email", "id"])));
+      users.map(u => req.hull.client.logger.debug("outgoing.user.start", _.pick(u, ["email", "id"])));
 
       return req.shipApp.queueAgent.create("sendUsers", { users });
     });
