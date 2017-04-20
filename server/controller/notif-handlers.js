@@ -49,11 +49,11 @@ export default class NotifHandlers {
     const { user, changes = {}, segments = [], events = [] } = payload.message;
     const { left = [] } = _.get(changes, "segments", {});
 
-    logger.info("outgoing.user.start", _.pick(user, ["email", "id"]));
+    logger.debug("outgoing.user.start", _.pick(user, ["email", "id"]));
 
     if (!_.isEmpty(_.get(changes, "user['traits_intercom/id'][1]"))
       || !_.isEmpty(_.get(changes, "user['traits_intercom/tags'][1]"))) {
-      logger.info("outgoing.user.skip", _.pick(user, ["email", "id"]));
+      logger.debug("outgoing.user.skip", _.pick(user, ["email", "id"]));
       return Promise.resolve();
     }
     user.segment_ids = user.segment_ids || segments.map(s => s.id);
@@ -64,7 +64,9 @@ export default class NotifHandlers {
     });
 
     if (!filteredUser) {
-      logger.info("outgoing.user.skip", _.pick(user, ["email", "id"]));
+      logger.info("outgoing.user.skip", _.merge(_.pick(user, ["email", "id", "external_id"]), {
+        reason: "doesn't match filtered segments"
+      }));
       return Promise.resolve();
     }
 
