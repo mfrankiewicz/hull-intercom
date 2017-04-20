@@ -110,7 +110,7 @@ export default class SyncAgent {
           user.segment_ids.map(segment_id => {
             const segment = _.find(segments, { id: segment_id });
             if (_.isEmpty(segment)) {
-              this.hullClient.logger.error("segment not found", segment);
+              this.hullClient.logger.debug("segment not found", segment);
               return o;
             }
             if (_.includes(existingUserTags, segment.name)) {
@@ -123,7 +123,7 @@ export default class SyncAgent {
           user.remove_segment_ids.map(segment_id => {
             const segment = _.find(segments, { id: segment_id });
             if (_.isEmpty(segment)) {
-              this.hullClient.logger.error("segment not found", segment);
+              this.hullClient.logger.debug("segment not found", segment);
               return o;
             }
             if (!_.includes(existingUserTags, segment.name)) {
