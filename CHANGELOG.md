@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.5.2
+- implement logging convention and adjust logging levels
+
 ## 0.5.1
 - hotfix variable name
 
