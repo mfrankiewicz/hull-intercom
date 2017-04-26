@@ -38,5 +38,6 @@ export default {
   connector,
   shipConfig,
   controllers,
-  jobs: controllers.Jobs
+  jobs: controllers.Jobs,
+  cache
 };

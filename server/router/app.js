@@ -3,7 +3,7 @@ import cors from "cors";
 import { notifHandler, batchHandler } from "hull/lib/utils";
 
 import AppMiddleware from "../lib/app-middleware";
-import requireConfiguration from "../util/middleware/require-configuration";
+import requireConfiguration from "../lib/require-configuration";
 
 export default function AppRouter(deps) {
   const router = new Router();

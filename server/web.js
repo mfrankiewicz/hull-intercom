@@ -1,6 +1,6 @@
 import express from "express";
 
-import KueRouter from "./util/router/kue";
+import KueRouter from "./router/kue";
 
 import bootstrap from "./bootstrap";
 import AppRouter from "./router/app";
@@ -20,6 +20,6 @@ connector.setupApp(app);
 app
   .use("/", AppRouter(bootstrap))
   .use("/auth", OAuthRouter(bootstrap))
-  .use("/kue", KueRouter(bootstrap));
+  .use("/kue", KueRouter(bootstrap.connector));
 
 connector.startApp(app);

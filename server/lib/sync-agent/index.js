@@ -115,7 +115,7 @@ export default class SyncAgent {
             return o;
           }
           user.segment_ids.map(segment_id => {
-            const segment = _.find(segments, {id: segment_id});
+            const segment = _.find(segments, { id: segment_id });
             if (_.isEmpty(segment)) {
               this.client.logger.debug("segment not found", segment);
               return o;
@@ -128,7 +128,7 @@ export default class SyncAgent {
             return o[segment.name].push(userOp);
           });
           user.remove_segment_ids.map(segment_id => {
-            const segment = _.find(segments, {id: segment_id});
+            const segment = _.find(segments, { id: segment_id });
             if (_.isEmpty(segment)) {
               this.client.logger.debug("segment not found", segment);
               return o;

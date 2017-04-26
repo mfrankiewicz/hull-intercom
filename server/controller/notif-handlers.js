@@ -1,7 +1,7 @@
 import Promise from "bluebird";
 import _ from "lodash";
 
-import BatchSyncHandler from "../util/handler/batch-sync";
+import BatchSyncHandler from "../lib/batch-sync";
 
 export default class NotifHandlers {
 
@@ -73,7 +73,6 @@ export default class NotifHandlers {
     filteredUser.events = events || [];
     return BatchSyncHandler.getHandler({
       client: ctx.client,
-      ship: ctx.ship,
       ns: "notif",
       options: {
         maxSize: process.env.NOTIFY_BATCH_HANDLER_SIZE || 100,

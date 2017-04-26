@@ -1,6 +1,6 @@
 import _ from "lodash";
 
-import BatchSyncHandler from "../util/handler/batch-sync";
+import BatchSyncHandler from "../lib/batch-sync";
 
 export default class Actions {
 
@@ -24,8 +24,7 @@ export default class Actions {
     if (_.get(req, "body.topic") === "user.created") {
       // map the users to get only mapped fields
       return BatchSyncHandler.getHandler({
-        hull: req.hull,
-        ship: req.hull.ship,
+        client: req.hull.client,
         ns: "webhook",
         options: {
           maxSize: process.env.NOTIFY_BATCH_HANDLER_SIZE || 100,
@@ -39,7 +38,6 @@ export default class Actions {
 
     return BatchSyncHandler.getHandler({
       client: req.client,
-      ship: req.hull.ship,
       ns: "webhook_events",
       options: {
         maxSize: process.env.NOTIFY_BATCH_HANDLER_SIZE || 100,

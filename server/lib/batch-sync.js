@@ -20,9 +20,8 @@ export default class BatchSyncHandler {
     return HANDLERS[name] = HANDLERS[name] || new BatchSyncHandler(args); // eslint-disable-line no-return-assign
   }
 
-  constructor({ ns = "", ship, client, options = {} }) {
+  constructor({ ns = "", client, options = {} }) {
     this.ns = ns;
-    this.ship = ship;
     this.client = client;
     this.messages = [];
     this.options = options;

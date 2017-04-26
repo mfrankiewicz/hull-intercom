@@ -190,7 +190,7 @@ export default class IntercomAgent {
     this.metric.increment("ship.outgoing.events", events.length);
     // FIXME: enable bulk jobs and remove `true` here, when we can match the user by `id`,
     // look at error logged below
-    if (events.length <= 10) { // eslint-disable-line no-constant-condition
+    if (true || events.length <= 10) { // eslint-disable-line no-constant-condition
       return Promise.map(events, (event) => {
         return this.intercomClient
         .post("/events")
