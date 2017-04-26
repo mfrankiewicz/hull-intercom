@@ -7,16 +7,16 @@ export default class Jobs {
    * Takes list of users with fields and segment_ids set,
    * sends them to Intercom and tags them.
    */
-  static sendUsers(req) {
-    const { users, mode = "bulk" } = req.payload;
-    const { syncAgent, intercomAgent, queueAgent } = req.shipApp;
+  static sendUsers(ctx, payload) {
+    const { users, mode = "bulk" } = payload;
+    const { syncAgent, intercomAgent } = ctx.shipApp;
 
-    req.hull.client.logger.debug("sendUsers.preFilter", users.length);
+    ctx.client.logger.debug("sendUsers.preFilter", users.length);
     const usersToSave = syncAgent.getUsersToSave(users);
     const intercomUsersToSave = usersToSave.map(u => syncAgent.userMapping.getIntercomFields(u));
 
-    req.hull.client.logger.debug("sendUsers.filtered", intercomUsersToSave.length);
-    req.shipApp.instrumentationAgent.metricVal("ship.outgoing.users", intercomUsersToSave.length, req.hull.client.configuration());
+    ctx.client.logger.debug("sendUsers.filtered", intercomUsersToSave.length);
+    ctx.metric.increment("ship.outgoing.users", intercomUsersToSave.length);
 
     return syncAgent.syncShip()
       .then(() => intercomAgent.sendUsers(intercomUsersToSave, mode))
@@ -28,7 +28,7 @@ export default class Jobs {
               u["traits_intercom/id"] = intercomData.id;
               u["traits_intercom/tags"] = intercomData.tags.tags.map(t => t.name);
 
-              req.hull.client.logger.info("outgoing.user.success", _.pick(u, ["email", "id", "external_id"]));
+              ctx.client.logger.info("outgoing.user.success", _.pick(u, ["email", "id", "external_id"]));
               return u;
             });
           const errors = _.filter(res, { body: { type: "error.list" } });
@@ -47,19 +47,19 @@ export default class Jobs {
         }
 
         if (_.get(res, "body.id")) {
-          return queueAgent.create("handleBulkJob", { users: usersToSave, id: res.body.id });
+          return ctx.enqueue("handleBulkJob", { users: usersToSave, id: res.body.id });
         }
         return Promise.resolve();
       });
   }
 
-  static handleBulkJob(req) {
-    const { id, users, attempt = 1 } = req.payload;
-    const { syncAgent, intercomAgent, queueAgent } = req.shipApp;
+  static handleBulkJob(ctx, payload) {
+    const { id, users, attempt = 1 } = payload;
+    const { syncAgent, intercomAgent } = ctx.shipApp;
     return intercomAgent.getJob(id)
       .then(({ isCompleted, hasErrors }) => {
         if (isCompleted) {
-          req.shipApp.instrumentationAgent.metricVal("intercom.bulk_job.attempt", attempt, req.hull.client.configuration());
+          ctx.metric.increment("intercom.bulk_job.attempt", attempt);
           return (() => {
             if (hasErrors) {
               return intercomAgent.getJobErrors(id)
@@ -69,7 +69,7 @@ export default class Jobs {
           })()
             .then(() => {
               users.map(u => {
-                return req.hull.client.logger.info("outgoing.user.success", _.pick(u, ["email", "id"]));
+                return ctx.client.logger.info("outgoing.user.success", _.pick(u, ["email", "id"]));
               });
             })
             .then(() => syncAgent.groupUsersToTag(users))
@@ -77,11 +77,11 @@ export default class Jobs {
         }
 
         if (attempt > 20) {
-          req.shipApp.instrumentationAgent.metricInc("intercom.bulk_job.fallback", 1, req.hull.client.configuration());
-          return queueAgent.create("sendUsers", { users, mode: "regular" });
+          ctx.metric.increment("intercom.bulk_job.fallback", 1);
+          return ctx.enqueue("sendUsers", { users, mode: "regular" });
         }
 
-        return queueAgent.create("handleBulkJob", {
+        return ctx.enqueue("handleBulkJob", {
           users,
           id,
           attempt: attempt + 1
@@ -92,33 +92,34 @@ export default class Jobs {
 
   /**
    * Saves users incoming from Intercom API
-   * @param  {Object} req
    * @return {Promise}
+   * @param ctx
+   * @param payload
    */
-  static saveUsers(req) {
-    const { users } = req.payload;
-    const { syncAgent, hullAgent } = req.shipApp;
+  static saveUsers(ctx, payload) {
+    const { users } = payload;
+    const { syncAgent } = ctx.shipApp;
 
-    req.shipApp.instrumentationAgent.metricVal("ship.incoming.users", users.length, req.hull.client.configuration());
+    ctx.metric.increment("ship.incoming.users", users.length);
 
     return syncAgent.syncShip()
       .then(() => {
         return Promise.map(users, (intercomUser) => {
-          req.hull.client.logger.info("incoming.user", intercomUser);
+          ctx.client.logger.info("incoming.user", intercomUser);
           const ident = syncAgent.userMapping.getIdentFromIntercom(intercomUser);
           const traits = syncAgent.userMapping.getHullTraits(intercomUser);
           if (ident.email) {
-            return req.hull.client.as(ident).traits(traits);
+            return ctx.client.as(ident).traits(traits);
           }
-          return req.hull.client.logger.info("incoming.user.skip", intercomUser);
+          return ctx.client.logger.info("incoming.user.skip", intercomUser);
         });
       })
       .then(() => {
         const customAttributes = _.uniq(_.flatten(users.map(u => _.keys(u.custom_attributes))));
-        const oldAttributes = req.hull.ship.private_settings.custom_attributes;
+        const oldAttributes = ctx.ship.private_settings.custom_attributes;
         const newAttributes = _.difference(customAttributes, oldAttributes);
         if (!_.isEmpty(newAttributes)) {
-          return hullAgent.updateShipSettings({
+          return ctx.helpers.updateSettings({
             custom_attributes: _.concat(oldAttributes, newAttributes)
           });
         }
@@ -126,12 +127,12 @@ export default class Jobs {
       });
   }
 
-  static fetchAllUsers(req) {
-    const { scroll_param } = req.payload;
-    const { intercomAgent, queueAgent, instrumentationAgent } = req.shipApp;
+  static fetchAllUsers(ctx, payload) {
+    const { scroll_param } = payload;
+    const { intercomAgent, instrumentationAgent } = ctx.shipApp;
     if (_.isEmpty(scroll_param)) {
       instrumentationAgent.metricEvent({
-        title: "fetchAllUsers", context: req.hull.client.configuration(),
+        title: "fetchAllUsers", context: ctx.client.configuration(), // todo
       });
     }
     return intercomAgent.importUsers(scroll_param)
@@ -146,36 +147,42 @@ export default class Jobs {
         // expires it cannot be recovered.
         // @see https://developers.intercom.com/reference#iterating-over-all-users
         return Promise.all([
-          queueAgent.create("fetchAllUsers", { scroll_param: next_scroll_param }, { priority: "high" }),
-          queueAgent.create("saveUsers", { users })
+          ctx.enqueue("fetchAllUsers", { scroll_param: next_scroll_param }, { priority: "high" }),
+          ctx.enqueue("saveUsers", { users })
         ]);
       });
   }
 
-  static handleBatch(req) {
-    const { hullAgent, syncAgent, instrumentationAgent } = req.shipApp;
-    const { body, segmentId, source } = req.payload;
-    instrumentationAgent.metricEvent({
-      title: "batch",
-      context: req.hull.client.configuration(),
-      text: JSON.stringify(req.payload.body)
-    });
-
-    return hullAgent.extractAgent.handleExtract(body, 100, (users) => {
+  static batchHandler(ctx, source, segmentId) {
+    return (users) => {
       const ignoreFilter = (source !== "connector");
       users = _.filter(users.map(u => {
-        return syncAgent.updateUserSegments(u, { add_segment_ids: [segmentId] }, ignoreFilter);
+        return ctx.shipApp.syncAgent.updateUserSegments(u, { add_segment_ids: [segmentId] }, ignoreFilter);
       }));
 
-      users.map(u => req.hull.client.logger.debug("outgoing.user.start", _.pick(u, ["email", "id"])));
+      users.map(u => ctx.client.logger.debug("outgoing.user.start", _.pick(u, ["email", "id"])));
 
-      return req.shipApp.queueAgent.create("sendUsers", { users });
-    });
+      return ctx.enqueue("sendUsers", { users });
+    };
   }
 
-  static fetchUsers(req) {
-    const { syncAgent, intercomAgent, queueAgent } = req.shipApp;
-    const { last_updated_at, count, page = 1 } = req.payload;
+
+  static handleBatch(ctx, payload) {
+    const segmentId = ctx.query.segmentId;
+    const { body, source } = payload;
+    ctx.metric.event("batch", {
+      properties: {
+        context: ctx.client.configuration(),
+        text: JSON.stringify(payload.body)
+      }
+    });
+
+    return ctx.client.utils.extract.handle({ body, batchSize: 100, handler: this.batchHandler(ctx, source, segmentId) });
+  }
+
+  static fetchUsers(ctx, payload) {
+    const { syncAgent, intercomAgent } = ctx.shipApp;
+    const { last_updated_at, count, page = 1 } = payload;
 
     return (() => {
       if (_.isEmpty(last_updated_at)) {
@@ -184,12 +191,12 @@ export default class Jobs {
       return Promise.resolve(last_updated_at);
     })()
       .then((new_last_updated_at) => {
-        req.hull.client.logger.debug("fetchUsers", { new_last_updated_at, page });
+        ctx.client.logger.debug("fetchUsers", { new_last_updated_at, page });
         return intercomAgent.getRecentUsers(new_last_updated_at, count, page)
           .then(({ users, hasMore }) => {
             const promises = [];
             if (hasMore) {
-              promises.push(queueAgent.create("fetchUsers", {
+              promises.push(ctx.enqueue("fetchUsers", {
                 last_updated_at: new_last_updated_at,
                 count,
                 page: page + 1
@@ -197,7 +204,7 @@ export default class Jobs {
             }
 
             if (!_.isEmpty(users)) {
-              promises.push(queueAgent.create("saveUsers", { users }));
+              promises.push(ctx.enqueue("saveUsers", { users }));
             }
 
             return Promise.all(promises);
@@ -205,9 +212,9 @@ export default class Jobs {
       });
   }
 
-  static saveEvents(req) {
-    const { syncAgent, intercomAgent } = req.shipApp;
-    const { events = [] } = req.payload;
+  static saveEvents(ctx, payload) {
+    const { syncAgent, intercomAgent } = ctx.shipApp;
+    const { events = [] } = payload;
     return Promise.all(events.map(e => syncAgent.eventsAgent.saveEvent(e)))
       .then(() => intercomAgent.getTags())
       .then((allTags) => {
@@ -225,7 +232,7 @@ export default class Jobs {
             if (ident.email) {
               const traits = {};
               traits["intercom/tags"] = tags;
-              return req.hull.client.as(ident).traits(traits);
+              return ctx.client.as(ident).traits(traits);
             }
           }
           return null;

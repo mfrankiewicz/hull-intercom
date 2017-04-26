@@ -20,6 +20,15 @@
     "CLIENT_SECRET" : {
       "description" : "oAuth Client Secret",
       "required": true
+    },
+    "MINIMUM_BULK_SIZE": {
+      "description": "Minimum bulk size."
+    },
+    "NOTIFY_BATCH_HANDLER_SIZE": {
+      "description": "Defines batch handler size "
+    },
+    "NOTIFY_BATCH_HANDLER_THROTTLE": {
+      "description": "Defines batch handler throttle"
     }
   },
   "scripts": {},

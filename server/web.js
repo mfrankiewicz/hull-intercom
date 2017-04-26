@@ -1,33 +1,25 @@
-import WebApp from "./util/app/web";
-import ExitHandler from "./util/handler/exit";
-import BatchSyncHandler from "./util/handler/batch-sync";
-import StaticRouter from "./util/router/static";
+import express from "express";
+
 import KueRouter from "./util/router/kue";
 
 import bootstrap from "./bootstrap";
 import AppRouter from "./router/app";
 import OAuthRouter from "./router/oauth";
+import Worker from "./worker";
+
+const { connector } = bootstrap;
 
 if (process.env.COMBINED) {
-  require("./worker"); // eslint-disable-line global-require
+  Worker(bootstrap);
 }
 
-const { instrumentationAgent } = bootstrap;
+const app = express();
 
-const port = process.env.PORT || 8082;
-
-const app = WebApp();
+connector.setupApp(app);
 
 app
-  .use(instrumentationAgent.startMiddleware())
   .use("/", AppRouter(bootstrap))
-  .use("/", StaticRouter(bootstrap))
   .use("/auth", OAuthRouter(bootstrap))
-  .use("/kue", KueRouter(bootstrap))
-  .use(instrumentationAgent.stopMiddleware());
+  .use("/kue", KueRouter(bootstrap));
 
-app.listen(port, () => {
-  bootstrap.Hull.logger.info("webApp.listen", port);
-});
-
-ExitHandler(BatchSyncHandler.exit.bind(BatchSyncHandler));
+connector.startApp(app);

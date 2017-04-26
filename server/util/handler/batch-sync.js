@@ -20,10 +20,10 @@ export default class BatchSyncHandler {
     return HANDLERS[name] = HANDLERS[name] || new BatchSyncHandler(args); // eslint-disable-line no-return-assign
   }
 
-  constructor({ ns = "", ship, hull, options = {} }) {
+  constructor({ ns = "", ship, client, options = {} }) {
     this.ns = ns;
     this.ship = ship;
-    this.hull = hull;
+    this.client = client;
     this.messages = [];
     this.options = options;
 
@@ -38,7 +38,7 @@ export default class BatchSyncHandler {
 
   add(message) {
     this.messages.push(message);
-    this.hull.client.logger.debug("batchSyncHandler.added", this.messages.length);
+    this.client.logger.debug("batchSyncHandler.added", this.messages.length);
     const { maxSize } = this.options;
     if (this.messages.length >= maxSize) {
       this.flush();
@@ -50,14 +50,14 @@ export default class BatchSyncHandler {
 
   flush() {
     const messages = this.messages;
-    this.hull.client.logger.debug("batchSyncHandler.flush", messages.length);
+    this.client.logger.debug("batchSyncHandler.flush", messages.length);
     this.messages = [];
     return this.callback(messages)
       .then(() => {
-        this.hull.client.logger.debug("batchSyncHandler.flush.sucess");
+        this.client.logger.debug("batchSyncHandler.flush.sucess");
       }, (err) => {
         console.error(err);
-        this.hull.client.logger.error("batchSyncHandler.flush.error", err);
+        this.client.logger.error("batchSyncHandler.flush.error", err);
       });
   }
 }

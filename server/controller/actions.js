@@ -5,19 +5,17 @@ import BatchSyncHandler from "../util/handler/batch-sync";
 export default class Actions {
 
   static fetchAll(req, res, next) {
-    req.shipApp.queueAgent.create("fetchAllUsers")
+    req.hull.enqueue("fetchAllUsers")
       .then(next, next);
   }
 
-  static batchHandler(req, res, next) {
-    const segmentId = req.query.segment_id || null;
-    const source = req.query.source || null;
-    req.shipApp.queueAgent.create("handleBatch", { body: req.body, segmentId, source })
-      .then(next, next);
+  static handleBatchAction(req, res, next) {
+    req.hull.query.segmentId = req.query.segment_id || null;
+    next();
   }
 
   static sync(req, res, next) {
-    req.shipApp.queueAgent.create("fetchUsers")
+    req.hull.enqueue("fetchUsers")
       .then(next, next);
   }
 
@@ -34,13 +32,13 @@ export default class Actions {
           throttle: process.env.NOTIFY_BATCH_HANDLER_THROTTLE || 30000
         }
       })
-      .setCallback(users => req.shipApp.queueAgent.create("saveUsers", { users }))
+      .setCallback(users => req.hull.enqueue("saveUsers", { users }))
       .add(_.get(req, "body.data.item"))
       .then(next, next);
     }
 
     return BatchSyncHandler.getHandler({
-      hull: req.hull,
+      client: req.client,
       ship: req.hull.ship,
       ns: "webhook_events",
       options: {
@@ -48,7 +46,7 @@ export default class Actions {
         throttle: process.env.NOTIFY_BATCH_HANDLER_THROTTLE || 30000
       }
     })
-    .setCallback(events => req.shipApp.queueAgent.create("saveEvents", { events }))
+    .setCallback(events => req.hull.enqueue("saveEvents", { events }))
     .add(_.get(req, "body"))
     .then(next, next);
   }

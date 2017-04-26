@@ -9,17 +9,17 @@ import EventsAgent from "./events-agent";
 
 export default class SyncAgent {
 
-  constructor(intercomAgent, hullAgent, hull, hostname, instrumentationAgent) {
-    this.ship = hull.ship;
-    this.hullAgent = hullAgent;
+  constructor(intercomAgent, client, segments, metric, ship, helpers, hostname) {
+    this.ship = ship;
+    this.segments = segments;
     this.intercomAgent = intercomAgent;
-    this.hullClient = hull.client;
-    this.logger = hull.client.logger;
+    this.client = client;
+    this.logger = client.logger;
 
-    this.tagMapping = new TagMapping(intercomAgent, hullAgent, hull.ship);
-    this.userMapping = new UserMapping(hull.ship);
-    this.webhookAgent = new WebhookAgent(intercomAgent, hullAgent, hull.ship, hostname);
-    this.eventsAgent = new EventsAgent(this.tagMapping, hull, instrumentationAgent, this.userMapping);
+    this.tagMapping = new TagMapping(intercomAgent, ship, helpers);
+    this.userMapping = new UserMapping(ship);
+    this.webhookAgent = new WebhookAgent(intercomAgent, client, ship, helpers, hostname);
+    this.eventsAgent = new EventsAgent(this.tagMapping, this.userMapping, client, metric);
   }
 
   isConfigured() {
@@ -32,7 +32,7 @@ export default class SyncAgent {
    */
   syncShip() {
     return this.webhookAgent.ensureWebhook()
-      .then(() => this.hullAgent.getSegments())
+      .then(() => this.segments)
       .then((segments) => this.tagMapping.sync(segments));
   }
 
@@ -48,6 +48,11 @@ export default class SyncAgent {
    */
   userWithError(user) {
     return !_.isEmpty(user["traits_intercom/import_error"]);
+  }
+
+  userWhitelisted(user) {
+    const segmentIds = _.get(this.ship, "private_settings.synchronized_segments", []);
+    return _.intersection(segmentIds, user.segment_ids).length > 0;
   }
 
   /**
@@ -72,33 +77,33 @@ export default class SyncAgent {
       const errorMessage = errorDetails.map(e => e.message).join(" ");
 
       if (_.find(errorDetails, { code: "conflict" })) {
-        this.hullClient.logger.error("saving user error", { errorDetails });
+        this.client.logger.error("saving user error", { errorDetails });
       }
 
       const ident = this.userMapping.getIdentFromIntercom(error.data);
 
-      this.hullClient.logger.info("outgoing.user.error", _.merge(ident, { errors: errorDetails }));
-      return this.hullClient.as(ident).traits({
+      this.client.logger.info("outgoing.user.error", _.merge(ident, { errors: errorDetails }));
+      return this.client.as(ident).traits({
         "intercom/import_error": errorMessage
       });
     });
   }
 
   getUsersToSave(users) {
-    return users.filter((u) => this.hullAgent.userComplete(u)
+    return users.filter((u) => !_.isEmpty(u.email)
       && !this.userWithError(u));
   }
 
   getUsersToTag(users) {
-    return users.filter((u) => this.hullAgent.userWhitelisted(u)
+    return users.filter((u) => this.userWhitelisted(u)
       && this.userAdded(u)
       && !this.userWithError(u));
   }
 
   groupUsersToTag(users) {
-    return this.hullAgent.getSegments()
+    return Promise.resolve(this.segments)
       .then(segments => {
-        const ops = _.reduce(users, (o, user) => {
+        return _.reduce(users, (o, user) => {
           const existingUserTags = _.intersection(user["traits_intercom/tags"], segments.map(s => s.name));
 
           const userOp = {};
@@ -110,26 +115,26 @@ export default class SyncAgent {
             return o;
           }
           user.segment_ids.map(segment_id => {
-            const segment = _.find(segments, { id: segment_id });
+            const segment = _.find(segments, {id: segment_id});
             if (_.isEmpty(segment)) {
-              this.hullClient.logger.debug("segment not found", segment);
+              this.client.logger.debug("segment not found", segment);
               return o;
             }
             if (_.includes(existingUserTags, segment.name)) {
-              this.hullClient.logger.debug("user.add_segment.skip", segment.name);
+              this.client.logger.debug("user.add_segment.skip", segment.name);
               return null;
             }
             o[segment.name] = o[segment.name] || [];
             return o[segment.name].push(userOp);
           });
           user.remove_segment_ids.map(segment_id => {
-            const segment = _.find(segments, { id: segment_id });
+            const segment = _.find(segments, {id: segment_id});
             if (_.isEmpty(segment)) {
-              this.hullClient.logger.debug("segment not found", segment);
+              this.client.logger.debug("segment not found", segment);
               return o;
             }
             if (!_.includes(existingUserTags, segment.name)) {
-              this.hullClient.logger.debug("user.remove_segment.skip", segment.name);
+              this.client.logger.debug("user.remove_segment.skip", segment.name);
               return null;
             }
             o[segment.name] = o[segment.name] || [];
@@ -139,7 +144,6 @@ export default class SyncAgent {
           });
           return o;
         }, {});
-        return ops;
       });
   }
 
@@ -148,7 +152,7 @@ export default class SyncAgent {
    * @type {Array}
    */
   updateUserSegments(user, { add_segment_ids = [], remove_segment_ids = [] }, ignoreFilter = false) {
-    if (this.hullAgent.userWhitelisted(user) || ignoreFilter === true) {
+    if (this.userWhitelisted(user) || ignoreFilter === true) {
       user.segment_ids = _.uniq(_.concat(user.segment_ids || [], _.filter(add_segment_ids)));
       user.remove_segment_ids = _.filter(remove_segment_ids);
     } else {
@@ -163,7 +167,7 @@ export default class SyncAgent {
    */
   getLastUpdatedAt() {
     const defaultValue = moment().subtract(1, "hour").format();
-    return this.hullAgent.hullClient.get("/search/user_reports", {
+    return this.client.get("/search/user_reports", {
       include: ["traits_intercom/updated_at"],
       sort: {
         "traits_intercom/updated_at": "desc"

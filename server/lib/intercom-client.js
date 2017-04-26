@@ -5,13 +5,12 @@ import _ from "lodash";
 
 export default class IntercomClient {
 
-  constructor(hull, instrumentationAgent) {
-    this.apiKey = _.get(hull.ship, "private_settings.api_key");
-    this.appId = _.get(hull.ship, "private_settings.app_id");
-    this.accessToken = _.get(hull.ship, "private_settings.access_token");
-    this.hull = hull;
-    this.instrumentationAgent = instrumentationAgent;
-
+  constructor({ ship, client, metric }) {
+    this.apiKey = _.get(ship, "private_settings.api_key");
+    this.appId = _.get(ship, "private_settings.app_id");
+    this.accessToken = _.get(ship, "private_settings.access_token");
+    this.client = client;
+    this.metric = metric;
     this.req = request;
   }
 
@@ -37,13 +36,13 @@ export default class IntercomClient {
         // const remainingSeconds = moment(_.get(res.header, "x-ratelimit-reset"), "X")
         //   .diff(moment(), "seconds");
         // x-runtime
-        this.instrumentationAgent.metricInc("ship.service_api.call", 1, this.hull.client.configuration());
+        this.metric.increment("ship.service_api.call", 1);
         if (remaining) {
-          this.instrumentationAgent.metricVal("ship.service_api.remaining", remaining, this.hull.client.configuration());
+          this.metric.value("ship.service_api.remaining", remaining);
         }
 
         if (limit) {
-          this.instrumentationAgent.metricVal("ship.service_api.limit", limit, this.hull.client.configuration());
+          this.metric.value("ship.service_api.limit", limit);
         }
       });
 
@@ -54,7 +53,7 @@ export default class IntercomClient {
   }
 
   get(url) {
-    const req = this.req.get(url);
+    const req = this.req.get(url); // todo ???
     return this.attach(req);
   }
 

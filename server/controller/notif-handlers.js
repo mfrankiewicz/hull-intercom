@@ -5,44 +5,44 @@ import BatchSyncHandler from "../util/handler/batch-sync";
 
 export default class NotifHandlers {
 
-  static shipUpdateHandler(payload, { req }) {
-    const { syncAgent } = req.shipApp;
+  static shipUpdateHandler(ctx) {
+    const { syncAgent } = ctx.shipApp;
     if (!syncAgent.isConfigured()) {
-      req.hull.client.logger.info("ship is not configured");
+      ctx.client.logger.info("ship is not configured");
       return Promise.resolve();
     }
 
     return syncAgent.syncShip();
   }
 
-  static segmentUpdateHandler(payload, { req }) {
-    const { syncAgent, hullAgent } = req.shipApp;
+  static segmentUpdateHandler(ctx, payload) {
+    const { syncAgent } = ctx.shipApp;
     if (!syncAgent.isConfigured()) {
-      req.hull.client.logger.info("ship is not configured");
+      ctx.client.logger.info("ship is not configured");
       return Promise.resolve();
     }
 
     const segment = payload.message;
     const fields = syncAgent.userMapping.getHullTraitsKeys();
     return syncAgent.syncShip()
-      .then(() => hullAgent.extractAgent.requestExtract({ segment, fields }));
+      .then(() => ctx.helpers.requestExtract({ segment, fields }));
   }
 
-  static segmentDeleteHandler(payload, { req }) {
-    const { syncAgent } = req.shipApp;
+  static segmentDeleteHandler(ctx) {
+    const { syncAgent } = ctx.shipApp;
     if (!syncAgent.isConfigured()) {
-      req.hull.client.logger.info("ship is not configured");
+      ctx.client.logger.info("ship is not configured");
       return Promise.resolve();
     }
 
     return syncAgent.syncShip();
   }
 
-  static userUpdateHandler(payload, { req }) {
-    const { syncAgent, queueAgent } = req.shipApp;
-    const { logger } = req.hull.client;
+  static userUpdateHandler(ctx, payload) {
+    const { syncAgent } = ctx.shipApp;
+    const { logger } = ctx.client;
     if (!syncAgent.isConfigured()) {
-      req.hull.client.logger.info("ship is not configured");
+      ctx.client.logger.info("ship is not configured");
       return Promise.resolve();
     }
 
@@ -72,14 +72,15 @@ export default class NotifHandlers {
 
     filteredUser.events = events || [];
     return BatchSyncHandler.getHandler({
-      hull: req.hull,
-      ship: req.hull.ship,
+      client: ctx.client,
+      ship: ctx.ship,
       ns: "notif",
       options: {
         maxSize: process.env.NOTIFY_BATCH_HANDLER_SIZE || 100,
         throttle: process.env.NOTIFY_BATCH_HANDLER_THROTTLE || 30000
       }
-    }).setCallback(users => queueAgent.create("sendUsers", { users }))
-    .add(filteredUser);
+    })
+      .setCallback(users => ctx.enqueue("sendUsers", { users }))
+      .add(filteredUser);
   }
 }

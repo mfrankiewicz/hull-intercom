@@ -3,10 +3,10 @@ import Promise from "bluebird";
 
 export default class TagMapping {
 
-  constructor(intercomAgent, hullAgent, ship) {
+  constructor(intercomAgent, ship, helpers) {
     this.ship = ship;
-    this.hullAgent = hullAgent;
     this.intercomClient = intercomAgent.intercomClient;
+    this.helpers = helpers;
 
     this.settingKey = "tag_mapping";
     this.mapping = _.get(this.ship, `private_settings[${this.settingKey}]`, {});
@@ -30,7 +30,7 @@ export default class TagMapping {
     }
     const newSettings = {};
     newSettings[this.settingKey] = this.mapping;
-    return this.hullAgent.updateShipSettings(newSettings);
+    return this.helpers.updateShipSettings(newSettings);
   }
 
   /**

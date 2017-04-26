@@ -3,11 +3,11 @@ import Promise from "bluebird";
 
 export default class EventsAgent {
 
-  constructor(tagMapping, hull, instrumentationAgent, userMapping) {
-    this.hull = hull;
-    this.logger = hull.client.logger;
+  constructor(tagMapping, userMapping, client, metric) {
+    this.client = client;
+    this.logger = client.logger;
     this.tagMapping = tagMapping;
-    this.instrumentationAgent = instrumentationAgent;
+    this.metric = metric;
     this.userMapping = userMapping;
 
     this.map = [
@@ -219,9 +219,9 @@ export default class EventsAgent {
     });
 
     this.logger.info("incoming.event", user, eventName, props, context);
-    this.instrumentationAgent.metricInc("ship.incoming.events", 1, this.hull.client.configuration());
+    this.metric.increment("ship.incoming.events", 1);
 
     const ident = this.userMapping.getIdentFromIntercom(user);
-    return this.hull.client.as(ident).track(eventName, props, context);
+    return this.client.as(ident).track(eventName, props, context);
   }
 }
