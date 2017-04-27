@@ -1,8 +1,6 @@
 import Promise from "bluebird";
 import _ from "lodash";
 
-import BatchSyncHandler from "../lib/batch-sync";
-
 export default class NotifHandlers {
 
   static shipUpdateHandler(ctx) {
