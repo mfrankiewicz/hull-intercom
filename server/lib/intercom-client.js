@@ -53,7 +53,7 @@ export default class IntercomClient {
   }
 
   get(url) {
-    const req = this.req.get(url); // todo ???
+    const req = this.req.get(url);
     return this.attach(req);
   }
 
