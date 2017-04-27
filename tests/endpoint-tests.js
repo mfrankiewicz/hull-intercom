@@ -25,8 +25,13 @@ app.use((req, res, next) => {
     client: ClientMock(),
     ship: {
       private_settings: {
-        token: "12345"
-      }
+        api_key: "123",
+        app_id: "1234",
+        access_token: "12345",
+        custom_attributes: [
+          "custom"
+        ]
+      },
     },
     metric: {
       increment: () => {}
@@ -71,7 +76,8 @@ describe("Server", () => {
         });
 
       setTimeout(() => {
-        console.log(body);
+        assert.equal(JSON.parse(body).options.slice(-1)[0].label, "custom");
+        assert.equal(JSON.parse(body).options.slice(-1)[0].value, "custom");
         done();
       }, 100);
     });

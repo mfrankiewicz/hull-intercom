@@ -4,7 +4,17 @@ import { Queue, Cache } from "hull/lib/utils";
 import * as controllers from "./controller";
 
 
-const { PORT = 8082, LOG_LEVEL, SECRET = "1234", CLIENT_ID, CLIENT_SECRET, KUE_PREFIX = "hull-intercom", REDIS_URL, SHIP_CACHE_MAX = 100, SHIP_CACHE_TTL = 60 } = process.env;
+const {
+  PORT = 8082,
+  LOG_LEVEL,
+  SECRET = "1234",
+  CLIENT_ID,
+  CLIENT_SECRET,
+  KUE_PREFIX = "hull-intercom",
+  REDIS_URL,
+  SHIP_CACHE_MAX = 100,
+  SHIP_CACHE_TTL = 60
+} = process.env;
 
 if (LOG_LEVEL) {
   Hull.logger.transports.console.level = LOG_LEVEL;

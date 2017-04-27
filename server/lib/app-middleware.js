@@ -15,7 +15,7 @@ export default function AppMiddleware() {
     const intercomAgent = new IntercomAgent(intercomClient, ctx);
     const syncAgent = new SyncAgent(intercomAgent, ctx.client, ctx.segments, ctx.metric, ctx.ship, ctx.helpers, ctx.hostname);
 
-    req.shipApp = {
+    req.hull.shipApp = {
       intercomClient,
       intercomAgent,
       syncAgent

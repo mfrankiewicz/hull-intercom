@@ -36,7 +36,7 @@ export default function OAuthRouter(deps) {
         //   .catch((err) => hull.logger.error("Error in creating segments property", err));
 
         return client.get(ship.id).then(s => {
-          return req.shipApp.intercomAgent.getUsersTotalCount()
+          return req.hull.shipApp.intercomAgent.getUsersTotalCount()
             .then(total_count => {
               return { settings: s.private_settings, total_count };
             });
