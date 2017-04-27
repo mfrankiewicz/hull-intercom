@@ -36,7 +36,7 @@ export default function AppRouter(deps) {
 
   router.post("/fetch-all", ...middlewareSet, Actions.fetchAll);
   // FIXME: 404 for that endpoint?
-  router.use("/intercom", ...middlewareSet, Actions.webhook);
+  router.use("/intercom", ...middlewareSet, Actions.webhook, ResponseMiddleware);
 
   router.post("/sync", ...middlewareSet, Actions.sync, ResponseMiddleware);
 
