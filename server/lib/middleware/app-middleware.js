@@ -1,6 +1,6 @@
-import IntercomClient from "./intercom-client";
-import SyncAgent from "./sync-agent";
-import IntercomAgent from "./intercom-agent";
+import IntercomClient from "../intercom-client";
+import SyncAgent from "../sync-agent";
+import IntercomAgent from "../intercom-agent";
 
 export default function AppMiddleware() {
   return function middleware(req, res, next) {

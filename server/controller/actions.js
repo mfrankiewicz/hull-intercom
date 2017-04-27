@@ -53,10 +53,7 @@ export default class Actions {
     const fieldsMap = _.filter(req.hull.shipApp.syncAgent.userMapping.map, f => !f.read_only)
       .map(f => f.name);
     const customAttributes = req.hull.ship.private_settings.custom_attributes;
-    console.log(customAttributes);
     const fields = _.uniq(_.concat(fieldsMap, customAttributes));
-    console.log();
-    console.log(fields);
     res.json({
       options: fields.map(f => {
         return { label: f, value: f };

@@ -9,10 +9,6 @@ import Worker from "./worker";
 
 const { connector } = bootstrap;
 
-if (process.env.COMBINED) {
-  Worker(bootstrap);
-}
-
 const app = express();
 
 connector.setupApp(app);
@@ -21,5 +17,9 @@ app
   .use("/", AppRouter(bootstrap))
   .use("/auth", OAuthRouter(bootstrap))
   .use("/kue", KueRouter(bootstrap.connector));
+
+if (process.env.COMBINED) {
+  Worker(bootstrap);
+}
 
 connector.startApp(app);

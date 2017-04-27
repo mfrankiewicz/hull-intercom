@@ -8,9 +8,8 @@
     "build:server": "babel server -d build",
     "start": "npm run build && COMBINED=true node build/web",
     "start:dev": "NODE_ENV=development COMBINED=true babel-watch -L server/web",
-    "test": "npm run test:lint && npm run test:units",
+    "test": "mocha --require babel-register -R spec ./tests",
     "test:lint": "eslint server tests",
-    "test:units": "NODE_ENV=test mocha -R spec ./tests/index",
     "clean": "rm -rf build",
     "postinstall": "npm run build"
   },
@@ -57,7 +56,6 @@
     "lodash": "^4.12.0",
     "moment": "^2.14.1",
     "newrelic": "^1.28.3",
-    "nock": "^9.0.13",
     "passport-intercom": "0.0.2",
     "promise-streams": "^1.0.1",
     "raven": "^0.12.1",
@@ -75,6 +73,7 @@
     "eslint-config-airbnb-base": "^3.0.1",
     "eslint-plugin-import": "^1.8.0",
     "mocha": "^2.5.2",
+    "nock": "^9.0.13",
     "sinon": "^1.17.4"
   }
 }
