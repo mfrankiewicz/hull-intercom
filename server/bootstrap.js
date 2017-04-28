@@ -1,6 +1,6 @@
 /* @flow */
 import Hull from "hull";
-import { Queue, Cache } from "hull/lib/utils";
+import { Queue, Cache } from "hull/lib/infra";
 
 import * as controllers from "./controller";
 
@@ -21,7 +21,7 @@ if (LOG_LEVEL) {
   Hull.logger.transports.console.level = LOG_LEVEL;
 }
 
-Hull.logger.transports.console.json = true;
+Hull.logger.transports.console.stringify = true;
 
 const shipConfig = {
   hostSecret: SECRET,
@@ -37,10 +37,7 @@ const cache = new Cache({
 
 const queue = new Queue("kue", {
   prefix: KUE_PREFIX,
-  redis: {
-    host: REDIS_URL
-  }
-
+  redis: REDIS_URL
 });
 
 const connector = new Hull.Connector({ queue, cache, hostSecret: SECRET, port: PORT });

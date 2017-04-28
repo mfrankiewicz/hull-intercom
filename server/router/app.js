@@ -3,6 +3,7 @@ import { Router } from "express";
 import cors from "cors";
 import { notifHandler } from "hull/lib/utils";
 import ResponseMiddleware from "../lib/middleware/response-middleware";
+import { notifHandler, batchHandler, responseMiddleware } from "hull/lib/utils";
 
 import AppMiddleware from "../lib/middleware/app-middleware";
 import requireConfiguration from "../lib/require-configuration";
@@ -36,9 +37,9 @@ export default function AppRouter(deps: any) {
 
   router.post("/fetch-all", ...middlewareSet, Actions.fetchAll);
   // FIXME: 404 for that endpoint?
-  router.use("/intercom", ...middlewareSet, Actions.webhook, ResponseMiddleware);
+  router.use("/intercom", ...middlewareSet, Actions.webhook, responseMiddleware());
 
-  router.post("/sync", ...middlewareSet, Actions.sync, ResponseMiddleware);
+  router.post("/sync", ...middlewareSet, Actions.sync, responseMiddleware());
 
   router.get("/schema/user_fields", cors(), ...middlewareSet, Actions.fields);
 
