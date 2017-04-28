@@ -1,3 +1,5 @@
+/* @flow */
+
 import Promise from "bluebird";
 import _ from "lodash";
 
@@ -168,8 +170,7 @@ export default class Jobs {
 
 
   static handleBatch(ctx, payload) {
-    const segmentId = ctx.query.segmentId;
-    const { body, source } = payload;
+    const { segmentId, body, source } = payload;
     ctx.metric.event("batch", {
       properties: {
         context: ctx.client.configuration(),

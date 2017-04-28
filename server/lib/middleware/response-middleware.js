@@ -1,11 +1,14 @@
+/* @flow */
 import _ from "lodash";
+import { Request, Response, Next, Result } from "express";
 
 /**
+ * @param result
  * @param  {Object}   req
  * @param  {Object}   res
  * @param  {Function} next
  */
-export default function responseMiddleware(result, req, res, next) {
+export default function responseMiddleware(result: Result, req: Request, res: Response, next: Next) {
   if (_.isError(result)) {
     try {
       req.hull.client.logger.error("action.error", result);

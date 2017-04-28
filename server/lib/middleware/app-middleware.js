@@ -1,9 +1,11 @@
+/* @flow */
+import { Request, Response, Next } from "express";
 import IntercomClient from "../intercom-client";
 import SyncAgent from "../sync-agent";
 import IntercomAgent from "../intercom-agent";
 
 export default function AppMiddleware() {
-  return function middleware(req, res, next) {
+  return function middleware(req: Request, res: Response, next: Next) {
     req.hull.shipApp = req.hull.shipApp || {};
     const ctx = req.hull;
 

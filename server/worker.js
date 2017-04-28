@@ -1,6 +1,7 @@
+/* @flow */
 import AppMiddleware from "./lib/middleware/app-middleware";
 
-module.exports = function worker(options = {}) {
+module.exports = function worker(options: any = {}) {
   const { connector, jobs } = options;
 
   connector.worker({

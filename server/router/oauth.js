@@ -1,8 +1,9 @@
+/* @flow */
 import { Strategy as IntercomStrategy } from "passport-intercom";
 import moment from "moment";
 import { oAuthHandler } from "hull/lib/utils";
 
-export default function OAuthRouter(deps) {
+export default function OAuthRouter(deps: any) {
   const {
     shipConfig,
     cache,

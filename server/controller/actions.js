@@ -1,3 +1,4 @@
+/* @flow */
 import _ from "lodash";
 
 import BatchSyncHandler from "../lib/batch-sync";
@@ -9,9 +10,11 @@ export default class Actions {
       .then(next, next);
   }
 
-  static handleBatchAction(req, res, next) {
-    req.hull.query.segmentId = req.query.segment_id || null;
-    next();
+  static batchHandler(req, res, next) {
+    const segmentId = req.query.segment_id || null;
+    const source = req.query.source || null;
+    req.hull.enqueue("handleBatch", { body: req.body, segmentId, source })
+      .then(next, next);
   }
 
   static sync(req, res, next) {

@@ -1,14 +1,14 @@
+/* @flow */
 import { Router } from "express";
 import cors from "cors";
-import { notifHandler, batchHandler } from "hull/lib/utils";
+import { notifHandler } from "hull/lib/utils";
 import ResponseMiddleware from "../lib/middleware/response-middleware";
 
 import AppMiddleware from "../lib/middleware/app-middleware";
 import requireConfiguration from "../lib/require-configuration";
 
-export default function AppRouter(deps) {
+export default function AppRouter(deps: any) {
   const router = new Router();
-  const { jobs } = deps;
   const { Actions, NotifHandlers } = deps.controllers;
 
   // FIXME: since we have two routers on the same mountpoint: "/"
@@ -20,7 +20,7 @@ export default function AppRouter(deps) {
   const middlewareSet = [requireConfiguration];
 
   router.use(AppMiddleware());
-  router.use("/batch", ...middlewareSet, Actions.handleBatchAction, batchHandler(jobs.handleBatch, {}));
+  router.use("/batch", ...middlewareSet, Actions.batchHandler);
 
   router.use("/notify", notifHandler({
     userHandlerOptions: {

@@ -1,3 +1,4 @@
+/* @flow */
 import { Router } from "express";
 import basicAuth from "basic-auth";
 import ui from "kue-ui";
@@ -21,7 +22,7 @@ function auth(pass) {
   };
 }
 
-export default function KueRouter({ hostSecret, queue }) {
+export default function KueRouter({ hostSecret, queue }: any) {
   const router = Router();
 
   router.use(auth(hostSecret));

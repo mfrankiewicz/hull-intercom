@@ -1,3 +1,4 @@
+/* @flow */
 import express from "express";
 
 import KueRouter from "./router/kue";
