@@ -8,7 +8,8 @@
     "build:server": "babel server -d build",
     "start": "npm run build && COMBINED=true node build/web",
     "start:dev": "NODE_ENV=development COMBINED=true babel-watch -L server/web",
-    "test": "mocha --require babel-register -R spec ./tests",
+    "test": "npm run test:lint && npm run test:units",
+    "test:units": "mocha --require babel-register -R spec ./tests",
     "test:lint": "eslint server tests",
     "clean": "rm -rf build",
     "postinstall": "npm run build"
@@ -49,7 +50,7 @@
     "datadog-metrics": "^0.3.0",
     "ejs": "^2.4.1",
     "express": "^4.13.4",
-    "hull": "0.11.0-beta.3",
+    "hull": "^0.11.0-beta.4",
     "kue": "^0.11.1",
     "kue-ui": "^0.1.0",
     "librato-node": "^4.1.0",

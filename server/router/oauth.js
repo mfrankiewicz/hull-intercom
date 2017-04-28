@@ -4,8 +4,7 @@ import { oAuthHandler } from "hull/lib/utils";
 
 export default function OAuthRouter(deps) {
   const {
-    shipConfig,
-    cache,
+    shipConfig
   } = deps;
 
   const {
@@ -48,17 +47,13 @@ export default function OAuthRouter(deps) {
       return Promise.resolve();
     },
     onAuthorize: (req) => {
-      const { client, ship } = req.hull;
+      const { helpers } = req.hull;
       const { accessToken } = (req.account || {});
       const newShip = {
-        private_settings: {
-          ...ship.private_settings,
-          access_token: accessToken,
-          token_fetched_at: moment().utc().format("x"),
-        }
+        access_token: accessToken,
+        token_fetched_at: moment().utc().format("x")
       };
-      return client.put(ship.id, newShip)
-        .then(() => cache.del(ship.id));
+      return helpers.updateSettings(newShip);
     },
     views: {
       login: "login.html",

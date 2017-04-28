@@ -14,7 +14,7 @@ const assert = require("assert");
 const app = express();
 
 const hostSecret = "1234";
-const connector = new Hull.Connector({ hostSecret, port: 8080 });
+const connector = new Hull.Connector({ hostSecret, port: 8070 });
 connector.setupApp(app);
 
 connector.queue.adapter.app = (req, res, next) => { return next(); }; // Memory queue does not have app field
@@ -67,7 +67,7 @@ describe("Server", () => {
       let body = "";
 
       request
-        .get("http://127.0.0.1:8080/schema/user_fields")
+        .get("http://127.0.0.1:8070/schema/user_fields")
         .on("response", (response) => {
           assert(response.statusCode === 200);
         })

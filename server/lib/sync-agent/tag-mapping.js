@@ -30,7 +30,7 @@ export default class TagMapping {
     }
     const newSettings = {};
     newSettings[this.settingKey] = this.mapping;
-    return this.helpers.updateShipSettings(newSettings);
+    return this.helpers.updateSettings(newSettings);
   }
 
   /**

@@ -109,7 +109,7 @@ export default class Jobs {
           const ident = syncAgent.userMapping.getIdentFromIntercom(intercomUser);
           const traits = syncAgent.userMapping.getHullTraits(intercomUser);
           if (ident.email) {
-            return ctx.client.as(ident).traits(traits);
+            return ctx.client.asUser(ident).traits(traits);
           }
           return ctx.client.logger.info("incoming.user.skip", intercomUser);
         });
@@ -127,12 +127,12 @@ export default class Jobs {
       });
   }
 
-  static fetchAllUsers(ctx, payload) {
+  static fetchAllUsers(ctx, payload = {}) {
     const { scroll_param } = payload;
-    const { intercomAgent, instrumentationAgent } = ctx.shipApp;
+    const { intercomAgent } = ctx.shipApp;
     if (_.isEmpty(scroll_param)) {
-      instrumentationAgent.metricEvent({
-        title: "fetchAllUsers", context: ctx.client.configuration(), // todo
+      ctx.metric.event({
+        title: "fetchAllUsers"
       });
     }
     return intercomAgent.importUsers(scroll_param)
@@ -180,7 +180,7 @@ export default class Jobs {
     return ctx.client.utils.extract.handle({ body, batchSize: 100, handler: this.batchHandler(ctx, source, segmentId) });
   }
 
-  static fetchUsers(ctx, payload) {
+  static fetchUsers(ctx, payload = {}) {
     const { syncAgent, intercomAgent } = ctx.shipApp;
     const { last_updated_at, count, page = 1 } = payload;
 
@@ -232,7 +232,7 @@ export default class Jobs {
             if (ident.email) {
               const traits = {};
               traits["intercom/tags"] = tags;
-              return ctx.client.as(ident).traits(traits);
+              return ctx.client.asUser(ident).traits(traits);
             }
           }
           return null;

@@ -222,6 +222,6 @@ export default class EventsAgent {
     this.metric.increment("ship.incoming.events", 1);
 
     const ident = this.userMapping.getIdentFromIntercom(user);
-    return this.client.as(ident).track(eventName, props, context);
+    return this.client.asUser(ident).track(eventName, props, context);
   }
 }

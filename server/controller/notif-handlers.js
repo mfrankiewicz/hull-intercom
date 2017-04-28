@@ -36,15 +36,15 @@ export default class NotifHandlers {
     return syncAgent.syncShip();
   }
 
-  static userUpdateHandler(ctx, payload) {
+  static userUpdateHandler(ctx, messages) {
     const { syncAgent } = ctx.shipApp;
     const { logger } = ctx.client;
     if (!syncAgent.isConfigured()) {
       logger.info("ship is not configured");
       return Promise.resolve();
     }
-
-    const users = payload.messages.reduce((accumulator, message) => {
+    logger.debug("MESSAGES", messages.length);
+    const users = messages.reduce((accumulator, message) => {
       const { user, changes = {}, segments = [], events = [] } = message;
       const { left = [] } = _.get(changes, "segments", {});
 
@@ -70,7 +70,6 @@ export default class NotifHandlers {
       }
 
       user.events = events || [];
-      console.debug("filtered user's segments when updating user: ", user);
       return accumulator.concat(user);
     }, []);
 

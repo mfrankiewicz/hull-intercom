@@ -25,6 +25,7 @@ export default class Actions {
       // map the users to get only mapped fields
       return BatchSyncHandler.getHandler({
         client: req.hull.client,
+        ship: req.hull.ship,
         ns: "webhook",
         options: {
           maxSize: process.env.NOTIFY_BATCH_HANDLER_SIZE || 100,
@@ -37,7 +38,8 @@ export default class Actions {
     }
 
     return BatchSyncHandler.getHandler({
-      client: req.client,
+      client: req.hull.client,
+      ship: req.hull.ship,
       ns: "webhook_events",
       options: {
         maxSize: process.env.NOTIFY_BATCH_HANDLER_SIZE || 100,
