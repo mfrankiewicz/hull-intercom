@@ -6,7 +6,7 @@ import KueRouter from "./router/kue";
 import bootstrap from "./bootstrap";
 import AppRouter from "./router/app";
 import OAuthRouter from "./router/oauth";
-import Worker from "./worker";
+import WorkerJobs from "./worker-jobs";
 
 const { connector } = bootstrap;
 
@@ -20,7 +20,7 @@ app
   .use("/kue", KueRouter(bootstrap.connector));
 
 if (process.env.COMBINED) {
-  Worker(bootstrap);
+  WorkerJobs(bootstrap);
 }
 
 connector.startApp(app);

@@ -1,14 +1,5 @@
-/* @flow */
-import { helpersMiddleware } from "hull/lib/utils";
+import WorkerJobs from "./worker-jobs";
+import bootstrap from "./bootstrap";
 
-import AppMiddleware from "./lib/middleware/app-middleware";
-
-module.exports = function worker(options: any = {}) {
-  const { connector, jobs } = options;
-
-  connector.worker(jobs)
-    .use(helpersMiddleware())
-    .use(AppMiddleware());
-
-  connector.startWorker();
-};
+const options = bootstrap;
+WorkerJobs(options);
