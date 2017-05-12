@@ -97,6 +97,17 @@ export default class TagMapping {
           _.unset(this.mapping, segment.id);
           return Promise.resolve();
         }
+
+        if (fErr.statusCode === 400) {
+          this.hullAgent.hullClient.logger.error("sync.error", {
+            error: "Unable to delete tag",
+            segment: segment.id,
+            tag_id: tagId
+          });
+          _.unset(this.mapping, segment.id);
+          return Promise.resolve();
+        }
+
         return Promise.reject(fErr);
       });
   }
