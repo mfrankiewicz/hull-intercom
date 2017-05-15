@@ -1,5 +1,10 @@
-import WorkerJobs from "./worker-jobs";
-import bootstrap from "./bootstrap";
+/* @flow */
+import { Connector } from "hull";
 
-const options = bootstrap;
-WorkerJobs(options);
+import appMiddleware from "./lib/middleware/app-middleware";
+import * as jobs from "./jobs";
+
+export default function worker(connector: Connector) {
+  return connector.worker(jobs)
+    .use(appMiddleware());
+}

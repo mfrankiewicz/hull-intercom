@@ -5,9 +5,7 @@ import request from "request";
 
 import AppRouter from "../server/router/app";
 import OAuthRouter from "../server/router/oauth";
-import KueRouter from "../server/router/kue";
 import ClientMock from "./mocks/client-mock";
-import * as controllers from "../server/controller";
 
 const assert = require("assert");
 
@@ -41,22 +39,15 @@ app.use((req, res, next) => {
   next();
 });
 
-const shipConfig = {
-  hostSecret,
-  clientID: "123",
-  clientSecret: "321"
-};
 
 const opts = {
-  connector,
-  controllers,
-  shipConfig,
-  jobs: controllers.Jobs
+  hostSecret,
+  clientID: "123",
+  clientSecret: "321",
 };
 
 app.use("/", AppRouter(opts))
-  .use("/", OAuthRouter(opts))
-  .use("/kue", KueRouter(connector));
+  .use("/", OAuthRouter(opts));
 
 
 connector.startApp(app);

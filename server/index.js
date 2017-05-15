@@ -1,8 +1,11 @@
 /* @flow */
 import Hull from "hull";
 import { Queue, Cache } from "hull/lib/infra";
+import express from "express";
 
-import * as controllers from "./controller";
+// import * as controllers from "./controller";
+import server from "./server";
+import worker from "./worker";
 
 
 const {
@@ -23,11 +26,6 @@ if (LOG_LEVEL) {
 
 Hull.logger.transports.console.stringify = true;
 
-const shipConfig = {
-  hostSecret: SECRET,
-  clientID: CLIENT_ID,
-  clientSecret: CLIENT_SECRET
-};
 
 const cache = new Cache({
   store: "memory",
@@ -41,11 +39,22 @@ const queue = new Queue("kue", {
 });
 
 const connector = new Hull.Connector({ queue, cache, hostSecret: SECRET, port: PORT });
+const app = express();
 
-export default {
-  connector,
-  shipConfig,
-  controllers,
-  jobs: controllers.Jobs,
-  cache
-};
+connector.setupApp(app);
+
+if (process.env.WORKER || process.env.COMBINED) {
+  worker(connector);
+  connector.startWorker();
+}
+
+if (process.env.WEB || process.env.COMBINED) {
+  server(app, {
+    hostSecret: SECRET,
+    clientID: CLIENT_ID,
+    clientSecret: CLIENT_SECRET,
+    queue,
+    cache
+  });
+  connector.startApp(app);
+}

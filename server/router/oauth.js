@@ -3,16 +3,12 @@ import { Strategy as IntercomStrategy } from "passport-intercom";
 import moment from "moment";
 import { oAuthHandler } from "hull/lib/utils";
 
-export default function OAuthRouter(deps: any) {
-  const {
-    shipConfig
-  } = deps;
-
+export default function OAuthRouter(dependencies: Object) {
   const {
     hostSecret,
     clientID,
     clientSecret,
-  } = shipConfig;
+  } = dependencies;
 
   return oAuthHandler({
     hostSecret,

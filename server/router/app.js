@@ -3,12 +3,13 @@ import { Router } from "express";
 import cors from "cors";
 import { notifHandler, responseMiddleware } from "hull/lib/utils";
 
-import AppMiddleware from "../lib/middleware/app-middleware";
+import appMiddleware from "../lib/middleware/app-middleware";
 import requireConfiguration from "../lib/require-configuration";
+import * as notifHandlers from "./../notif-handlers";
+import * as actions from "./../actions";
 
-export default function AppRouter(deps: any) {
+export default function AppRouter(): Router {
   const router = new Router();
-  const { Actions, NotifHandlers } = deps.controllers;
 
   // FIXME: since we have two routers on the same mountpoint: "/"
   // all middleware applied here also is applied to the static router,
@@ -16,30 +17,30 @@ export default function AppRouter(deps: any) {
   // router.use(deps.hullMiddleware);
   // router.use(AppMiddleware(deps));
 
-  const middlewareSet = [requireConfiguration];
+  // const middlewareSet = [requireConfiguration];
 
-  router.use(AppMiddleware());
-  router.use("/batch", ...middlewareSet, Actions.batchHandler);
+  router.use(appMiddleware());
+  router.use("/batch", requireConfiguration, actions.batchHandler);
 
   router.use("/notify", notifHandler({
     userHandlerOptions: {
       groupTraits: false
     },
     handlers: {
-      "segment:update": NotifHandlers.segmentUpdateHandler,
-      "segment:delete": NotifHandlers.segmentDeleteHandler,
-      "user:update": NotifHandlers.userUpdateHandler,
-      "ship:update": NotifHandlers.shipUpdateHandler
+      "segment:update": notifHandlers.segmentUpdate,
+      "segment:delete": notifHandlers.segmentDelete,
+      "user:update": notifHandlers.userUpdate,
+      "ship:update": notifHandlers.shipUpdate
     }
   }));
 
-  router.post("/fetch-all", ...middlewareSet, Actions.fetchAll);
+  router.post("/fetch-all", requireConfiguration, actions.fetchAll);
   // FIXME: 404 for that endpoint?
-  router.use("/intercom", ...middlewareSet, Actions.webhook, responseMiddleware());
+  router.use("/intercom", requireConfiguration, actions.webhook, responseMiddleware());
 
-  router.post("/sync", ...middlewareSet, Actions.sync, responseMiddleware());
+  router.post("/sync", requireConfiguration, actions.sync, responseMiddleware());
 
-  router.get("/schema/user_fields", cors(), ...middlewareSet, Actions.fields);
+  router.get("/schema/user_fields", cors(), requireConfiguration, actions.fields);
 
   return router;
 }
