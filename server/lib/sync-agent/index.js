@@ -162,34 +162,6 @@ export default class SyncAgent {
   }
 
   /**
-   * Get information about last import done from intercom
-   * @return {Promise}
-   */
-  getLastUpdatedAt() {
-    const defaultValue = moment().subtract(1, "hour").format();
-    return this.client.get("/search/user_reports", {
-      include: ["traits_intercom/updated_at"],
-      sort: {
-        "traits_intercom/updated_at": "desc"
-      },
-      per_page: 1,
-      page: 1
-    })
-    .then((r) => {
-      if (!_.get(r, "data[0]['traits_intercom/updated_at']")) {
-        return defaultValue;
-      }
-      return r.data[0]["traits_intercom/updated_at"];
-    })
-    .catch((err) => {
-      if (err.status === 400) {
-        return Promise.resolve(defaultValue);
-      }
-      return Promise.reject(err);
-    });
-  }
-
-  /**
    * Sends Hull events to Intercom. Only for users with `traits_intercom/id` and events matching
    * the set filter.
    * @param  {Array} users Hull users with `events` property supplied

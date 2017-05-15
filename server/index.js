@@ -3,10 +3,8 @@ import Hull from "hull";
 import { Queue, Cache } from "hull/lib/infra";
 import express from "express";
 
-// import * as controllers from "./controller";
 import server from "./server";
 import worker from "./worker";
-
 
 const {
   PORT = 8082,
@@ -23,9 +21,6 @@ const {
 if (LOG_LEVEL) {
   Hull.logger.transports.console.level = LOG_LEVEL;
 }
-
-Hull.logger.transports.console.stringify = true;
-
 
 const cache = new Cache({
   store: "memory",

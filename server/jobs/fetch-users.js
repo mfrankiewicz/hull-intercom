@@ -1,34 +1,34 @@
 import Promise from "bluebird";
+import moment from "moment";
 import _ from "lodash";
 
 export default function fetchUsers(ctx, payload = {}) {
-  const { syncAgent, intercomAgent } = ctx.shipApp;
-  const { last_updated_at, count, page = 1 } = payload;
+  const { intercomAgent } = ctx.shipApp;
+  const defaultLastUpdatedAt = ctx.ship.private_settings.last_updated_at || moment().subtract(1, "hour").format();
+  const { last_updated_at = defaultLastUpdatedAt, count = 50, page = 1 } = payload;
 
-  return (() => {
-    if (_.isEmpty(last_updated_at)) {
-      return syncAgent.getLastUpdatedAt();
-    }
-    return Promise.resolve(last_updated_at);
-  })()
-    .then((new_last_updated_at) => {
-      ctx.client.logger.debug("fetchUsers", { new_last_updated_at, page });
-      return intercomAgent.getRecentUsers(new_last_updated_at, count, page)
-        .then(({ users, hasMore }) => {
-          const promises = [];
-          if (hasMore) {
-            promises.push(ctx.enqueue("fetchUsers", {
-              last_updated_at: new_last_updated_at,
-              count,
-              page: page + 1
-            }));
-          }
+  ctx.client.logger.debug("fetchUsers", { last_updated_at, page });
+  return intercomAgent.getRecentUsers(last_updated_at, count, page)
+    .then(({ users, hasMore }) => {
+      const promises = [];
+      if (hasMore) {
+        promises.push(ctx.enqueue("fetchUsers", {
+          last_updated_at,
+          count,
+          page: page + 1
+        }));
+      }
 
-          if (!_.isEmpty(users)) {
-            promises.push(ctx.enqueue("saveUsers", { users }));
-          }
+      if (!_.isEmpty(users)) {
+        promises.push(ctx.enqueue("saveUsers", { users }));
+      }
 
-          return Promise.all(promises);
+      return Promise.all(promises)
+        .then(() => {
+          const newLastUpdatedAt = _.get(_.last(users), "updated_at");
+          return ctx.helpers.updateSettings({
+            last_updated_at: newLastUpdatedAt
+          });
         });
     });
 }
