@@ -14,24 +14,24 @@ export default function fetchUsers(ctx, payload = {}) {
   return intercomAgent.getRecentUsers(last_updated_at, count, page)
     .then(({ users, hasMore }) => {
       const promises = [];
+      if (!_.isEmpty(users)) {
+        promises.push(saveUsers(ctx, { users }));
+      }
       if (hasMore) {
         promises.push(fetchUsers(ctx, {
           last_updated_at,
           count,
           page: page + 1
         }));
+      } else {
+        const newLastUpdatedAt = _.get(_.last(users), "updated_at")
+          ? moment(_.last(users).updated_at, "X").format()
+          : null;
+        promises.push(ctx.helpers.updateSettings({
+          last_updated_at: newLastUpdatedAt
+        }));
       }
 
-      if (!_.isEmpty(users)) {
-        promises.push(saveUsers(ctx, { users }));
-      }
-
-      return Promise.all(promises)
-        .then(() => {
-          const newLastUpdatedAt = moment(_.get(_.last(users), "updated_at"), "X").format();
-          return ctx.helpers.updateSettings({
-            last_updated_at: newLastUpdatedAt
-          });
-        });
+      return Promise.all(promises);
     });
 }
