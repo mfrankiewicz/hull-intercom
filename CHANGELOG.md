@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.3
+- ignore an error when we try to delete an Intercom tag, which cannot be deleted (error 400)
+
+## 0.5.2
+- implement logging convention and adjust logging levels
+
 ## 0.5.1
 - hotfix variable name
 
