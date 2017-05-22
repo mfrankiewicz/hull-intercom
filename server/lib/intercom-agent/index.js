@@ -7,12 +7,11 @@ import moment from "moment";
  */
 export default class IntercomAgent {
 
-  constructor(intercomClient, queueAgent, hull, instrumentationAgent) {
+  constructor(intercomClient, { client, metric }) {
     this.intercomClient = intercomClient;
-    this.queueAgent = queueAgent;
-    this.hull = hull;
-    this.logger = hull.client.logger;
-    this.instrumentationAgent = instrumentationAgent;
+    this.client = client;
+    this.logger = client.logger;
+    this.metric = metric;
   }
 
   getJob(id) {
@@ -87,7 +86,7 @@ export default class IntercomAgent {
       })
     };
 
-    if (users.length < (process.env.MINMUM_BULK_SIZE || 10)
+    if (users.length < (process.env.MINIMUM_BULK_SIZE || 10)
       || mode === "regular") {
       return Promise.map(body.items, item => {
         return this.intercomClient.post("/users")
@@ -188,7 +187,7 @@ export default class IntercomAgent {
    * @return {Promise}
    */
   sendEvents(events) {
-    this.instrumentationAgent.metricInc("ship.outgoing.events", events.length, this.hull.client.configuration());
+    this.metric.increment("ship.outgoing.events", events.length);
     // FIXME: enable bulk jobs and remove `true` here, when we can match the user by `id`,
     // look at error logged below
     if (true || events.length <= 10) { // eslint-disable-line no-constant-condition

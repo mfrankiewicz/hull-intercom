@@ -1,18 +1,10 @@
-import WorkerApp from "./util/app/worker";
-import ExitHandler from "./util/handler/exit";
+/* @flow */
+import { Connector } from "hull";
 
-import bootstrap from "./bootstrap";
+import appMiddleware from "./lib/middleware/app-middleware";
+import * as jobs from "./jobs";
 
-const workerApp = new WorkerApp(bootstrap);
-
-const { hullMiddleware, queueAdapter, appMiddleware } = bootstrap;
-
-workerApp
-  .use(hullMiddleware)
-  .use(appMiddleware);
-
-workerApp.process();
-
-bootstrap.Hull.logger.info("workerApp.process");
-
-ExitHandler(queueAdapter.exit.bind(queueAdapter));
+export default function worker(connector: Connector) {
+  return connector.worker(jobs)
+    .use(appMiddleware());
+}

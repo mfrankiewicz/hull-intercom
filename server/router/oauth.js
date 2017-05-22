@@ -1,24 +1,16 @@
+/* @flow */
 import { Strategy as IntercomStrategy } from "passport-intercom";
 import moment from "moment";
+import { oAuthHandler } from "hull/lib/utils";
 
-export default function OAuthRouter(deps) {
-  const {
-    Hull,
-    shipConfig,
-    shipCache,
-    appMiddleware
-  } = deps;
-
+export default function OAuthRouter(dependencies: Object) {
   const {
     hostSecret,
     clientID,
     clientSecret,
-  } = shipConfig;
+  } = dependencies;
 
-
-  const { OAuthHandler } = Hull;
-
-  return OAuthHandler({
+  return oAuthHandler({
     hostSecret,
     name: "Intercom",
     Strategy: IntercomStrategy,
@@ -27,20 +19,20 @@ export default function OAuthRouter(deps) {
       clientID,
       clientSecret
     },
-    isSetup(req, { hull, ship }) {
+    isSetup(req) {
       if (req.query.reset) return Promise.reject();
+      const { ship, client } = req.hull;
       const { access_token, api_key, app_id } = ship.private_settings || {};
 
       if (access_token || (api_key && app_id)) {
         // TODO: we have noticed problems with syncing hull segments property
         // after a Intercom resync, there may be a problem with notification
         // subscription. Following two lines fixes that problem.
-        appMiddleware(req, {}, () => {});
         // req.shipApp.intercomAgent.syncContactProperties()
         //   .catch((err) => hull.logger.error("Error in creating segments property", err));
 
-        return hull.get(ship.id).then(s => {
-          return req.shipApp.intercomAgent.getUsersTotalCount()
+        return client.get(ship.id).then(s => {
+          return req.hull.shipApp.intercomAgent.getUsersTotalCount()
             .then(total_count => {
               return { settings: s.private_settings, total_count };
             });
@@ -51,17 +43,14 @@ export default function OAuthRouter(deps) {
     onLogin: () => {
       return Promise.resolve();
     },
-    onAuthorize: (req, { hull, ship }) => {
+    onAuthorize: (req) => {
+      const { helpers } = req.hull;
       const { accessToken } = (req.account || {});
       const newShip = {
-        private_settings: {
-          ...ship.private_settings,
-          access_token: accessToken,
-          token_fetched_at: moment().utc().format("x"),
-        }
+        access_token: accessToken,
+        token_fetched_at: moment().utc().format("x")
       };
-      return hull.put(ship.id, newShip)
-        .then(() => shipCache.del(ship.id));
+      return helpers.updateSettings(newShip);
     },
     views: {
       login: "login.html",

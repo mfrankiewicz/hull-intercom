@@ -4,10 +4,10 @@ import Promise from "bluebird";
 
 export default class WebhookAgent {
 
-  constructor(intercomAgent, hullAgent, ship, hostname) {
+  constructor(intercomAgent, client, ship, helpers, hostname) {
     this.ship = ship;
-    this.hullAgent = hullAgent;
-    this.hullClient = hullAgent.hullClient;
+    this.client = client;
+    this.helpers = helpers;
     this.intercomClient = intercomAgent.intercomClient;
     this.hostname = hostname;
 
@@ -65,7 +65,7 @@ export default class WebhookAgent {
       })
       .then(res => {
         this.webhookId = res.body.id;
-        return this.hullAgent.updateShipSettings({
+        return this.helpers.updateSettings({
           webhook_id: this.webhookId
         }).then(() => {
           return this.webhookId;
@@ -74,7 +74,7 @@ export default class WebhookAgent {
   }
 
   getWebhookUrl() {
-    const { organization, id, secret } = this.hullClient.configuration();
+    const { organization, id, secret } = this.client.configuration();
     const search = {
       organization,
       secret,

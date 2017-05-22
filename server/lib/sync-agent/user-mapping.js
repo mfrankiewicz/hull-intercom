@@ -76,7 +76,7 @@ export default class UserMapping {
   }
 
   getIntercomFieldsKeys() {
-    return this.computeIntercomTraits().map(f => f.name);
+    return this.computeIntercomFields().map(f => f.name);
   }
 
   /**

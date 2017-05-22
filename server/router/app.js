@@ -1,23 +1,15 @@
+/* @flow */
 import { Router } from "express";
-import bodyParser from "body-parser";
 import cors from "cors";
-import { NotifHandler } from "hull";
+import { notifHandler, responseMiddleware } from "hull/lib/utils";
 
-import responseMiddleware from "../util/middleware/response";
-import requireConfiguration from "../util/middleware/require-configuration";
-import tokenMiddleware from "../util/middleware/token";
+import appMiddleware from "../lib/middleware/app-middleware";
+import requireConfiguration from "../lib/require-configuration";
+import * as notifHandlers from "./../notif-handlers";
+import * as actions from "./../actions";
 
-export default function AppRouter(deps) {
+export default function AppRouter(): Router {
   const router = new Router();
-  const { hullMiddleware, appMiddleware } = deps;
-  const { Actions, NotifHandlers } = deps.controllers;
-
-  const wrapWithMiddleware = (fn) => {
-    return (payload, context) => {
-      appMiddleware(context.req, {}, () => {});
-      return fn(payload, context);
-    };
-  };
 
   // FIXME: since we have two routers on the same mountpoint: "/"
   // all middleware applied here also is applied to the static router,
@@ -25,28 +17,30 @@ export default function AppRouter(deps) {
   // router.use(deps.hullMiddleware);
   // router.use(AppMiddleware(deps));
 
-  const middlewareSet = [tokenMiddleware, hullMiddleware, appMiddleware, requireConfiguration, bodyParser.json()];
+  // const middlewareSet = [requireConfiguration];
 
-  router.post("/fetch-all", ...middlewareSet, Actions.fetchAll, responseMiddleware);
-  router.post("/batch", ...middlewareSet, Actions.batchHandler, responseMiddleware);
-  router.post("/notify", NotifHandler({
-    hostSecret: deps.shipConfig.hostSecret,
-    groupTraits: false,
-    handlers: {
-      "segment:update": wrapWithMiddleware(NotifHandlers.segmentUpdateHandler),
-      "segment:delete": wrapWithMiddleware(NotifHandlers.segmentDeleteHandler),
-      "user:update": wrapWithMiddleware(NotifHandlers.userUpdateHandler),
-      "ship:update": wrapWithMiddleware(NotifHandlers.shipUpdateHandler)
+  router.use(appMiddleware());
+  router.use("/batch", requireConfiguration, actions.batchHandler);
+
+  router.use("/notify", notifHandler({
+    userHandlerOptions: {
+      groupTraits: false
     },
-    shipCache: deps.shipCache
+    handlers: {
+      "segment:update": notifHandlers.segmentUpdate,
+      "segment:delete": notifHandlers.segmentDelete,
+      "user:update": notifHandlers.userUpdate,
+      "ship:update": notifHandlers.shipUpdate
+    }
   }));
 
+  router.post("/fetch-all", requireConfiguration, actions.fetchAll);
   // FIXME: 404 for that endpoint?
-  router.post("/intercom", ...middlewareSet, Actions.webhook, responseMiddleware);
+  router.use("/intercom", requireConfiguration, actions.webhook, responseMiddleware());
 
-  router.post("/sync", ...middlewareSet, Actions.sync, responseMiddleware);
+  router.post("/sync", requireConfiguration, actions.sync, responseMiddleware());
 
-  router.get("/schema/user_fields", cors(), ...middlewareSet, Actions.fields);
+  router.get("/schema/user_fields", cors(), requireConfiguration, actions.fields);
 
   return router;
 }

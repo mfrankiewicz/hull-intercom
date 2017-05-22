@@ -1,6 +1,7 @@
 /* global describe, it */
 import assert from "assert";
 import IntercomClient from "../server/lib/intercom-client";
+import ClientMock from "./mocks/client-mock";
 
 const hullMock = {
   ship: {
@@ -9,14 +10,13 @@ const hullMock = {
       app_id: process.env.APP_ID
     }
   },
-  client: {
-    configuration: () => {}
+  client: ClientMock(),
+  metric: {
+    increment: () => {
+    },
+    value: () => {
+    }
   }
-};
-
-const instrumentationAgent = {
-  metricInc: () => {},
-  metricVal: () => {}
 };
 
 describe("Intercom Client", () => {
@@ -25,7 +25,7 @@ describe("Intercom Client", () => {
   }
 
   it("should allow for get api calls", () => {
-    const intercomClient = new IntercomClient(hullMock, instrumentationAgent);
+    const intercomClient = new IntercomClient(hullMock);
 
     return intercomClient.get("/users")
       .then(res => {
@@ -34,7 +34,7 @@ describe("Intercom Client", () => {
   });
 
   it("should provide error handling helper", () => {
-    const intercomClient = new IntercomClient(hullMock, instrumentationAgent);
+    const intercomClient = new IntercomClient(hullMock);
 
     return intercomClient.get("/non-existing-api")
       .catch(err => {
