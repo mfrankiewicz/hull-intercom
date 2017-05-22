@@ -1,5 +1,7 @@
 import _ from "lodash";
 
+import sendUsers from "./send-users";
+
 function batchHandler(ctx, source, segmentId) {
   return (users) => {
     const ignoreFilter = (source !== "connector");
@@ -9,7 +11,7 @@ function batchHandler(ctx, source, segmentId) {
 
     users.map(u => ctx.client.logger.debug("outgoing.user.start", _.pick(u, ["email", "id"])));
 
-    return ctx.enqueue("sendUsers", { users });
+    return sendUsers(ctx, { users });
   };
 }
 
@@ -22,6 +24,6 @@ export default function handleBatch(ctx, payload) {
       text: JSON.stringify(payload.body)
     }
   });
-
+  ctx.client.logger.debug("outgoing.batch", { body });
   return ctx.client.utils.extract.handle({ body, batchSize: 100, handler: batchHandler(ctx, source, segmentId) });
 }

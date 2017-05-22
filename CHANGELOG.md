@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.6.2
+- fix responses on endpoints
+
 ## 0.6.1
 - fix the `last_updated_at` if not present in settings
 

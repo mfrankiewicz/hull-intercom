@@ -20,7 +20,7 @@ export default function AppRouter(): Router {
   // const middlewareSet = [requireConfiguration];
 
   router.use(appMiddleware());
-  router.use("/batch", requireConfiguration, actions.batchHandler);
+  router.use("/batch", requireConfiguration, actions.batchHandler, responseMiddleware());
 
   router.use("/notify", notifHandler({
     userHandlerOptions: {
@@ -34,7 +34,7 @@ export default function AppRouter(): Router {
     }
   }));
 
-  router.post("/fetch-all", requireConfiguration, actions.fetchAll);
+  router.post("/fetch-all", requireConfiguration, actions.fetchAll, responseMiddleware());
   // FIXME: 404 for that endpoint?
   router.use("/intercom", requireConfiguration, actions.webhook, responseMiddleware());
 
