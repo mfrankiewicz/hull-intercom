@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.6.1
+- fix the `last_updated_at` if not present in settings
+
 ## 0.6.0
 - upgrade to `hull-node@0.11.0`
 - restructurize the controllers into separate files
