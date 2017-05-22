@@ -10,10 +10,11 @@ export default function fetchUsers(ctx, payload = {}) {
   let { last_updated_at } = payload;
 
   if (!last_updated_at || !moment(last_updated_at).isValid()) {
-    if (moment(ctx.ship.private_settings.last_updated_at).isValid()) {
+    if (ctx.ship.private_settings.last_updated_at
+      && moment(ctx.ship.private_settings.last_updated_at).isValid()) {
       last_updated_at = ctx.ship.private_settings.last_updated_at;
     } else {
-      last_updated_at = moment().subtract(1, "hour").format();
+      last_updated_at = moment().subtract(10, "minutes").format();
     }
   }
 
