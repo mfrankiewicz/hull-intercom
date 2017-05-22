@@ -4,7 +4,7 @@
   "tags": ["outgoing", "incoming", "batch", "oneColumn"],
   "admin" : "/auth/",
   "picture": "picture.png",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "settings": [],
   "private_settings":[
     {
