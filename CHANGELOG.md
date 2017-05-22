@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.0
+- upgrade to `hull-node@0.11.0`
+- restructurize the controllers into separate files
+- reduce number of queued items - use jobs functions directly
+- change the way fetchUsers `last_updated_at` timestamp is save (was queries from userbase, now it saves it to the connector settings)
+
 ## 0.5.3
 - ignore an error when we try to delete an Intercom tag, which cannot be deleted (error 400)
 
