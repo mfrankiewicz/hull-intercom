@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.6.3
+- fix handling undeletable tag
+
 ## 0.6.2
 - fix responses on endpoints
 

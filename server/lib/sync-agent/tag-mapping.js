@@ -3,10 +3,11 @@ import Promise from "bluebird";
 
 export default class TagMapping {
 
-  constructor(intercomAgent, ship, helpers) {
+  constructor(intercomAgent, ship, helpers, logger) {
     this.ship = ship;
     this.intercomClient = intercomAgent.intercomClient;
     this.helpers = helpers;
+    this.logger = logger;
 
     this.settingKey = "tag_mapping";
     this.mapping = _.get(this.ship, `private_settings[${this.settingKey}]`, {});
@@ -99,7 +100,7 @@ export default class TagMapping {
         }
 
         if (fErr.statusCode === 400) {
-          this.hullAgent.hullClient.logger.error("sync.error", {
+          this.logger.error("sync.error", {
             error: "Unable to delete tag",
             segment: segment.id,
             tag_id: tagId
