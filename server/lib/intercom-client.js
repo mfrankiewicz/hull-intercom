@@ -24,7 +24,7 @@ export default class IntercomClient {
     }
 
     const preparedReq = req
-      .use(prefixPlugin("https://api.intercom.io"))
+      .use(prefixPlugin(process.env.OVERRIDE_INTERCOM_URL || "https://api.intercom.io"))
       .use(superagentPromisePlugin)
       .accept("application/json")
       .on("request", (reqData) => {
