@@ -55,22 +55,13 @@ connector.startApp(app);
 describe("Server", () => {
   describe("for /schema/user_fields", () => {
     it("should", (done) => {
-      let body = "";
-
       request
-        .get("http://127.0.0.1:8070/schema/user_fields")
-        .on("response", (response) => {
+        .get("http://127.0.0.1:8070/schema/user_fields", (error, response, body) => {
           assert(response.statusCode === 200);
-        })
-        .on("data", (data) => {
-          body += data;
+          assert.equal(JSON.parse(body).options.slice(-1)[0].label, "custom");
+          assert.equal(JSON.parse(body).options.slice(-1)[0].value, "custom");
+          done();
         });
-
-      setTimeout(() => {
-        assert.equal(JSON.parse(body).options.slice(-1)[0].label, "custom");
-        assert.equal(JSON.parse(body).options.slice(-1)[0].value, "custom");
-        done();
-      }, 100);
     });
   });
 });
