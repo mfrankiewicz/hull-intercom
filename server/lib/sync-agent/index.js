@@ -16,7 +16,7 @@ export default class SyncAgent {
     this.client = client;
     this.logger = client.logger;
 
-    this.tagMapping = new TagMapping(intercomAgent, ship, helpers);
+    this.tagMapping = new TagMapping(intercomAgent, ship, helpers, this.logger);
     this.userMapping = new UserMapping(ship);
     this.webhookAgent = new WebhookAgent(intercomAgent, client, ship, helpers, hostname);
     this.eventsAgent = new EventsAgent(this.tagMapping, this.userMapping, client, metric);
