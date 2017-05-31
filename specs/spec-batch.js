@@ -1,33 +1,17 @@
 import Minihull from "minihull";
-import { Connector } from "hull";
-import express from "express";
 import { expect } from "chai";
 
 import Miniintercom from "./miniintercom";
-import server from "../server/server";
-import worker from "../server/worker";
+import bootstrap from "./bootstrap";
 
 process.env.OVERRIDE_INTERCOM_URL = "http://localhost:8002";
 
-const minihull = new Minihull();
-const miniintercom = new Miniintercom();
-
-const app = express();
-const connector = new Connector({ hostSecret: "1234", port: 8000, clientConfig: { protocol: "http" } });
-connector.setupApp(app);
-server(app, {
-  hostSecret: "1234",
-  clientID: "123",
-  clientSecret: "abc",
-  cache: connector.cache,
-  queue: connector.queue
-});
-worker(connector);
-
-describe("intercom", function test() {
+describe("batch operation", function test() {
+  let minihull, miniintercom, server;
   before((done) => {
-    connector.startApp(app);
-    connector.startWorker();
+    minihull = new Minihull();
+    miniintercom = new Miniintercom();
+    server = bootstrap();
     setTimeout(() => {
       minihull.listen(8001);
       minihull.install("http://localhost:8000")
@@ -74,7 +58,6 @@ describe("intercom", function test() {
     minihull.close();
     miniintercom.resetDbState();
     miniintercom.close();
-    // connector.stopApp(app);
-    // connector.stopWorker();
+    server.close();
   });
 });

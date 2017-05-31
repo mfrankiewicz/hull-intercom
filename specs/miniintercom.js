@@ -7,6 +7,9 @@ export default class Miniintercom extends Minibase {
     this.app.post("/subscriptions", (req, res) => {
       res.end("ok");
     });
+    // this.app.get("/users", (req, res) => {
+    //   res.json(this.db.get("usersReponse"));
+    // });
     this.app.post("/users", (req, res) => {
       res.end("ok");
     });

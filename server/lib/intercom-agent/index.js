@@ -41,24 +41,39 @@ export default class IntercomAgent {
       });
   }
 
-  importUsers(scroll_param = null) {
+  importUsers(scroll_param = null, updated_after, updated_before) {
     return this.intercomClient.get("/users/scroll")
     .query({ scroll_param })
     .then(response => {
-      const { users, scroll_param: next_scroll_param } = response.body;
+      let { users } = response.body;
+      const { scroll_param: next_scroll_param } = response.body;
+
+      if (moment(updated_after).isValid()) {
+        users = users.filter((u) => {
+          return moment(u.updated_at, "X")
+            .isAfter(updated_after);
+        });
+      }
+
+      if (moment(updated_before).isValid()) {
+        users = users.filter((u) => {
+          return moment(u.updated_at, "X")
+            .isBefore(updated_before);
+        });
+      }
 
       return { users, scroll_param: next_scroll_param };
     })
     .catch(err => {
       const fErr = this.intercomClient.handleError(err);
 
-      if (_.get(fErr, "extra.body.errors[0].code") === "scroll_exists") {
-        this.logger.error("Trying to perform two separate scrolls");
+      if (_.get(fErr, "body.errors[0].code") === "scroll_exists") {
+        this.metric.event({ title: "Trying to perform two separate scrolls" });
         return Promise.resolve([]);
       }
 
-      if (_.get(fErr, "extra.body.errors[0].code") === "not_found") {
-        this.logger.error("Scroll expired, should start it again");
+      if (_.get(fErr, "body.errors[0].code") === "not_found") {
+        this.metric.event({ title: "Scroll expired, should start it again" });
         return Promise.resolve([]);
       }
 

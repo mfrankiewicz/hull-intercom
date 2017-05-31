@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.6.4
+- check if the `last_updated_at` have sane value, if not, skip to some default value
+- save `last_updated_at` not only at the end of the fetch, but also every 5 pages
+- change default `last_updated_at` value from 10 minutes to 1 day
+- allow to pass optional `updated_after` and `updated_before` params to fetchAll operation
+- add optional, experimental switch to fetchAll if fetch page is going to be too high
+- adds some metric events and end-to-end tests
+
 ## 0.6.3
 - fix handling undeletable tag
 
