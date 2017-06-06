@@ -15,6 +15,11 @@ module.exports = function getClientMock() {
     },
     put: () => {
       return Promise.resolve({});
-    }
+    },
+    asUser: function asUser() {
+      return this;
+    },
+    traits: () => Promise.resolve(""),
+    track: () => Promise.resolve("")
   };
 };

@@ -40,6 +40,8 @@ export default function AppRouter(): Router {
 
   router.post("/sync", requireConfiguration, actions.sync, responseMiddleware());
 
+  router.post("/fetch-leads", requireConfiguration, actions.fetchLeads, responseMiddleware());
+
   router.get("/schema/user_fields", cors(), requireConfiguration, actions.fields);
 
   return router;

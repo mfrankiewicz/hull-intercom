@@ -19,7 +19,8 @@ export default class WebhookAgent {
       "conversation.user.created", "conversation.user.replied",
       "conversation.admin.replied", "conversation.admin.single.created",
       "conversation.admin.assigned", "conversation.admin.opened",
-      "conversation.admin.closed", "user.email.updated"
+      "conversation.admin.closed", "user.email.updated",
+      "contact.created"
     ];
   }
 
