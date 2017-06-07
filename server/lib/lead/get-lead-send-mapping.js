@@ -3,7 +3,7 @@
 
 const defaultMapping = [];
 
-export default function getLeadSaveMapping(ctx: Object): Array<Object> {
+export default function getLeadSendMapping(ctx: Object): Array<Object> {
   console.log(ctx.ship);
   return defaultMapping;
 }

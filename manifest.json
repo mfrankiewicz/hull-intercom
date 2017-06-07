@@ -127,6 +127,74 @@
           "hull"
         ]
       }
+    },
+    {
+      "name" : "lead_fields_to_intercom",
+      "title" : "List of Lead attributes to push to Intercom",
+      "type" : "array",
+      "format" : "table",
+      "default": [],
+      "items" : {
+        "type" : "object",
+        "properties" : {
+          "hull" : {
+            "type" : "string",
+            "format" : "trait",
+            "title" : "Hull Attribute"
+          },
+          "name" : {
+            "type" : "string",
+            "format": "select",
+            "title" : "Intercom Attribute",
+            "options" : {
+              "allowCreate": true,
+              "loadOptions" : "/schema/lead_fields"
+            }
+          },
+          "overwrite" : {
+            "type" : "boolean",
+            "title" : "Hull overwrites Intercom",
+            "default" : false
+          }
+        },
+        "required" : [
+          "hull",
+          "name"
+        ]
+      }
+    },
+    {
+      "name" : "lead_fields_to_hull",
+      "title" : "List of Lead custom attributes to fetch from Intercom",
+      "type" : "array",
+      "format" : "table",
+      "default": [],
+      "items" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string",
+            "format": "select",
+            "title" : "Intercom Attributes",
+            "options" : {
+              "loadOptions" : "/schema/lead_fields"
+            }
+          },
+          "hull" : {
+            "type" : "string",
+            "format" : "trait",
+            "title" : "Hull Attributes",
+            "options": {
+              "allowCreate": true,
+              "source": "intercom"
+            }
+          }
+        },
+        "required" : [
+          "name",
+          "hull"
+        ]
+      }
     }
   ],
   "deployment_settings": [],
@@ -141,6 +209,11 @@
   "schedules": [
     {
       "url": "/sync",
+      "type": "cron",
+      "value": "*/5 * * * *"
+    },
+    {
+      "url": "/fetch-leads",
       "type": "cron",
       "value": "*/5 * * * *"
     }

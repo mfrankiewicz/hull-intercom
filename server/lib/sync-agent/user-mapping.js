@@ -113,6 +113,8 @@ export default class UserMapping {
       hullTraits.name = { operation: "setIfNull", value: intercomUser.name };
     }
 
+    hullTraits["intercom/type"] = "user";
+
     return hullTraits;
   }
 
