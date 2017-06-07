@@ -2,7 +2,7 @@ import Promise from "bluebird";
 import _ from "lodash";
 
 export default function saveEvents(ctx, payload) {
-  const { syncAgent, intercomAgent } = ctx.shipApp;
+  const { syncAgent, intercomAgent } = ctx.service;
   const { events = [] } = payload;
   return Promise.all(events.map(e => syncAgent.eventsAgent.saveEvent(e)))
     .then(() => intercomAgent.getTags())

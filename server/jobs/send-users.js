@@ -7,7 +7,7 @@ import _ from "lodash";
  */
 export default function sendUsers(ctx, payload) {
   const { users, mode = "bulk" } = payload;
-  const { syncAgent, intercomAgent } = ctx.shipApp;
+  const { syncAgent, intercomAgent } = ctx.service;
 
   ctx.client.logger.debug("sendUsers.preFilter", users.length);
   const usersToSave = syncAgent.getUsersToSave(users);

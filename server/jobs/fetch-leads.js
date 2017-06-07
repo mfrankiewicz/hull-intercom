@@ -3,7 +3,7 @@ import moment from "moment";
 import Promise from "bluebird";
 
 import saveLeads from "./save-leads";
-import getRecentLeads from "../lib/get-recent-leads";
+import getRecentLeads from "../lib/lead/get-recent-leads";
 
 export default function fetchLeads(ctx: Object, payload: Object) {
   const { ship, helpers } = ctx;

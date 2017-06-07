@@ -9,7 +9,7 @@ import _ from "lodash";
  */
 export default function saveUsers(ctx, payload) {
   const { users } = payload;
-  const { syncAgent } = ctx.shipApp;
+  const { syncAgent } = ctx.service;
 
   ctx.metric.increment("ship.incoming.users", users.length);
 

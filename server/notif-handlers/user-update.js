@@ -2,7 +2,7 @@ import Promise from "bluebird";
 import _ from "lodash";
 
 export default function userUpdate(ctx, messages) {
-  const { syncAgent } = ctx.shipApp;
+  const { syncAgent } = ctx.service;
   const { logger } = ctx.client;
   if (!syncAgent.isConfigured()) {
     logger.info("ship is not configured");

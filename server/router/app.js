@@ -4,7 +4,7 @@ import cors from "cors";
 import { notifHandler, responseMiddleware } from "hull/lib/utils";
 
 import appMiddleware from "../lib/middleware/app-middleware";
-import requireConfiguration from "../lib/require-configuration";
+import requireConfiguration from "../lib/middleware/require-configuration";
 import * as notifHandlers from "./../notif-handlers";
 import * as actions from "./../actions";
 

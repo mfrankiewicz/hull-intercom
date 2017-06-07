@@ -6,7 +6,7 @@ function batchHandler(ctx, source, segmentId) {
   return (users) => {
     const ignoreFilter = (source !== "connector");
     users = _.filter(users.map(u => {
-      return ctx.shipApp.syncAgent.updateUserSegments(u, { add_segment_ids: [segmentId] }, ignoreFilter);
+      return ctx.service.syncAgent.updateUserSegments(u, { add_segment_ids: [segmentId] }, ignoreFilter);
     }));
 
     users.map(u => ctx.client.logger.debug("outgoing.user.start", _.pick(u, ["email", "id"])));

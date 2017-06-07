@@ -3,7 +3,7 @@ import { expect } from "chai";
 import sinon from "sinon";
 
 import saveLeads from "../server/jobs/save-leads";
-import getLeadIdent from "../server/lib/get-lead-ident";
+import getLeadIdent from "../server/lib/lead/get-lead-ident";
 import getClientMock from "./mocks/client-mock";
 
 describe("saveLeads", () => {

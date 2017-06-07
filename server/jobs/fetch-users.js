@@ -6,7 +6,7 @@ import saveUsers from "./save-users";
 import fetchAllUsers from "./fetch-all-users";
 
 export default function fetchUsers(ctx, payload = {}) {
-  const { intercomAgent } = ctx.shipApp;
+  const { intercomAgent } = ctx.service;
   const { count = 50, page = 1 } = payload;
   let { last_updated_at } = payload;
 

@@ -4,7 +4,7 @@ import moment from "moment";
 
 
 export default function getRecentLeads(ctx: Object, options: Object): Object {
-  const { intercomClient } = ctx.shipApp;
+  const { intercomClient } = ctx.service;
   const { page, count, updated_after, updated_before } = options;
 
   return intercomClient.get("/contacts")
