@@ -31,7 +31,8 @@ describe("fetchLeads", function test() {
 
   it("should fetch all leads", (done) => {
     const now = moment().format("X");
-    miniintercom.app.get("/contacts", (req, res) => {
+    miniintercom.stubGet("/contacts")
+    .callsFake((req, res) => {
       res.json({
         "contacts": [{
           email: "foo@bar.com",
@@ -47,13 +48,13 @@ describe("fetchLeads", function test() {
         }]
       });
     });
-    minihull.on("incoming.request.5", (req) => {
+    minihull.on("incoming.request@/api/v1/firehose", (req) => {
       expect(req.body.batch[0].type).to.be.eql("traits");
       expect(req.body.batch[0].body).to.be.eql({ "intercom/type": "lead" });
       done();
     });
 
-    minihull.on("incoming.request.4", (req) => {
+    minihull.on("incoming.request#6", (req) => {
       expect(req.body.private_settings.leads_last_fetched_at).to.be.eql(moment(now, "X").format());
     });
 
