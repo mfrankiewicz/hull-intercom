@@ -1,11 +1,9 @@
-import Minihull from "minihull";
-import { Connector } from "hull";
-import express from "express";
-import { expect } from "chai";
-import moment from "moment";
+const Minihull = require("minihull");
+const expect = require("chai").expect;
+const moment = require("moment");
 
-import Miniintercom from "./miniintercom";
-import bootstrap from "./bootstrap";
+const Miniintercom = require("./miniintercom");
+const bootstrap = require("./bootstrap");
 
 process.env.OVERRIDE_INTERCOM_URL = "http://localhost:8002";
 
