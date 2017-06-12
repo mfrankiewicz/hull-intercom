@@ -1,6 +1,6 @@
-import Minibase from "minihull/src/minibase";
+const Minibase = require("minihull/src/minibase");
 
-export default class Miniintercom extends Minibase {
+class Miniintercom extends Minibase {
   constructor(options = {}) {
     super(options);
     this.db.defaults({ contacts: [] }).write();
@@ -22,3 +22,5 @@ export default class Miniintercom extends Minibase {
     }).write();
   }
 }
+
+module.exports = Miniintercom;

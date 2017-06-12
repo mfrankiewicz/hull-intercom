@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.6.5
+- revert back to `es2015` preset and ignore `specs` directory where we do class inheritance
+
 ## 0.6.4
 - check if the `last_updated_at` have sane value, if not, skip to some default value
 - save `last_updated_at` not only at the end of the fetch, but also every 5 pages
