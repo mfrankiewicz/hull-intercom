@@ -1,8 +1,6 @@
 import { Batcher } from "hull/lib/infra";
 import _ from "lodash";
 
-import getLeadSaveMapping from "../lib/lead/get-lead-save-mapping";
-
 export default function webhook(req, res, next) {
   req.hull.client.logger.debug("intercom message", req.body);
   if (_.get(req, "body.topic") === "user.created") {
@@ -20,8 +18,7 @@ export default function webhook(req, res, next) {
   }
 
   if (_.get(req, "body.topic") === "contact.created") {
-    const leadSaveMapping = getLeadSaveMapping(req.hull);
-    const lead = _.pick(_.get(req, "body.data.item"), leadSaveMapping.map(m => m.intercom));
+    const lead = _.get(req, "body.data.item");
     return Batcher.getHandler("webhook_leads", {
       ctx: req.hull,
       options: {
@@ -35,8 +32,7 @@ export default function webhook(req, res, next) {
   }
 
   if (_.get(req, "body.topic") === "contact.signed_up") {
-    const leadSaveMapping = getLeadSaveMapping(req.hull);
-    const lead = _.pick(_.get(req, "body.data.item"), leadSaveMapping.map(m => m.intercom));
+    const lead = _.get(req, "body.data.item");
     return Batcher.getHandler("webhook_leads", {
       ctx: req.hull,
       options: {

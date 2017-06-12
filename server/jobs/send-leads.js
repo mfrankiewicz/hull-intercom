@@ -1,5 +1,7 @@
 import _ from "lodash";
 
+import postLeads from "../lib/lead/post-leads";
+
 /**
  * Takes list of leads with fields and segment_ids set,
  * sends them to Intercom and tags them.
@@ -16,7 +18,7 @@ export default function sendLeads(ctx, payload) {
   ctx.metric.increment("ship.outgoing.leads", intercomleadsToSave.length);
 
   return syncAgent.syncShip()
-    .then(() => intercomAgent.sendleads(intercomleadsToSave))
+    .then(() => postLeads(intercomleadsToSave))
     .then(res => {
       const savedleads = _.intersectionBy(leadsToSave, res, "email")
         .map(u => {
@@ -37,8 +39,8 @@ export default function sendLeads(ctx, payload) {
       });
 
       return syncAgent.sendEvents(savedleads)
-        .then(() => syncAgent.groupleadsToTag(savedleads))
-        .then(groupedleads => intercomAgent.tagleads(groupedleads))
+        .then(() => syncAgent.groupUsersToTag(savedleads))
+        .then(groupedleads => intercomAgent.tagUsers(groupedleads))
         .then(() => syncAgent.handleUserErrors(groupedErrors));
     });
 }

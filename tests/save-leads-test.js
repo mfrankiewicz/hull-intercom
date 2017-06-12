@@ -12,7 +12,14 @@ describe("saveLeads", () => {
     const asUserSpy = sinon.spy(clientMock, "asUser");
     const traitsSpy = sinon.spy(clientMock, "traits");
     const result = saveLeads({
-      client: clientMock
+      client: clientMock,
+      service: {
+        syncAgent: {
+          userMapping: {
+            getHullTraits: () => {}
+          }
+        }
+      }
     }, [{ user_id: "123" }]);
     expect(asUserSpy.callCount).to.be.equal(1);
     expect(traitsSpy.callCount).to.be.equal(1);

@@ -1,8 +1,8 @@
-import Minihull from "minihull";
-import { expect } from "chai";
+const Minihull = require("minihull");
+const expect = require("chai").expect;
 
-import Miniintercom from "./miniintercom";
-import bootstrap from "./bootstrap";
+const Miniintercom = require("./miniintercom");
+const bootstrap = require("./bootstrap");
 
 process.env.OVERRIDE_INTERCOM_URL = "http://localhost:8002";
 
@@ -27,7 +27,7 @@ describe("outgoing users traffic", function test() {
     miniintercom.listen(8002);
   });
 
-  it("should remove tags from users", (done) => {
+  it("should remove tags = require(users", (done) => {
     minihull.segments().push({ id: "s2", name: "Segment 2" }).write();
     miniintercom.stubPost("/users")
       .callsFake((req, res) => {

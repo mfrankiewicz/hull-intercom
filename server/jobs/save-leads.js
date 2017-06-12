@@ -1,19 +1,17 @@
 // @flow
 import _ from "lodash";
 
-import getLeadTraits from "../lib/lead/get-lead-traits";
 import getLeadIdent from "../lib/lead/get-lead-ident";
-import getLeadSaveMapping from "../lib/lead/get-lead-save-mapping";
 
 /**
  * Gets a list of Intercom's leads and saves them as users to hull
  */
 export default function saveLeads(ctx: Object, leads:Array<Object> = []): Promise<String> {
   const { client } = ctx;
-  const mapping = getLeadSaveMapping(ctx);
   return Promise.all(_.map(leads, (lead) => {
     const ident = getLeadIdent(ctx, lead);
-    const traits = getLeadTraits(ctx, mapping, lead);
+    const traits = ctx.service.syncAgent.userMapping.getHullTraits(lead);
+    traits["intercom/type"] = "lead";
 
     return client
       .asUser(ident)

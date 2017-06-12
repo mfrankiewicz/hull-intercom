@@ -1,11 +1,11 @@
-import Minihull from "minihull";
-import { Connector } from "hull";
-import express from "express";
-import { expect } from "chai";
-import moment from "moment";
+const Minihull = require("minihull");
+const Connector = require("hull").Connector;
+const express = require("express");
+const expect = require("chai").expect;
+const moment = require("moment");
 
-import Miniintercom from "./miniintercom";
-import bootstrap from "./bootstrap";
+const Miniintercom = require("./miniintercom");
+const bootstrap = require("./bootstrap");
 
 process.env.OVERRIDE_INTERCOM_URL = "http://localhost:8002";
 
@@ -50,7 +50,11 @@ describe("fetchLeads", function test() {
     });
     minihull.on("incoming.request@/api/v1/firehose", (req) => {
       expect(req.body.batch[0].type).to.be.eql("traits");
-      expect(req.body.batch[0].body).to.be.eql({ "intercom/type": "lead" });
+      expect(req.body.batch[0].body).to.be.eql({
+        email: "foo@bar.com",
+        "intercom/updated_at": now,
+        "intercom/type": "lead"
+      });
       done();
     });
 
