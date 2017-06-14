@@ -34,7 +34,7 @@ export default function fetchLeads(ctx: Object, payload: Object) {
         }));
       }
       if (leads.length > 0) {
-        promises.push(saveLeads(ctx, leads));
+        promises.push(saveLeads(ctx, { leads }));
       }
 
       if (!hasMore || page % 5 === 0) {

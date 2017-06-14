@@ -20,8 +20,9 @@ export default function saveEvents(ctx, payload) {
         }
 
         let ident;
+        console.log("ANONYMOUS", user);
         // anonymous is set to true for intercom leads
-        if (user.anonymous === true) {
+        if (user.anonymous === true || user.type === "lead" || user.type === "contact") {
           ident = getLeadIdent(ctx, user);
         } else {
           ident = syncAgent.userMapping.getIdentFromIntercom(user);

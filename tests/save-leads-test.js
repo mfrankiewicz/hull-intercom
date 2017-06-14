@@ -20,7 +20,7 @@ describe("saveLeads", () => {
           }
         }
       }
-    }, [{ user_id: "123" }]);
+    }, { leads: [{ id: "123", user_id: "123" }] });
     expect(asUserSpy.callCount).to.be.equal(1);
     expect(traitsSpy.callCount).to.be.equal(1);
     expect(result).to.be.a("promise");
@@ -29,7 +29,7 @@ describe("saveLeads", () => {
 
 describe("getLeadIdent", () => {
   it("should set user_id as anonymous_id", () => {
-    const ident = getLeadIdent({}, { user_id: "abc" });
-    expect(ident.anonymous_id).to.equal("intercom:abc");
+    const ident = getLeadIdent({}, { id: "123", user_id: "abc" });
+    expect(ident.anonymous_id).to.equal("intercom:123");
   });
 });
