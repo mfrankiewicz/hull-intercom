@@ -143,6 +143,11 @@
       "url": "/sync",
       "type": "cron",
       "value": "*/5 * * * *"
+    },
+    {
+      "url": "/fetch-leads",
+      "type": "cron",
+      "value": "*/5 * * * *"
     }
  ]
 }

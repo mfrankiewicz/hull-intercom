@@ -5,7 +5,7 @@ import saveUsers from "./save-users";
 
 export default function fetchAllUsers(ctx, payload = {}) {
   const { scroll_param, updated_after, updated_before } = payload;
-  const { intercomAgent } = ctx.shipApp;
+  const { intercomAgent } = ctx.service;
   if (_.isEmpty(scroll_param)) {
     ctx.metric.event({
       title: "fetchAllUsers"
