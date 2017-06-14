@@ -40,7 +40,7 @@ export default function webhook(req, res, next) {
         throttle: process.env.NOTIFY_BATCH_HANDLER_THROTTLE || 30000
       }
     })
-    .setCallback(leads => req.hull.enqueue("convertLeadsToUsers", leads))
+    .setCallback(users => req.hull.enqueue("sendUsers", users))
     .addMessage(lead)
     .then(next, next);
   }

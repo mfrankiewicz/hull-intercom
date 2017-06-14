@@ -51,9 +51,16 @@ describe("fetchLeads", function test() {
     minihull.on("incoming.request@/api/v1/firehose", (req) => {
       expect(req.body.batch[0].type).to.be.eql("traits");
       expect(req.body.batch[0].body).to.be.eql({
-        email: "foo@bar.com",
-        "intercom/updated_at": now,
-        "intercom/type": "lead"
+        email: {
+          operation: "setIfNull",
+          value: "foo@bar.com"
+        },
+        "intercom/updated_at": {
+          operation: "setIfNull",
+          value: now,
+        },
+        "intercom/is_lead": true,
+        "intercom/lead_user_id": "abc123"
       });
       done();
     });

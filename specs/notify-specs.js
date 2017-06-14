@@ -27,7 +27,7 @@ describe("outgoing users traffic", function test() {
     miniintercom.listen(8002);
   });
 
-  it("should remove tags = require(users", (done) => {
+  it("should remove tags from users", (done) => {
     minihull.segments().push({ id: "s2", name: "Segment 2" }).write();
     miniintercom.stubPost("/users")
       .callsFake((req, res) => {

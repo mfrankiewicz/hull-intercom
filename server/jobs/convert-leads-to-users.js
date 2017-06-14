@@ -1,15 +1,13 @@
 // @flow
 import Promise from "bluebird";
 
-import getLeadIdent from "../lib/lead/get-lead-ident";
+// import getLeadIdent from "../lib/lead/get-lead-ident";
+import postConvertLead from "../lib/lead/post-convert-lead";
 
-export default function convertLeadsToUsers(ctx: Object, leads: Array<Object>): Promise {
-  const { client } = ctx;
+export default function convertLeadsToUsers(ctx: Object, payload: Object): Promise {
+  const { leads } = payload;
 
   return Promise.map(leads, (lead) => {
-    const ident = getLeadIdent(ctx, lead);
-    const traits = ctx.service.syncAgent.userMapping.getHullTraits(lead);
-    traits["intercom\type"] = "user";
-    return client.asUser(ident).traits(traits);
+    return postConvertLead(ctx, lead);
   });
 }

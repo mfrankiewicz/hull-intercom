@@ -8,7 +8,7 @@ import getRecentLeads from "../lib/lead/get-recent-leads";
 export default function fetchLeads(ctx: Object, payload: Object) {
   const { ship, helpers } = ctx;
   const {
-    all,
+    fetch_all,
     updated_before,
     page = 1,
     count = 50
@@ -19,17 +19,18 @@ export default function fetchLeads(ctx: Object, payload: Object) {
   } = payload;
 
   // by default that operation works for interval based pooling
-  if (!all && !updated_after && !updated_before) {
+  if (!fetch_all && !updated_after && !updated_before) {
     updated_after = ship.private_settings.leads_last_fetched_at
       || moment().subtract(process.env.LEADS_FETCH_DEFAULT_HOURS || 24, "hours").format();
   }
 
   return getRecentLeads(ctx, { page, count, updated_after, updated_before })
     .then(({ leads, hasMore }) => {
+      ctx.client.logger.info("fetch.leads.progress", { leads: ((page - 1) * count + leads.length) });
       const promises = [];
       if (hasMore) {
         promises.push(fetchLeads(ctx, {
-          updated_after, updated_before, all, page: (page + 1), count
+          updated_after, updated_before, fetch_all, page: (page + 1), count
         }));
       }
       if (leads.length > 0) {
