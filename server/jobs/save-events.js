@@ -20,7 +20,6 @@ export default function saveEvents(ctx, payload) {
         }
 
         let ident;
-        console.log("ANONYMOUS", user);
         // anonymous is set to true for intercom leads
         if (user.anonymous === true || user.type === "lead" || user.type === "contact") {
           ident = getLeadIdent(ctx, user);
@@ -29,18 +28,15 @@ export default function saveEvents(ctx, payload) {
         }
 
         if (isTagEvent(ctx, event)) {
-          console.log(event);
           client.logger.debug("skipping tag event", {
             user: user.email,
             topic: event.topic,
             tag: event.data.item.tag.name
           });
           const traits = getTagEventTraits(ctx, user, allTags);
-          console.log("--------", "client.asUser", ident, ".traits", traits);
           return client.asUser(ident).traits(traits);
         }
 
-        console.log("--------", "client.asUser", ident, ".track", eventName);
         client.logger.info("incoming.event", { ident, eventName, props, context });
         metric.increment("ship.incoming.events", 1);
         return client.asUser(ident).track(eventName, props, context);

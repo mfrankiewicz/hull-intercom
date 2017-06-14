@@ -10,7 +10,6 @@ export default function convertLeadsToUsers(ctx: Object, payload: Object): Promi
     return postConvertLead(ctx, user)
       .then(() => {
         const ident = { id: user.id };
-        console.log("--------", "client.asUser", ident, ".traits");
         ctx.client.asUser(ident).traits({
           "intercom/is_lead": false
         });

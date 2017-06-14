@@ -48,7 +48,6 @@ export default function userUpdate(ctx, messages) {
         || user["traits_intercom/anonymous"] === false
       )
     ) {
-      console.log("!!-----", "DETECTED MERGED USER", user);
       leadsToConvert.push(user);
       return accumulator;
     }
