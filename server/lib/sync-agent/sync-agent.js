@@ -5,7 +5,6 @@ import Promise from "bluebird";
 import TagMapping from "./tag-mapping";
 import UserMapping from "./user-mapping";
 import WebhookAgent from "./webhook-agent";
-import EventsAgent from "./events-agent";
 
 export default class SyncAgent {
 
@@ -19,7 +18,6 @@ export default class SyncAgent {
     this.tagMapping = new TagMapping(intercomAgent, ship, helpers, this.logger);
     this.userMapping = new UserMapping(ship);
     this.webhookAgent = new WebhookAgent(intercomAgent, client, ship, helpers, hostname);
-    this.eventsAgent = new EventsAgent(this.tagMapping, this.userMapping, client, metric);
   }
 
   isConfigured() {

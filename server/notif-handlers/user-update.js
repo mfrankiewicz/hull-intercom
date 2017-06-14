@@ -41,8 +41,14 @@ export default function userUpdate(ctx, messages) {
       return accumulator;
     }
 
-    if (_.get(changes, "user['traits_intercom/is_lead'][1]") === true
-      && user["traits_intercom/is_user"] === true) {
+    if (user["traits_intercom/is_lead"] === true
+      && user.external_id
+      && (
+        user["traits_intercom/is_user"] === true
+        || user["traits_intercom/anonymous"] === false
+      )
+    ) {
+      console.log("!!-----", "DETECTED MERGED USER", user);
       leadsToConvert.push(user);
       return accumulator;
     }
