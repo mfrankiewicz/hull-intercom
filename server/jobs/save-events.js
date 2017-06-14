@@ -28,12 +28,14 @@ export default function saveEvents(ctx, payload) {
         }
 
         if (isTagEvent(ctx, event)) {
+          console.log(event);
           client.logger.debug("skipping tag event", {
-            user: event.data.item.user.email,
+            user: user.email,
             topic: event.topic,
             tag: event.data.item.tag.name
           });
           const traits = getTagEventTraits(ctx, user, allTags);
+          console.log("--------", "client.asUser", ident, ".traits", traits);
           return client.asUser(ident).traits(traits);
         }
 

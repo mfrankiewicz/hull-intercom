@@ -21,6 +21,7 @@ export default function saveUsers(ctx, payload) {
         const traits = syncAgent.userMapping.getHullTraits(intercomUser);
         traits["intercom/is_user"] = true;
         if (ident.email) {
+          console.log("--------", "client.asUser", ident, ".traits", traits);
           return ctx.client.asUser(ident).traits(traits);
         }
         return ctx.client.logger.info("incoming.user.skip", intercomUser);

@@ -73,7 +73,7 @@ export default function userUpdate(ctx, messages) {
   }
 
   if (leadsToConvert) {
-    promises.push(ctx.enqueue("convertLeadsToUsers", { leads: leadsToConvert }));
+    promises.push(ctx.enqueue("convertLeadsToUsers", { users: leadsToConvert }));
   }
 
   return Promise.all(promises);
