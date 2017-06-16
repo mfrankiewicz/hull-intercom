@@ -1,14 +1,12 @@
 import Promise from "bluebird";
 
-export default function segmentUpdate(ctx, payload) {
+export default function segmentUpdate(ctx, segment) {
   const { syncAgent } = ctx.shipApp;
   if (!syncAgent.isConfigured()) {
     ctx.client.logger.info("ship is not configured");
     return Promise.resolve();
   }
-
-  const segment = payload.message;
   const fields = syncAgent.userMapping.getHullTraitsKeys();
   return syncAgent.syncShip()
-    .then(() => ctx.helpers.requestExtract({ segment, fields }));
+    .then(() => ctx.helpers.requestExtract({ segment, fields, description: "sync after segment update" }));
 }
