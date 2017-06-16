@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.6.7
+- fix the fetchAll operation internal filtering
+
 ## 0.6.6
 - pass segment information correctly to request an extract from Hull
 - update hull-node to 0.11.3

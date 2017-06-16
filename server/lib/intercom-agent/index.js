@@ -48,14 +48,14 @@ export default class IntercomAgent {
       let { users } = response.body;
       const { scroll_param: next_scroll_param } = response.body;
 
-      if (moment(updated_after).isValid()) {
+      if (updated_after && moment(updated_after).isValid()) {
         users = users.filter((u) => {
           return moment(u.updated_at, "X")
             .isAfter(updated_after);
         });
       }
 
-      if (moment(updated_before).isValid()) {
+      if (updated_before && moment(updated_before).isValid()) {
         users = users.filter((u) => {
           return moment(u.updated_at, "X")
             .isBefore(updated_before);
