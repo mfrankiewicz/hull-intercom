@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.6
+- pass segment information correctly to request an extract from Hull
+- update hull-node to 0.11.3
+
 ## 0.6.5
 - revert back to `es2015` preset and ignore `specs` directory where we do class inheritance
 
