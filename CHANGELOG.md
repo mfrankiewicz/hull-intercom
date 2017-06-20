@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.6.8
+- upgrade hull-node@0.11.4
+
 ## 0.6.7
 - fix the fetchAll operation internal filtering
 
