@@ -33,10 +33,7 @@ export default function saveLeads(ctx: Object, payload: Object): Promise<String>
 
     ctx.client.logger.info("incoming.user.success", ident);
     return client
-      .asUser(ident)
-      .traits(traits, {
-        ip: lead.last_seen_ip,
-        active: true
-      });
+      .asUser(ident, { active: true })
+      .traits(traits);
   }));
 }
