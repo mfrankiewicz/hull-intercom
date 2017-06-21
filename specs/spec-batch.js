@@ -54,9 +54,7 @@ describe("batch operation", function test() {
   });
 
   after(() => {
-    minihull.resetDbState();
     minihull.close();
-    miniintercom.resetDbState();
     miniintercom.close();
     server.close();
   });

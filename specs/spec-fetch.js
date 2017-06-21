@@ -50,7 +50,7 @@ describe("fetch operation", function test() {
       expect(req.body.batch[1].body.email).to.be.eql("foo2@bar.com");
     });
 
-    minihull.on("incoming.request#9", (req) => {
+    minihull.on("incoming.request#10", (req) => {
       expect(req.body.private_settings.last_updated_at).to.be.eql(moment(now, "X").format());
       done();
     });
@@ -59,12 +59,8 @@ describe("fetch operation", function test() {
     .then((res) => {});
   });
 
-  it("should save ")
-
   after(() => {
-    minihull.resetDbState();
     minihull.close();
-    miniintercom.resetDbState();
     miniintercom.close();
     server.close();
   });

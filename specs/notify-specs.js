@@ -14,6 +14,7 @@ describe("outgoing users traffic", function test() {
     server = bootstrap();
     setTimeout(() => {
       minihull.listen(8001);
+      minihull.segments().push({ id: "s2", name: "Segment 2" }).write();
       minihull.install("http://localhost:8000")
         .then(() => {
           minihull.updateFirstShip({
@@ -28,7 +29,6 @@ describe("outgoing users traffic", function test() {
   });
 
   it("should remove tags from users", (done) => {
-    minihull.segments().push({ id: "s2", name: "Segment 2" }).write();
     miniintercom.stubPost("/users")
       .callsFake((req, res) => {
         res.json({ email: "foo@bar.com", tags: { tags: [{ name: "Segment 2" }] } });
@@ -48,6 +48,7 @@ describe("outgoing users traffic", function test() {
       },
       events: []
     });
+
     miniintercom.on("incoming.request@/tags", (req) => {
       if (req.body.users) {
         expect(req.body.users[0]).to.eql({ email: "foo@bar.com", untag: true });
@@ -58,9 +59,7 @@ describe("outgoing users traffic", function test() {
   });
 
   after(() => {
-    minihull.resetDbState();
     minihull.close();
-    miniintercom.resetDbState();
     miniintercom.close();
     server.close();
   });

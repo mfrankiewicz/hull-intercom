@@ -2862,9 +2862,9 @@ mime@^1.3.4:
   version "1.3.6"
   resolved "https://registry.yarnpkg.com/mime/-/mime-1.3.6.tgz#591d84d3653a6b0b4a3b9df8de5aa8108e72e5e0"
 
-minihull@^0.0.7:
-  version "0.0.7"
-  resolved "https://registry.yarnpkg.com/minihull/-/minihull-0.0.7.tgz#fc044590cbda477d2c639e62a4194ac9095f3c24"
+minihull@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/minihull/-/minihull-0.1.1.tgz#7d7517ae4099a2e0fecb6fe29d5b3915b0226fef"
   dependencies:
     bluebird "^3.5.0"
     body-parser "^1.17.2"
@@ -2873,7 +2873,6 @@ minihull@^0.0.7:
     lodash-id "^0.14.0"
     lowdb "^0.16.2"
     moment "^2.18.1"
-    self-signed "^1.3.1"
     shelljs "^0.7.7"
     sinon "^2.3.2"
     superagent "^3.5.2"
@@ -3004,10 +3003,6 @@ nock@^9.0.13:
     mkdirp "^0.5.0"
     propagate "0.4.0"
     qs "^6.0.2"
-
-node-forge@~0.2.0:
-  version "0.2.37"
-  resolved "https://registry.yarnpkg.com/node-forge/-/node-forge-0.2.37.tgz#25b7c4d37886b521ea35e84b65db6cb082476451"
 
 node-pre-gyp@^0.6.29:
   version "0.6.34"
@@ -3799,12 +3794,6 @@ samsam@1.x, samsam@^1.1.3:
 sax@0.5.x:
   version "0.5.8"
   resolved "https://registry.yarnpkg.com/sax/-/sax-0.5.8.tgz#d472db228eb331c2506b0e8c15524adb939d12c1"
-
-self-signed@^1.3.1:
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/self-signed/-/self-signed-1.3.1.tgz#24a6363adf74ae9eeec0bcfdf6e60eae2eb8c509"
-  dependencies:
-    node-forge "~0.2.0"
 
 "semver@2 || 3 || 4 || 5", semver@^5.1.0, semver@^5.3.0:
   version "5.3.0"
