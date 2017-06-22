@@ -1,6 +1,6 @@
 {
   "name": "Intercom",
-  "description": "Sync Users in Intercom with Hull",
+  "description": "Sync Leads and Users in Intercom with Hull",
   "tags": ["outgoing", "incoming", "batch", "oneColumn"],
   "admin" : "/auth/",
   "picture": "picture.png",
