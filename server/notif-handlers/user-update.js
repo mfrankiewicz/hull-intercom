@@ -41,18 +41,15 @@ export default function userUpdate(ctx, messages) {
       return accumulator;
     }
 
-    if (user["traits_intercom/is_lead"] === true
-      && user.external_id
-      && (
-        user["traits_intercom/is_user"] === true
-        || user["traits_intercom/anonymous"] === false
-      )
+    if (user.external_id
+      && changes.user["traits_intercom/anonymous"][0] === false
+      && changes.user["traits_intercom/anonymous"][1] === true
     ) {
       leadsToConvert.push(user);
       return accumulator;
     }
 
-    if (user["traits_intercom/is_lead"] === true) {
+    if (user["traits_intercom/anonymous"] === true) {
       leads.push(user);
       return accumulator;
     }

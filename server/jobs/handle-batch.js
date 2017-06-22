@@ -13,9 +13,9 @@ function batchHandler(ctx, source, segmentId) {
 
     users.map(u => ctx.client.logger.debug("outgoing.user.start", _.pick(u, ["email", "id"])));
 
-    const leads = users.filter((u) => u["traits_intercom/is_lead"] === true);
+    const leads = users.filter((u) => u["traits_intercom/anonymous"] === true);
 
-    users = users.filter((u) => !u["traits_intercom/is_lead"]);
+    users = users.filter((u) => !u["traits_intercom/anonymous"]);
 
     return Promise.all([
       sendUsers(ctx, { users }),
