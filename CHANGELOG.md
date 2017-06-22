@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.7.0
+- support for leads:
+  * listen for `contact.created` webhooks events and create corresponding user in Hull
+  * fetch leads every 5 minutes in case of missed webhook call
+  * push back to Intercom enriched leads traits - the same mapping and filtering as for users is applied here
+  * detect leads conversion on Intercom side and merge that lead and user on Hull side
+  * try to merge user on Hull side and when it's possible convert the lead into user on Intercom
+
 ## 0.6.8
 - upgrade hull-node@0.11.4
 
