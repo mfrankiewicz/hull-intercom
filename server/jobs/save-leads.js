@@ -28,6 +28,15 @@ export default function saveLeads(ctx: Object, payload: Object): Promise<String>
         value: lead.pseudonym
       };
     }
+
+    if (lead.last_seen_ip) {
+      traits["last_known_ip"] = lead.last_seen_ip;
+    }
+
+    if (lead.last_request_at) {
+      traits["last_seen_at"] = lead.last_request_at;
+    }
+
     traits["intercom/is_lead"] = true;
     traits["intercom/lead_user_id"] = lead.user_id;
 
