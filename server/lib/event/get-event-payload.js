@@ -27,7 +27,7 @@ const mapping = [
     intercom: "conversation.user.replied",
     eventName: "User replied to conversation",
     user: (event) => _.get(event, "data.item.user"),
-    props: (_event) => {
+    props: (event) => {
       return {
         message: _.get(event, "data.item.conversation_message.body"),
         link: _.get(event, "data.item.links.conversation_web"),
@@ -48,7 +48,7 @@ const mapping = [
     intercom: "conversation.admin.replied",
     eventName: "Admin replied to conversation",
     user: (event) => _.get(event, "data.item.user"),
-    props: (_event) => {
+    props: (event) => {
       return {
         message: _.get(event, "data.item.conversation_message.body"),
         link: _.get(event, "data.item.links.conversation_web"),
@@ -69,7 +69,7 @@ const mapping = [
     intercom: "conversation.admin.single.created",
     eventName: "Admin started conversation",
     user: (event) => _.get(event, "data.item.user"),
-    props: (_event) => {
+    props: (event) => {
       return {
         message: _.get(event, "data.item.conversation_message.body"),
         link: _.get(event, "data.item.links.conversation_web"),
@@ -172,7 +172,7 @@ const mapping = [
     intercom: "user.unsubscribed",
     eventName: "Unsubscribed from emails",
     user: (event) => _.get(event, "data.item"),
-    props: (_event) => {
+    props: (event) => {
       return {};
     },
     context: (event) => {
@@ -186,7 +186,7 @@ const mapping = [
     intercom: "user.email.updated",
     eventName: "Updated email address",
     user: (event) => _.get(event, "data.item"),
-    props: (_event) => {
+    props: (event) => {
       return {};
     },
     context: (event) => {
