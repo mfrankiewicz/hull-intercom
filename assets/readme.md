@@ -68,3 +68,21 @@ Select Hull attributes to send to Intercom
 Select Intercom custom attributes to retrieve (Standard attributes are fetched automatically)
 
 ![fetch](intercom--6--fetch_2x.png)
+
+## Better leads to user linking
+
+For better leads matching add Hull.js to your website:
+
+1. Install the base initialization snippet:
+  ```html
+  <script
+    id="hull-js-sdk"
+    data-platform-id="YOUR_PLATFORM_ID"
+    data-org-url="https://ORG_NAMESPACE.hullapp.io"
+    src="https://js.hull.io/0.10.0/hull.js.gz"></script>
+  ```
+
+2. Below that snippet add another one which does the linking:
+  ```html
+  <script>function getAnonymousId(){if(window.Intercom&&window.Intercom("getVisitorId"))return window.Intercom("getVisitorId")}function waitForAnonymousId(o){if((check+=1)<20&&!getAnonymousId())return setTimeout(waitForAnonymousId,100);getAnonymousId()&&o(getAnonymousId())}var check=0;Hull.ready(function(){waitForAnonymousId(function(o){Hull.api({path:"/me/alias"},"post",{anonymous_id:"intercom:"+o})})});</script>
+  ```
