@@ -6,8 +6,13 @@ const mapping = [
     intercom: "conversation.user.created",
     eventName: "User started conversation",
     user: (event) => _.get(event, "data.item.user"),
-    props: (_event) => {
+    props: (event) => {
       return {
+        message: _.get(event, "data.item.conversation_message.body"),
+        link: _.get(event, "data.item.links.conversation_web"),
+        assignee_name: _.get(event, "data.item.assignee.name"),
+        assignee_email: _.get(event, "data.item.assignee.email"),
+        assignee_id: _.get(event, "data.item.assignee.id"),
         initiated: "user"
       };
     },
