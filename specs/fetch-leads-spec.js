@@ -35,16 +35,13 @@ describe("fetchLeads", function test() {
     .callsFake((req, res) => {
       res.json({
         "contacts": [{
-          anonymous: true,
           email: "foo@bar.com",
           user_id: "abc123",
           updated_at: now
         }, {
-          anonymous: true,
           user_id: "abc1234",
           updated_at: moment().subtract(1, "minute").format("X")
         }, {
-          anonymous: true,
           email: "skip@it.com",
           user_id: "abc12345",
           updated_at: moment().subtract(25, "hour").format("X")
@@ -62,7 +59,7 @@ describe("fetchLeads", function test() {
           operation: "setIfNull",
           value: now,
         },
-        "intercom/anonymous": true,
+        "intercom/is_lead": true,
         "intercom/lead_user_id": "abc123"
       });
       done();
