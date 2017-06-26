@@ -12,9 +12,10 @@ describe("fetch operation", function test() {
   before((done) => {
     minihull = new Minihull();
     miniintercom = new Miniintercom();
+    minihull.listen(8001);
+    miniintercom.listen(8002);
     server = bootstrap();
     setTimeout(() => {
-      minihull.listen(8001);
       minihull.install("http://localhost:8000")
         .then(() => {
           minihull.updateFirstShip({
@@ -22,9 +23,7 @@ describe("fetch operation", function test() {
           });
           done();
         });
-    }, 100);
-
-    miniintercom.listen(8002);
+    }, 500);
   });
 
   it("should by default get last 1 day of last updated users", (done) => {
@@ -54,7 +53,6 @@ describe("fetch operation", function test() {
       expect(req.body.private_settings.last_updated_at).to.be.eql(moment(now, "X").format());
       done();
     });
-
     minihull.callFirstShip("/sync")
     .then((res) => {});
   });

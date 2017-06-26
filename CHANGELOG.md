@@ -8,6 +8,10 @@
   * detect leads conversion on Intercom side and merge that lead and user on Hull side
   * try to merge user on Hull side and when it's possible convert the lead into user on Intercom
 
+## 0.6.9
+- adds rate limit handler - requeue current job wuth 10 seconds delay and don't fail
+- upgrade testing tooling
+
 ## 0.6.8
 - upgrade hull-node@0.11.4
 

@@ -1,6 +1,8 @@
 import Promise from "bluebird";
 import _ from "lodash";
 
+import handleRateLimitError from "../lib/handle-rate-limit-error";
+
 export default function handleBulk(ctx, payload) {
   const { id, users, attempt = 1 } = payload;
   const { syncAgent, intercomAgent } = ctx.service;
@@ -34,5 +36,6 @@ export default function handleBulk(ctx, payload) {
         id,
         attempt: attempt + 1
       }, { delay: attempt * 10000 });
-    });
+    })
+    .catch(err => handleRateLimitError(ctx, "handleBulk", payload, err));
 }

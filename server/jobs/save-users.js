@@ -1,6 +1,8 @@
 import Promise from "bluebird";
 import _ from "lodash";
 
+import handleRateLimitError from "../lib/handle-rate-limit-error";
+
 /**
  * Saves users incoming from Intercom API
  * @return {Promise}
@@ -35,5 +37,6 @@ export default function saveUsers(ctx, payload) {
         });
       }
       return true;
-    });
+    })
+    .catch(err => handleRateLimitError(ctx, "saveUsers", payload, err));
 }

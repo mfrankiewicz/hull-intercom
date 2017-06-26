@@ -172,7 +172,7 @@ const mapping = [
     intercom: "user.unsubscribed",
     eventName: "Unsubscribed from emails",
     user: (event) => _.get(event, "data.item"),
-    props: (event) => {
+    props: (_event) => {
       return {};
     },
     context: (event) => {
@@ -186,7 +186,7 @@ const mapping = [
     intercom: "user.email.updated",
     eventName: "Updated email address",
     user: (event) => _.get(event, "data.item"),
-    props: (event) => {
+    props: (_event) => {
       return {};
     },
     context: (event) => {

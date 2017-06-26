@@ -5,6 +5,8 @@ import isTagEvent from "../lib/event/is-tag-event";
 import getTagEventTraits from "../lib/event/get-tag-event-traits";
 import getEventPayload from "../lib/event/get-event-payload";
 
+import handleRateLimitError from "../lib/handle-rate-limit-error";
+
 export default function saveEvents(ctx, payload) {
   const { client, metric } = ctx;
   const { syncAgent, intercomAgent } = ctx.service;
@@ -42,5 +44,6 @@ export default function saveEvents(ctx, payload) {
         metric.increment("ship.incoming.events", 1);
         return client.asUser(ident).track(eventName, props, context);
       });
-    });
+    })
+    .catch(err => handleRateLimitError(ctx, "saveEvents", payload, err));
 }
