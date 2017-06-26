@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.9
+- adds rate limit handler - requeue current job wuth 10 seconds delay and don't fail
+- upgrade testing tooling
+
 ## 0.6.8
 - upgrade hull-node@0.11.4
 
