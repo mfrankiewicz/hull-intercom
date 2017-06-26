@@ -30,6 +30,6 @@ describe("saveLeads", () => {
 describe("getLeadIdent", () => {
   it("should set user_id as anonymous_id", () => {
     const ident = getLeadIdent({}, { id: "123", user_id: "abc" });
-    expect(ident.anonymous_id).to.equal("intercom:123");
+    expect(ident.anonymous_id).to.equal("intercom:abc");
   });
 });

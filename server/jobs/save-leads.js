@@ -23,10 +23,10 @@ export default function saveLeads(ctx: Object, payload: Object): Promise<String>
       };
     });
 
-    if (lead.pseudonym) {
-      traits.name = {
+    if (lead.avatar && lead.avatar.image_url) {
+      traits.picture = {
         operation: "setIfNull",
-        value: lead.pseudonym
+        value: lead.avatar.image_url
       };
     }
 
@@ -41,7 +41,7 @@ export default function saveLeads(ctx: Object, payload: Object): Promise<String>
     traits["intercom/is_lead"] = true;
     traits["intercom/lead_user_id"] = lead.user_id;
 
-    ctx.client.logger.info("incoming.user.success", ident);
+    ctx.client.logger.info("incoming.user.success", { ident, traits });
     return client
       .asUser(ident, { active: true })
       .traits(traits);
