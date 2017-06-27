@@ -1,6 +1,8 @@
 import Promise from "bluebird";
 import _ from "lodash";
 
+import handleRateLimitError from "../lib/handle-rate-limit-error";
+
 /**
  * Takes list of users with fields and segment_ids set,
  * sends them to Intercom and tags them.
@@ -48,5 +50,6 @@ export default function sendUsers(ctx, payload) {
         return ctx.enqueue("handleBulk", { users: usersToSave, id: res.body.id });
       }
       return Promise.resolve();
-    });
+    })
+    .catch(err => handleRateLimitError(ctx, "sendUsers", payload, err));
 }

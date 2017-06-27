@@ -1,6 +1,8 @@
 import Promise from "bluebird";
 import _ from "lodash";
 
+import handleRateLimitError from "../lib/handle-rate-limit-error";
+
 export default function saveEvents(ctx, payload) {
   const { syncAgent, intercomAgent } = ctx.shipApp;
   const { events = [] } = payload;
@@ -26,5 +28,6 @@ export default function saveEvents(ctx, payload) {
         }
         return null;
       }));
-    });
+    })
+    .catch(err => handleRateLimitError(ctx, "saveEvents", payload, err));
 }

@@ -112,7 +112,7 @@ export default class IntercomAgent {
           .catch(err => {
             const fErr = this.intercomClient.handleError(err);
             this.logger.error("intercomAgent.sendUsers.microbatch.error", fErr);
-            return Promise.resolve(fErr);
+            return Promise.reject(fErr);
           });
       }, { concurrency: 5 });
     }
