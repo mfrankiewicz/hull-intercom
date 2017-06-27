@@ -30,8 +30,7 @@ export default class SyncAgent {
    */
   syncShip() {
     return this.webhookAgent.ensureWebhook()
-      .then(() => this.segments)
-      .then((segments) => this.tagMapping.sync(segments));
+      .then(() => this.tagMapping.sync(this.segments));
   }
 
   /**

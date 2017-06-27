@@ -7,9 +7,12 @@
   * push back to Intercom enriched leads traits - the same mapping and filtering as for users is applied here
   * detect leads conversion on Intercom side and merge that lead and user on Hull side
   * try to merge user on Hull side and when it's possible convert the lead into user on Intercom
+- fix `metric.event` call
+- handle `incoming.event.tagNotFound` event
+- improve the rate limit handler to handle all errors
 
 ## 0.6.9
-- adds rate limit handler - requeue current job wuth 10 seconds delay and don't fail
+- adds rate limit handler - requeue current job with 10 seconds delay and don't fail
 - upgrade testing tooling
 
 ## 0.6.8

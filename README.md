@@ -6,16 +6,18 @@ If you want to host your own instance: [![Deploy](https://www.herokucdn.com/depl
 
 ---
 
-### Using :
+## Using:
 
 [See Readme here](https://dashboard.hullapp.io/readme?url=https://hull-intercom.herokuapp.com)
 
-### Developing :
+## Developing:
 
 - Fork
 - Install
 - Start Redis instance
 - Copy .env.sample -> .env and set CLIENT_ID, CLIENT_SECRET, REDIS_URL
+
+### Native node:
 
 ```sh
 npm install
@@ -23,7 +25,7 @@ npm start
 npm run start:dev # for autoreloading after changes
 ```
 
-#### Docker based
+### Docker based:
 
 If you want Docker based development after setting `.env` file:
 
@@ -37,3 +39,28 @@ docker-compose run npm test
 # install new dep
 docker-compose run npm install dep -s
 ```
+
+
+---
+
+## Intercom API endpoints
+
+- `GET /users`
+- `GET /users/scroll`
+- `POST /users`
+- `POST /bulk/users`
+- `GET /jobs/${id}`
+- `GET /jobs/${id}/error`
+- `GET /tags`
+- `POST /tags`
+- `GET /contacts`
+- `POST /contacts`
+- `POST /contacts/convert`
+- `GET /subscriptions/${id}`
+- `POST /subscriptions/${id}`
+
+---
+
+## Custom logging messages
+
+  - `incoming.event.tagNotFound` - when capturing (un)tag events we update the `intercom/tags` trait - but sometimes we cannot find corresponding tag in `/tags` results

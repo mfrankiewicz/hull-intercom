@@ -27,11 +27,9 @@ function batchHandler(ctx, source, segmentId) {
 
 export default function handleBatch(ctx, payload) {
   const { segmentId, body, source } = payload;
-  ctx.metric.event("batch", {
-    properties: {
-      context: ctx.client.configuration(),
-      text: JSON.stringify(payload.body)
-    }
+  ctx.metric.event({
+    title: "batch",
+    text: JSON.stringify(payload.body)
   });
   ctx.client.logger.debug("outgoing.batch", { body });
   return ctx.client.utils.extract.handle({ body, batchSize: 100, handler: batchHandler(ctx, source, segmentId) });
