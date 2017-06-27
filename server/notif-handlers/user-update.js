@@ -2,13 +2,15 @@ import Promise from "bluebird";
 import _ from "lodash";
 
 export default function userUpdate(ctx, messages) {
-  const { syncAgent } = ctx.shipApp;
+  const { syncAgent } = ctx.service;
   const { logger } = ctx.client;
   if (!syncAgent.isConfigured()) {
     logger.info("ship is not configured");
     return Promise.resolve();
   }
   logger.debug("MESSAGES", messages.length);
+  const leads = [];
+  const leadsToConvert = [];
   const users = messages.reduce((accumulator, message) => {
     const { user, changes = {}, segments = [], events = [] } = message;
     const { left = [] } = _.get(changes, "segments", {});
@@ -17,7 +19,12 @@ export default function userUpdate(ctx, messages) {
 
     if (!_.isEmpty(_.get(changes, "user['traits_intercom/id'][1]"))
       || !_.isEmpty(_.get(changes, "user['traits_intercom/tags'][1]"))) {
-      logger.debug("outgoing.user.skip", _.pick(user, ["email", "id"]));
+      logger.debug("outgoing.user.skip", _.merge(
+        _.pick(user, ["email", "id"]),
+        {
+          reason: "User was just updated by the Intercom connector, avoiding loop"
+        }
+      ));
       return accumulator;
     }
     user.segment_ids = user.segment_ids || segments.map(s => s.id);
@@ -34,9 +41,37 @@ export default function userUpdate(ctx, messages) {
       return accumulator;
     }
 
+    if (
+      user["traits_intercom/is_lead"] === true
+      && user.external_id
+      && user["traits_intercom/anonymous"] === false
+    ) {
+      leadsToConvert.push(user);
+      return accumulator;
+    }
+
+    if (user["traits_intercom/is_lead"] === true) {
+      leads.push(user);
+      return accumulator;
+    }
+
     user.events = events || [];
     return accumulator.concat(user);
   }, []);
 
-  return ctx.enqueue("sendUsers", { users });
+  const promises = [];
+
+  if (users) {
+    promises.push(ctx.enqueue("sendUsers", { users }));
+  }
+
+  if (leads) {
+    promises.push(ctx.enqueue("sendLeads", { leads }));
+  }
+
+  if (leadsToConvert) {
+    promises.push(ctx.enqueue("convertLeadsToUsers", { users: leadsToConvert }));
+  }
+
+  return Promise.all(promises);
 }

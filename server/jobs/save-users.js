@@ -11,7 +11,7 @@ import handleRateLimitError from "../lib/handle-rate-limit-error";
  */
 export default function saveUsers(ctx, payload) {
   const { users } = payload;
-  const { syncAgent } = ctx.shipApp;
+  const { syncAgent } = ctx.service;
 
   ctx.metric.increment("ship.incoming.users", users.length);
 

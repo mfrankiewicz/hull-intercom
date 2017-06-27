@@ -1,10 +1,10 @@
 {
   "name": "Intercom",
-  "description": "Sync Users in Intercom with Hull",
+  "description": "Sync Leads and Users in Intercom with Hull",
   "tags": ["outgoing", "incoming", "batch", "oneColumn"],
   "admin" : "/auth/",
   "picture": "picture.png",
-  "version": "0.6.9",
+  "version": "0.7.0",
   "settings": [],
   "private_settings":[
     {
@@ -141,6 +141,11 @@
   "schedules": [
     {
       "url": "/sync",
+      "type": "cron",
+      "value": "*/5 * * * *"
+    },
+    {
+      "url": "/fetch-leads",
       "type": "cron",
       "value": "*/5 * * * *"
     }

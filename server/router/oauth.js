@@ -28,11 +28,11 @@ export default function OAuthRouter(dependencies: Object) {
         // TODO: we have noticed problems with syncing hull segments property
         // after a Intercom resync, there may be a problem with notification
         // subscription. Following two lines fixes that problem.
-        // req.shipApp.intercomAgent.syncContactProperties()
+        // req.service.intercomAgent.syncContactProperties()
         //   .catch((err) => hull.logger.error("Error in creating segments property", err));
 
         return client.get(ship.id).then(s => {
-          return req.hull.shipApp.intercomAgent.getUsersTotalCount()
+          return req.hull.service.intercomAgent.getUsersTotalCount()
             .then(total_count => {
               return { settings: s.private_settings, total_count };
             });

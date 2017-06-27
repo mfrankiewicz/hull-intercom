@@ -39,7 +39,11 @@
           <hr>
 
           <div class="">
-            <div data-href="/fetch-all" class="pull-right btn btn-rounded btn-pill btn-primary">Fetch All Users</div>
+            <div data-href="/fetch-all?" class="pull-right btn btn-rounded btn-pill btn-primary ml-1">Fetch All Users</div>
+          </div>
+
+          <div class="">
+            <div data-href="/fetch-leads?fetch_all=true&" class="pull-right btn btn-rounded btn-pill btn-primary">Fetch All Leads</div>
           </div>
 
         </div>
@@ -83,7 +87,7 @@
           closeOnConfirm: false
         }, function(isConfirm) {
           if (isConfirm) {
-            $.post(url+window.location.search);
+            $.post(url+window.location.search.replace("?", ""));
             swal("Fetching started", "The Intercom contacts will be fetched shortly.", "success");
           }
         });

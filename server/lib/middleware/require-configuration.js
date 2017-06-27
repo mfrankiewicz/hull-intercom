@@ -8,8 +8,7 @@ import { Request, Response, Next } from "express";
  * @param  {Function} next
  */
 export default function requireConfiguration(req: Request, res: Response, next: Next) {
-  if (!req.hull.shipApp || !req.hull.shipApp.syncAgent || !req.hull.shipApp.syncAgent.isConfigured()) {
-    req.hull.client.logger.info("ship is not configured");
+  if (!req.hull.service || !req.hull.service.syncAgent || !req.hull.service.syncAgent.isConfigured()) {
     return res.status(403).send("Ship is not configured");
   }
   return next();
