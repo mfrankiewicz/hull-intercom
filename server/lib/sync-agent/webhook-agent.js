@@ -26,7 +26,9 @@ export default class WebhookAgent {
   }
 
   getWebhook() {
+    this.client.logger.debug("connector.getWebhook");
     return this.cache.wrap("intercom-webhook", () => {
+      this.client.logger.debug("connector.getWebhook.cachemiss");
       return this.intercomClient.get(`/subscriptions/${this.webhookId}`);
     });
   }
