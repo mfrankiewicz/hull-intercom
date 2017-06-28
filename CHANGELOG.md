@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.6
+- adds cache to `subscriptions` endpoint
+- adds more context to rate limit error
+
 ## 0.7.5
 - cache `/tags` results to speed up `saveEvents`
 

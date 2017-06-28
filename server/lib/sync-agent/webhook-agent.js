@@ -4,12 +4,13 @@ import Promise from "bluebird";
 
 export default class WebhookAgent {
 
-  constructor(intercomAgent, client, ship, helpers, hostname) {
+  constructor(intercomAgent, client, ship, helpers, hostname, cache) {
     this.ship = ship;
     this.client = client;
     this.helpers = helpers;
     this.intercomClient = intercomAgent.intercomClient;
     this.hostname = hostname;
+    this.cache = cache;
 
     this.webhookId = _.get(this.ship, "private_settings.webhook_id");
 
@@ -24,12 +25,18 @@ export default class WebhookAgent {
     ];
   }
 
+  getWebhook() {
+    return this.cache.wrap("intercom-webhook", () => {
+      return this.intercomClient.get(`/subscriptions/${this.webhookId}`);
+    });
+  }
+
   /**
    * @return Promise
    */
   ensureWebhook() {
     if (this.webhookId) {
-      return this.intercomClient.get(`/subscriptions/${this.webhookId}`)
+      return this.getWebhook()
         .then(({ body }) => {
           const missingTopics = _.difference(this.topics, body.topics);
           if (_.isEmpty(missingTopics)) {
@@ -71,6 +78,9 @@ export default class WebhookAgent {
         }).then(() => {
           return this.webhookId;
         });
+      })
+      .then(() => {
+        return this.cache.del("intercom-webhook");
       });
   }
 
