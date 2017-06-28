@@ -61,15 +61,15 @@ export default function userUpdate(ctx, messages) {
 
   const promises = [];
 
-  if (users) {
+  if (!_.isEmpty(users)) {
     promises.push(ctx.enqueue("sendUsers", { users }));
   }
 
-  if (leads) {
+  if (!_.isEmpty(leads)) {
     promises.push(ctx.enqueue("sendLeads", { leads }));
   }
 
-  if (leadsToConvert) {
+  if (!_.isEmpty(leadsToConvert)) {
     promises.push(ctx.enqueue("convertLeadsToUsers", { users: leadsToConvert }));
   }
 

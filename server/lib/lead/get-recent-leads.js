@@ -20,14 +20,14 @@ export default function getRecentLeads(ctx: Object, options: Object): Object {
 
       const leads = originalLeads
       .filter(u => {
-        if (!updated_after) {
+        if (!updated_after || !moment(updated_after).isValid()) {
           return true;
         }
         return moment(u.updated_at, "X")
             .isAfter(updated_after);
       })
       .filter(u => {
-        if (!updated_before) {
+        if (!updated_before || !moment(updated_before).isValid()) {
           return true;
         }
         return moment(u.updated_at, "X")
