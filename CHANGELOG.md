@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.1
+- don't requeue interval based `fetchUsers` operation, in that case stop it and wait for next call to continue
+- for other operations radomly spread the delayed retry takin into account ratelimit information coming from Intercom headers
+
 ## 0.7.0
 - support for leads:
   * listen for `contact.created` webhooks events and create corresponding user in Hull

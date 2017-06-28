@@ -4,7 +4,6 @@ import _ from "lodash";
 
 import saveUsers from "./save-users";
 import fetchAllUsers from "./fetch-all-users";
-import handleRateLimitError from "../lib/handle-rate-limit-error";
 
 export default function fetchUsers(ctx, payload = {}) {
   const { intercomAgent } = ctx.service;
@@ -68,5 +67,11 @@ export default function fetchUsers(ctx, payload = {}) {
           return Promise.resolve();
         });
     })
-    .catch(err => handleRateLimitError(ctx, "fetchUsers", payload, err));
+    .catch(err => {
+      if (_.get(err, "statusCode") === 429 || _.get(err, "response.statusCode") === 429) {
+        ctx.client.logger.debug("service.api.ratelimit", { message: "stopping fetch, another will continue" });
+        return Promise.resolve("skip");
+      }
+      return Promise.reject(err);
+    });
 }
