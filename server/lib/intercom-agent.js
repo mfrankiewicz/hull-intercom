@@ -7,11 +7,12 @@ import moment from "moment";
  */
 export default class IntercomAgent {
 
-  constructor(intercomClient, { client, metric }) {
+  constructor(intercomClient, { client, metric, cache }) {
     this.intercomClient = intercomClient;
     this.client = client;
     this.logger = client.logger;
     this.metric = metric;
+    this.cache = cache;
   }
 
   getJob(id) {
@@ -247,9 +248,15 @@ export default class IntercomAgent {
   }
 
   getTags() {
-    return this.intercomClient.get("/tags")
-      .then(res => {
-        return _.get(res, "body.tags", []);
-      });
+    this.logger.debug("connector.getTags");
+    return this.cache.wrap("intercomTags", () => {
+      this.logger.debug("connector.getTags.cachemiss");
+      // TODO check if /tags endpoint has pagination
+      return this.intercomClient.get("/tags")
+        .then(res => {
+          // console.log("TEST", res.body);
+          return _.get(res, "body.tags", []);
+        });
+    });
   }
 }

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.5
+- cache `/tags` results to speed up `saveEvents`
+
+## 0.7.4
+- hotfix enqueueing too many empty jobs
+
 ## 0.7.3
 - don't sync ship settings with Intercom settings on `saveUsers` operation
 
