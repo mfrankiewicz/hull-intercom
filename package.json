@@ -58,6 +58,7 @@
     "newrelic": "^1.28.3",
     "passport-intercom": "0.0.4",
     "promise-streams": "^1.0.1",
+    "redlock": "^3.0.0",
     "request": "^2.72.0",
     "superagent": "^3.5.2",
     "superagent-prefix": "0.0.2",

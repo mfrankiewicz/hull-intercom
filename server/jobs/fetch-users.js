@@ -45,6 +45,7 @@ export default function fetchUsers(ctx, payload = {}) {
           });
         }
       } else if (hasMore) {
+        promises.push(ctx.lock.extend("fetchUsers", 30000));
         promises.push(fetchUsers(ctx, {
           last_updated_at,
           count,
