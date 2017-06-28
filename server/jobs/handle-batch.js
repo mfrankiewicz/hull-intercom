@@ -18,11 +18,11 @@ function batchHandler(ctx, source, segmentId) {
 
     users = users.filter((u) => !u["traits_intercom/is_lead"]);
 
-    if (leads) {
+    if (!_.isEmpty(leads)) {
       promises.push(sendLeads(ctx, { leads }));
     }
 
-    if (users) {
+    if (!_.isEmpty(users)) {
       promises.push(sendUsers(ctx, { users }));
     }
 
