@@ -1,6 +1,8 @@
 import { Batcher } from "hull/lib/infra";
 import _ from "lodash";
 
+import { saveUsers, saveLeads, saveEvents } from "../jobs";
+
 export default function webhook(req, res, next) {
   req.hull.client.logger.debug("intercom message", req.body);
   if (_.get(req, "body.topic") === "user.created") {
@@ -12,7 +14,7 @@ export default function webhook(req, res, next) {
         throttle: process.env.NOTIFY_BATCH_HANDLER_THROTTLE || 30000
       }
     })
-    .setCallback(users => req.hull.enqueue("saveUsers", { users }))
+    .setCallback(users => saveUsers(req.hull, { users }))
     .addMessage(_.get(req, "body.data.item"))
     .then(next, next);
   }
@@ -26,7 +28,7 @@ export default function webhook(req, res, next) {
         throttle: process.env.NOTIFY_BATCH_HANDLER_THROTTLE || 30000
       }
     })
-    .setCallback(leads => req.hull.enqueue("saveLeads", { leads }))
+    .setCallback(leads => saveLeads(req.hull, { leads }))
     .addMessage(lead)
     .then(next, next);
   }
@@ -40,7 +42,7 @@ export default function webhook(req, res, next) {
         throttle: process.env.NOTIFY_BATCH_HANDLER_THROTTLE || 30000
       }
     })
-    .setCallback(users => req.hull.enqueue("saveUsers", { users }))
+    .setCallback(users => saveUsers(req.hull, { users }))
     .addMessage(lead)
     .then(next, next);
   }
@@ -52,7 +54,7 @@ export default function webhook(req, res, next) {
       throttle: process.env.NOTIFY_BATCH_HANDLER_THROTTLE || 30000
     }
   })
-  .setCallback(events => req.hull.enqueue("saveEvents", { events }))
+  .setCallback(events => saveEvents(req.hull, { events }))
   .addMessage(_.get(req, "body"))
   .then(next, next);
 }
