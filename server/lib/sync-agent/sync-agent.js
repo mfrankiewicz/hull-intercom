@@ -8,7 +8,7 @@ import WebhookAgent from "./webhook-agent";
 
 export default class SyncAgent {
 
-  constructor(intercomAgent, client, segments, metric, ship, helpers, hostname) {
+  constructor(intercomAgent, client, segments, metric, ship, helpers, hostname, cache) {
     this.ship = ship;
     this.segments = segments;
     this.intercomAgent = intercomAgent;
@@ -17,7 +17,7 @@ export default class SyncAgent {
 
     this.tagMapping = new TagMapping(intercomAgent, ship, helpers, this.logger);
     this.userMapping = new UserMapping(ship);
-    this.webhookAgent = new WebhookAgent(intercomAgent, client, ship, helpers, hostname);
+    this.webhookAgent = new WebhookAgent(intercomAgent, client, ship, helpers, hostname, cache);
   }
 
   isConfigured() {
