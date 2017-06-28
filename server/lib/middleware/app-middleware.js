@@ -9,11 +9,10 @@ import SyncAgent from "../sync-agent";
 import IntercomAgent from "../intercom-agent";
 
 let redlock;
-if (process.env.REDIS_URL) {
+if (false && process.env.REDIS_URL) {
   const client = redis.createClient(process.env.REDIS_URL);
   redlock = new Redlock([client]);
 }
-
 
 export default function AppMiddleware() {
   return function middleware(req: Request, res: Response, next: Next) {
