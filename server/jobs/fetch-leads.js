@@ -24,6 +24,10 @@ export default function fetchLeads(ctx: Object, payload: Object) {
       || moment().subtract(process.env.LEADS_FETCH_DEFAULT_HOURS || 24, "hours").format();
   }
 
+  if (page === 1) {
+    ctx.client.logger.info("fetch.leads.start", { fetch_all, updated_after, updated_before });
+  }
+
   return getRecentLeads(ctx, { page, count, updated_after, updated_before })
     .then(({ leads, hasMore }) => {
       ctx.client.logger.info("fetch.leads.progress", { leads: ((page - 1) * count + leads.length) });
