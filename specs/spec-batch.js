@@ -5,7 +5,7 @@ const Miniintercom = require("./miniintercom");
 const bootstrap = require("./bootstrap");
 
 process.env.OVERRIDE_INTERCOM_URL = "http://localhost:8002";
-process.env.RATE_LIMIT_DELAY = 200;
+process.env.OVERRIDE_RATE_LIMIT_DELAY = 200;
 
 describe("batch operation", function test() {
   let minihull, miniintercom, server;
