@@ -13,7 +13,7 @@ describe("handleRateLimitError", () => {
       }
     },
     enqueue: () => {}
-  }
+  };
 
   it("should requeue the job with a delay in case of 429 error", () => {
     const loggerStub = sinon.stub(ctxStub.client.logger, "warn");
@@ -21,7 +21,7 @@ describe("handleRateLimitError", () => {
     const seconds = 1000;
     const minutes = 60000;
 
-    for (var i = 100; i >= 0; i--) {
+    for (let i = 100; i >= 0; i--) {
       handleRateLimitError(ctxStub, "fooJob", { fooPayload: "bar" }, { statusCode: 429 });
       expect(enqueueStub.firstCall.args[2].delay).to.be.within(10 * seconds, 10 * minutes);
     }
@@ -35,7 +35,7 @@ describe("handleRateLimitError", () => {
     const seconds = 1000;
     const minutes = 60000;
 
-    for (var i = 100; i >= 0; i--) {
+    for (let i = 100; i >= 0; i--) {
       const resetAt = moment().add(10, "seconds").format("X");
       handleRateLimitError(ctxStub, "fooJob", { fooPayload: "bar" }, {
         statusCode: 429,
