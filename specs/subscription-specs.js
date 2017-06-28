@@ -45,7 +45,7 @@ describe("ensure webhook operation", function test() {
       }
     });
 
-    minihull.postConnector("595103c73628d081190000f6", "http://localhost:8000/sync")
+    minihull.notifyConnector("595103c73628d081190000f6", "http://localhost:8000/notify", "ship:update", { foo: "bar" })
       .then((res) => {})
   });
 

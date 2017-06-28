@@ -6,6 +6,7 @@ import sendLeads from "./send-leads";
 
 function batchHandler(ctx, source, segmentId) {
   return (users) => {
+    const promises = [];
     const ignoreFilter = (source !== "connector");
     users = _.filter(users.map(u => {
       return ctx.service.syncAgent.updateUserSegments(u, { add_segment_ids: [segmentId] }, ignoreFilter);
@@ -17,10 +18,15 @@ function batchHandler(ctx, source, segmentId) {
 
     users = users.filter((u) => !u["traits_intercom/is_lead"]);
 
-    return Promise.all([
-      sendUsers(ctx, { users }),
-      sendLeads(ctx, { leads }),
-    ]);
+    if (leads) {
+      promises.push(sendLeads(ctx, { leads }));
+    }
+
+    if (users) {
+      promises.push(sendUsers(ctx, { users }));
+    }
+
+    return Promise.all(promises);
   };
 }
 

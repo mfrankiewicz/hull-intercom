@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.7.3
+- don't sync ship settings with Intercom settings on `saveUsers` operation
+
 ## 0.7.2
 - fix `convertLeadsToUsers` job
 
