@@ -82,7 +82,10 @@ For better leads matching add Hull.js to your website:
     src="https://js.hull.io/0.10.0/hull.js.gz"></script>
   ```
 
-2. Below that snippet add another one which does the linking:
-  ```html
-  <script>function getAnonymousId(){if(window.Intercom&&window.Intercom("getVisitorId"))return window.Intercom("getVisitorId")}function waitForAnonymousId(o){if((check+=1)<20&&!getAnonymousId())return setTimeout(waitForAnonymousId,100);getAnonymousId()&&o(getAnonymousId())}var check=0;Hull.ready(function(){waitForAnonymousId(function(o){Hull.api({path:"/me/alias"},"post",{anonymous_id:"intercom:"+o})})});</script>
-  ```
+2. Add the Client-side component of the Connector to your platform.
+  - Go to "Platforms", Pick the platform where to embed the connector.
+  - Click "Edit"
+  - In the sidebar, click "Add Connector"
+  - Pick the Intercom connector.
+
+3. That's it!

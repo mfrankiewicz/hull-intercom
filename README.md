@@ -25,7 +25,9 @@ npm start
 npm run start:dev # for autoreloading after changes
 ```
 
-### Docker based:
+`npm run ngrok` will allow you to serve the connector to a publicly-accessible URL
+
+### Docker based
 
 If you want Docker based development after setting `.env` file:
 
