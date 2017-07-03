@@ -2,6 +2,7 @@
   "name": "Intercom",
   "description": "Sync Leads and Users in Intercom with Hull",
   "tags": ["outgoing", "incoming", "batch", "oneColumn"],
+  "index": "ship.js",
   "admin" : "/auth/",
   "picture": "picture.png",
   "version": "0.7.6",
