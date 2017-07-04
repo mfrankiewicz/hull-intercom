@@ -14,10 +14,7 @@ export default function postLeads(ctx: Object, leads: Array<Object>): Promise {
   return Promise.map(leads, lead => {
     return service.intercomClient.post("/contacts")
       .send(lead)
-      .then(response => {
-        // client.logger.info("outgoing.user.success", { hull_id: lead.id, external_id: lead.user_id, email: lead.email });
-        return response.body;
-      })
+      .then(response => response.body)
       .catch(err => {
         const fErr = service.intercomClient.handleError(err);
         client.logger.error("postLeads.error", fErr);
