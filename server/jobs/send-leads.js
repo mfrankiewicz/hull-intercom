@@ -12,13 +12,16 @@ export default function sendLeads(ctx, payload) {
 
   ctx.client.logger.debug("sendLeads.preFilter", leads.length);
   const leadsToSave = leads.filter(lead => !syncAgent.userWithError(lead));
+  leadsToSave.map(u => ctx.client.logger.info("outgoing.user.start", { hull_id: u.hull_id, external_id: u.user_id, email: u.email }));
   const intercomLeadsToSave = leadsToSave.map(u => syncAgent.userMapping.getIntercomFields(u));
 
   ctx.client.logger.debug("sendLeads.filtered", intercomLeadsToSave.length);
   ctx.metric.increment("ship.outgoing.leads", intercomLeadsToSave.length);
 
   return syncAgent.syncShip()
-    .then(() => postLeads(ctx, intercomLeadsToSave))
+    .then(() => {
+      return postLeads(ctx, intercomLeadsToSave);
+    })
     .then(res => {
       const savedleads = _.intersectionWith(leadsToSave, res, (lead, result) => {
         return lead["traits_intercom/lead_user_id"] === result.user_id;

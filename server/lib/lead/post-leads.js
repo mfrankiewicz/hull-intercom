@@ -15,7 +15,7 @@ export default function postLeads(ctx: Object, leads: Array<Object>): Promise {
     return service.intercomClient.post("/contacts")
       .send(lead)
       .then(response => {
-        client.logger.info("outgoing.user.success", { hull_id: lead.id, external_id: lead.user_id, email: lead.email });
+        // client.logger.info("outgoing.user.success", { hull_id: lead.id, external_id: lead.user_id, email: lead.email });
         return response.body;
       })
       .catch(err => {

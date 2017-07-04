@@ -19,7 +19,7 @@ export default function handleBulk(ctx, payload) {
         })()
           .then(() => {
             users.map(u => {
-              return ctx.client.logger.info("outgoing.user.success", _.pick(u, ["email", "hull_id", "external_id"]));
+              return ctx.client.logger.info("outgoing.user.success", { hull_id: u.id, email: u.email, external_id: u.external_id });
             });
           })
           .then(() => syncAgent.groupUsersToTag(users))
