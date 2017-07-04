@@ -35,7 +35,7 @@ export default function userUpdate(ctx, messages) {
     });
 
     if (!filteredUser) {
-      logger.info("outgoing.user.skip", _.merge(_.pick(user, ["email", "id", "external_id"]), {
+      logger.info("outgoing.user.skip", _.merge(_.pick(user, ["email", "hull_id", "external_id"]), {
         reason: "doesn't match filtered segments"
       }));
       return accumulator;

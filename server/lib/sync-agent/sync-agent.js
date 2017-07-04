@@ -79,7 +79,7 @@ export default class SyncAgent {
 
       const ident = this.userMapping.getIdentFromIntercom(error.data);
 
-      this.client.logger.info("outgoing.user.error", _.merge(ident, { errors: errorDetails }));
+      this.client.logger.error("outgoing.user.error", _.merge(ident, { errors: errorDetails }));
       return this.client.asUser(ident).traits({
         "intercom/import_error": errorMessage
       });

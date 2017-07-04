@@ -28,7 +28,7 @@ export default function sendLeads(ctx, payload) {
         u["traits_intercom/id"] = intercomData.id;
         u["traits_intercom/tags"] = intercomData.tags.tags.map(t => t.name);
 
-        ctx.client.logger.info("outgoing.user.success", _.pick(u, ["email", "id", "external_id"]));
+        ctx.client.logger.info("outgoing.user.success", _.pick(u, ["email", "hull_id", "external_id"]));
         return u;
       });
       const errors = _.filter(res, { body: { type: "error.list" } });

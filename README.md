@@ -66,3 +66,11 @@ docker-compose run npm install dep -s
 ## Custom logging messages
 
   - `incoming.event.tagNotFound` - when capturing (un)tag events we update the `intercom/tags` trait - but sometimes we cannot find corresponding tag in `/tags` results
+  - `fetch.leads.start` - when fetching leads
+  - `fetch.leads.progress` - when getting recent leads
+  - `incoming.event` - when getting tags from intercom
+  - `incoming.user` - when saving users
+  - `incoming.user.skip` - when user is skipped(missing email) when saving users
+  - `outging.event` - when sending hull event to intercom
+  - `getRecentUsers.count` - when getting recent from intercom
+  - `` - 
