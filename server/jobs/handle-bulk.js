@@ -1,6 +1,4 @@
 import Promise from "bluebird";
-import _ from "lodash";
-
 import handleRateLimitError from "../lib/handle-rate-limit-error";
 
 export default function handleBulk(ctx, payload) {
