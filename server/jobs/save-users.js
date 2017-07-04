@@ -22,7 +22,7 @@ export default function saveUsers(ctx, payload) {
     if (ident.email) {
       return ctx.client.asUser(ident).traits(traits);
     }
-    return ctx.client.logger.info("incoming.user.skip", intercomUser);
+    return ctx.client.logger.info("incoming.user.skip", intercomUser, { reason: "missing email in ident"});
   }).then(() => {
     const customAttributes = _.uniq(_.flatten(users.map(u => _.keys(u.custom_attributes))));
     const oldAttributes = ctx.ship.private_settings.custom_attributes;
