@@ -3,7 +3,7 @@ import Promise from "bluebird";
 export default function segmentDelete(ctx) {
   const { syncAgent } = ctx.service;
   if (!syncAgent.isConfigured()) {
-    ctx.client.logger.warn("ship is not configured");
+    ctx.client.logger.error("connector.configuration.error", { errors: "ship is not configured" });
     return Promise.resolve();
   }
 

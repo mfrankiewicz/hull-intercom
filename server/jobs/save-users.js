@@ -16,13 +16,14 @@ export default function saveUsers(ctx, payload) {
   ctx.metric.increment("ship.incoming.users", users.length);
 
   return Promise.map(users, (intercomUser) => {
-    ctx.client.logger.info("incoming.user", intercomUser);
     const ident = syncAgent.userMapping.getIdentFromIntercom(intercomUser);
     const traits = syncAgent.userMapping.getHullTraits(intercomUser);
     if (ident.email) {
-      return ctx.client.asUser(ident).traits(traits);
+      const asUser = ctx.client.asUser(ident);
+      asUser.logger.info("incoming.user.success", { userIdent: intercomUser });
+      return asUser.traits(traits);
     }
-    return ctx.client.logger.info("incoming.user.skip", intercomUser, { reason: "missing email in ident" });
+    return ctx.client.logger.info("incoming.user.skip", { userIdent: intercomUser, reason: "missing email in ident" });
   }).then(() => {
     const customAttributes = _.uniq(_.flatten(users.map(u => _.keys(u.custom_attributes))));
     const oldAttributes = ctx.ship.private_settings.custom_attributes;

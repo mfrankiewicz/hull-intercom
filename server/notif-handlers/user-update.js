@@ -5,7 +5,7 @@ export default function userUpdate(ctx, messages) {
   const { syncAgent } = ctx.service;
   const { logger } = ctx.client;
   if (!syncAgent.isConfigured()) {
-    logger.warn("ship is not configured");
+    logger.error("connector.configuration.error", { errors: "ship is not configured" });
     return Promise.resolve();
   }
   logger.debug("MESSAGES", messages.length);
@@ -15,16 +15,11 @@ export default function userUpdate(ctx, messages) {
     const { user, changes = {}, segments = [], events = [] } = message;
     const { left = [] } = _.get(changes, "segments", {});
 
-    logger.debug("outgoing.user.start", _.pick(user, ["email", "id"]));
+    logger.debug("outgoing.user.start", { userIdent: { email: user.email, hull_id: user.id } });
 
     if (!_.isEmpty(_.get(changes, "user['traits_intercom/id'][1]"))
       || !_.isEmpty(_.get(changes, "user['traits_intercom/tags'][1]"))) {
-      logger.debug("outgoing.user.skip", _.merge(
-        _.pick(user, ["email", "id"]),
-        {
-          reason: "User was just updated by the Intercom connector, avoiding loop"
-        }
-      ));
+      logger.info("outgoing.user.skip", { userIdent: { email: user.email, hull_id: user.id }, reason: "User was just updated by the Intercom connector, avoiding loop" });
       return accumulator;
     }
     user.segment_ids = user.segment_ids || segments.map(s => s.id);
@@ -35,9 +30,7 @@ export default function userUpdate(ctx, messages) {
     });
 
     if (!filteredUser) {
-      logger.info("outgoing.user.skip", _.merge(_.pick(user, ["email", "hull_id", "external_id"]), {
-        reason: "doesn't match filtered segments"
-      }));
+      logger.info("outgoing.user.skip", { userIdent: { email: user.email, hull_id: user.id, external_id: user.external_id }, reason: "doesn't match filtered segments" });
       return accumulator;
     }
 

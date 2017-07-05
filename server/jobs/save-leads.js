@@ -41,9 +41,8 @@ export default function saveLeads(ctx: Object, payload: Object): Promise<String>
     traits["intercom/is_lead"] = true;
     traits["intercom/lead_user_id"] = lead.user_id;
 
-    ctx.client.logger.info("incoming.user.success", { ident, traits });
-    return client
-      .asUser(ident, { active: true })
-      .traits(traits);
+    const asUser = client.asUser(ident, { active: true });
+    asUser.logger.info("incoming.user.success", { userIdent: ident, traits });
+    return asUser.traits(traits);
   }));
 }

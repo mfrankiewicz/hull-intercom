@@ -37,12 +37,16 @@ export default function saveEvents(ctx, payload) {
             tag: event.data.item.tag.name
           });
           const traits = getTagEventTraits(ctx, user, allTags);
-          return client.asUser(ident).traits(traits);
+
+          const asUser = client.asUser(ident);
+          asUser.logger.info("incoming.event.skip", { reason: "skipping tag event", userIdent: ident, props, context, eventName });
+          return asUser.traits(traits);
         }
 
-        client.logger.info("incoming.event", { ident, eventName, props, context });
         metric.increment("ship.incoming.events", 1);
-        return client.asUser(ident).track(eventName, props, context);
+        const asUser = client.asUser(ident);
+        asUser.logger.info("incoming.event", { userIdent: ident, eventName, props, context });
+        return asUser.track(eventName, props, context);
       });
     })
     .catch(err => handleRateLimitError(ctx, "saveEvents", payload, err));

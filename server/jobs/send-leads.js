@@ -12,7 +12,7 @@ export default function sendLeads(ctx, payload) {
 
   ctx.client.logger.debug("sendLeads.preFilter", leads.length);
   const leadsToSave = leads.filter(lead => !syncAgent.userWithError(lead));
-  leadsToSave.map(u => ctx.client.logger.info("outgoing.user.start", { hull_id: u.hull_id, external_id: u.user_id, email: u.email }));
+  leadsToSave.map(u => ctx.client.logger.debug("outgoing.user.start", { hull_id: u.id, external_id: u.user_id, email: u.email }));
   const intercomLeadsToSave = leadsToSave.map(u => syncAgent.userMapping.getIntercomFields(u));
 
   ctx.client.logger.debug("sendLeads.filtered", intercomLeadsToSave.length);
@@ -31,7 +31,7 @@ export default function sendLeads(ctx, payload) {
         u["traits_intercom/id"] = intercomData.id;
         u["traits_intercom/tags"] = intercomData.tags.tags.map(t => t.name);
 
-        ctx.client.logger.info("outgoing.user.success", _.pick(u, ["email", "hull_id", "external_id"]));
+        ctx.client.logger.info("outgoing.user.success", { userIdent: { email: u.email, hull_id: u.id, external_id: u.external_id } });
         return u;
       });
       const errors = _.filter(res, { body: { type: "error.list" } });
