@@ -29,7 +29,7 @@ const mapping = [
     user: (event) => _.get(event, "data.item.user"),
     props: (event) => {
       return {
-        message: _.get(event, "data.item.conversation_message.body"),
+        message: _.get(event, "data.item.conversation_parts.conversation_parts[0].body"),
         link: _.get(event, "data.item.links.conversation_web"),
         assignee_name: _.get(event, "data.item.assignee.name"),
         assignee_email: _.get(event, "data.item.assignee.email"),
@@ -50,7 +50,7 @@ const mapping = [
     user: (event) => _.get(event, "data.item.user"),
     props: (event) => {
       return {
-        message: _.get(event, "data.item.conversation_message.body"),
+        message: _.get(event, "data.item.conversation_parts.conversation_parts[0].body"),
         link: _.get(event, "data.item.links.conversation_web"),
         assignee_name: _.get(event, "data.item.assignee.name"),
         assignee_email: _.get(event, "data.item.assignee.email"),
@@ -187,7 +187,9 @@ const mapping = [
     eventName: "Updated email address",
     user: (event) => _.get(event, "data.item"),
     props: (_event) => {
-      return {};
+      return {
+        email: _.get(event, "data.item.email"),
+      };
     },
     context: (event) => {
       return {
