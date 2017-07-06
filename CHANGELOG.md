@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.7.8
+- fixes fetch leads pagination
+
 ## 0.7.7
 - adds `src/ship.js` for easy client side embedding - webpack build script
 
