@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.7.9
+- adds support for fetch scrolling (using `/contacts/scroll`) API endpoint
+
 ## 0.7.8
 - fixes fetch leads pagination
 
