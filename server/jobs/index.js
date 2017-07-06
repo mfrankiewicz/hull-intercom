@@ -6,6 +6,7 @@ export saveEvents from "./save-events";
 export saveLeads from "./save-leads";
 
 export fetchAllUsers from "./fetch-all-users";
+export fetchAllLeads from "./fetch-all-leads";
 export fetchUsers from "./fetch-users";
 export fetchLeads from "./fetch-leads";
 
