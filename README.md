@@ -67,13 +67,15 @@ docker-compose run npm install dep -s
 
   Logs that are specific for Intercom Connector: 
   
-    * service.api.ratelimit - warning about rate limits 
-    * intercomAgent.sendUsers.microbatch.error - logged when encountered some problems during micro users batch operation 
-    * intercomAgent.sendUsers.bulkSubmit.error - logged when encountered some problems during bulk users submit operation
-    * intercomAgent.tagUsers.error - logged when encountered some problems during tag users operation 
-    * getUsersTotalCount.error - logged when encountered error while getting users from intercom
-    * saving user error - logged if connector encountered some conflicts during save user operation
-    * getRecentUsers.error - logged while getting recent users throwed an error
-    * sync.error - logged when connector was unable to delete tag at intercom
-    * postConvertLead.error - logged when converting lead throwed an error
-    * postLeads.error - logged when encountered problem during post leads operation
+    error :
+      * intercomAgent.sendUsers.microbatch.error - logged when encountered some problems during micro users batch operation
+      * intercomAgent.sendUsers.bulkSubmit.error - logged when encountered some problems during bulk users submit operation
+      * intercomAgent.tagUsers.error - logged when encountered some problems during tag users operation
+      * getUsersTotalCount.error - logged when encountered error while getting users from intercom
+      * saving.user.error - logged if connector encountered some conflicts during save user operation
+      * getRecentUsers.error - logged while getting recent users throwed an error
+      * sync.error - logged when connector was unable to delete tag at intercom
+      * postConvertLead.error - logged when converting lead throwed an error
+      * postLeads.error - logged when encountered problem during post leads operation
+    warn : 
+      * service.api.ratelimit - warning about rate limits

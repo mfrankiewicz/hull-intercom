@@ -74,7 +74,7 @@ export default class SyncAgent {
       const errorMessage = errorDetails.map(e => e.message).join(" ");
 
       if (_.find(errorDetails, { code: "conflict" })) {
-        this.client.logger.error("saving user error", { errorDetails });
+        this.client.logger.error("saving.user.error", { errorDetails });
       }
 
       const ident = this.userMapping.getIdentFromIntercom(error.data);
