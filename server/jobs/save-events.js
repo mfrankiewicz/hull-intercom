@@ -39,13 +39,13 @@ export default function saveEvents(ctx, payload) {
           const traits = getTagEventTraits(ctx, user, allTags);
 
           const asUser = client.asUser(ident);
-          asUser.logger.info("incoming.event.skip", { reason: "skipping tag event", userIdent: ident, props, context, eventName });
+          asUser.logger.info("incoming.event.skip", { reason: "skipping tag event", props, context, eventName });
           return asUser.traits(traits);
         }
 
         metric.increment("ship.incoming.events", 1);
         const asUser = client.asUser(ident);
-        asUser.logger.info("incoming.event", { userIdent: ident, eventName, props, context });
+        asUser.logger.info("incoming.event", { eventName, props, context });
         return asUser.track(eventName, props, context);
       });
     })
