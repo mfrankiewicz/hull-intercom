@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.7.10
+- remove requirement for validated email to complete oauth flow
+
 ## 0.7.9
 - adds support for fetch scrolling (using `/contacts/scroll`) API endpoint
 
