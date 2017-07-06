@@ -30,7 +30,7 @@ export default function fetchLeads(ctx: Object, payload: Object) {
 
   return getRecentLeads(ctx, { page, count, updated_after, updated_before })
     .then(({ leads, hasMore }) => {
-      ctx.client.logger.info("fetch.leads.progress", { leads: ((page - 1) * count + leads.length) });
+      ctx.client.logger.info("fetch.leads.progress", { leads: ((page - 1) * count + leads.length), hasMore });
       const promises = [];
       if (hasMore) {
         promises.push(fetchLeads(ctx, {
