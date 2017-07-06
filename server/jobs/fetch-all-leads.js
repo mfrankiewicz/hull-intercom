@@ -13,6 +13,7 @@ export default function fetchAllLeads(ctx, payload = {}) {
   }
   return getLeadsScroll(ctx, scroll_param, updated_after, updated_before)
     .then(({ leads, scroll_param: next_scroll_param }) => {
+      ctx.client.logger.info("incoming.job.progress", { jobName: "fetchAllLeads", next_scroll_param, progress: (leads || []).length });
       if (!next_scroll_param) {
         return Promise.resolve();
       }
