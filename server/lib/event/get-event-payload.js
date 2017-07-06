@@ -186,7 +186,7 @@ const mapping = [
     intercom: "user.email.updated",
     eventName: "Updated email address",
     user: (event) => _.get(event, "data.item"),
-    props: (_event) => {
+    props: (event) => {
       return {
         email: _.get(event, "data.item.email"),
       };
