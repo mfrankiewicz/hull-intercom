@@ -12,7 +12,7 @@ export default function sendLeads(ctx, payload) {
 
   ctx.client.logger.debug("sendLeads.preFilter", leads.length);
   const leadsToSave = leads.filter(lead => !syncAgent.userWithError(lead));
-  leadsToSave.map(u => ctx.client.logger.debug("outgoing.user.start", { hull_id: u.id, external_id: u.user_id, email: u.email }));
+  leadsToSave.map(u => ctx.client.asUser(_.pick(u, ["id", "external_id", "email"])).logger.debug("outgoing.user.start"));
   const intercomLeadsToSave = leadsToSave.map(u => syncAgent.userMapping.getIntercomFields(u));
 
   ctx.client.logger.debug("sendLeads.filtered", intercomLeadsToSave.length);

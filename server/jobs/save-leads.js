@@ -42,7 +42,10 @@ export default function saveLeads(ctx: Object, payload: Object): Promise<String>
     traits["intercom/lead_user_id"] = lead.user_id;
 
     const asUser = client.asUser(ident, { active: true });
-    asUser.logger.info("incoming.user.success", { traits });
-    return asUser.traits(traits);
+
+    return asUser.traits(traits).then(
+      () => asUser.logger.info("incoming.user.success", { traits }),
+      (error) => asUser.logger.error("incoming.user.error", { traits, errors: error })
+    );
   }));
 }

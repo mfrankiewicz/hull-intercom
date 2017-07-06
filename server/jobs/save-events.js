@@ -45,8 +45,10 @@ export default function saveEvents(ctx, payload) {
 
         metric.increment("ship.incoming.events", 1);
         const asUser = client.asUser(ident);
-        asUser.logger.info("incoming.event", { eventName, props, context });
-        return asUser.track(eventName, props, context);
+        return asUser.track(eventName, props, context).then(
+          () => asUser.logger.info("incoming.event.success", { eventName, props, context }),
+          (error) => asUser.logger.error("incoming.event.error", { eventName, props, context, errors: error })
+        );
       });
     })
     .catch(err => handleRateLimitError(ctx, "saveEvents", payload, err));
