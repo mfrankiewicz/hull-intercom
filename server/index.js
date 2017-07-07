@@ -15,7 +15,8 @@ const {
   KUE_PREFIX = "hull-intercom",
   REDIS_URL,
   SHIP_CACHE_MAX = 100,
-  SHIP_CACHE_TTL = 60
+  SHIP_CACHE_TTL = 60,
+  OVERRIDE_FIREHOSE_URL
 } = process.env;
 
 if (LOG_LEVEL) {
@@ -49,7 +50,10 @@ if (process.env.WEB || process.env.COMBINED) {
     clientID: CLIENT_ID,
     clientSecret: CLIENT_SECRET,
     queue,
-    cache
+    cache,
+    clientConfig: {
+      firehoseUrl: OVERRIDE_FIREHOSE_URL
+    }
   });
   connector.startApp(app);
 }

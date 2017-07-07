@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.7.12
+- adjust log levels
+- upgrade the hull-node - use new firehose
+- disable fastlane while saving leads on fetch-all-leads operation
+
 ## 0.7.11
 - fix intercom event tracking to capture the right data
 

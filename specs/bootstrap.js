@@ -6,7 +6,7 @@ const worker = require("../server/worker").default;
 
 module.exports = function bootstrap() {
   const app = express();
-  const connector = new Connector({ hostSecret: "1234", port: 8000, clientConfig: { protocol: "http" } });
+  const connector = new Connector({ hostSecret: "1234", port: 8000, clientConfig: { protocol: "http", firehoseUrl: "firehose" } });
   connector.setupApp(app);
   server(app, {
     hostSecret: "1234",
@@ -19,4 +19,4 @@ module.exports = function bootstrap() {
 
   connector.startWorker();
   return connector.startApp(app);
-}
+};

@@ -14,13 +14,10 @@ export default function postLeads(ctx: Object, leads: Array<Object>): Promise {
   return Promise.map(leads, lead => {
     return service.intercomClient.post("/contacts")
       .send(lead)
-      .then(response => {
-        client.logger.info("outgoing.user.success", lead);
-        return response.body;
-      })
+      .then(response => response.body)
       .catch(err => {
         const fErr = service.intercomClient.handleError(err);
-        client.logger.error("postLeads.error", fErr);
+        client.asUser({ email: lead.email, external_id: lead.user_id }).logger.error("outgoing.user.error", fErr);
         return Promise.resolve(fErr);
       });
   }, { concurrency: 5 });

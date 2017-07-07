@@ -1,7 +1,6 @@
 import Promise from "bluebird";
-import _ from "lodash";
-
 import handleRateLimitError from "../lib/handle-rate-limit-error";
+import _ from "lodash";
 
 export default function handleBulk(ctx, payload) {
   const { id, users, attempt = 1 } = payload;
@@ -19,7 +18,7 @@ export default function handleBulk(ctx, payload) {
         })()
           .then(() => {
             users.map(u => {
-              return ctx.client.logger.info("outgoing.user.success", _.pick(u, ["email", "id"]));
+              return ctx.client.asUser(_.pick(u, ["id", "email", "external_id"])).logger.info("outgoing.user.success", { users });
             });
           })
           .then(() => syncAgent.groupUsersToTag(users))

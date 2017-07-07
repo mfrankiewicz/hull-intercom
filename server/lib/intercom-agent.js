@@ -177,7 +177,7 @@ export default class IntercomAgent {
           return moment(u.updated_at, "X")
             .isAfter(last_updated_at);
         });
-        this.logger.info("getRecentUsers.count", {
+        this.logger.debug("getRecentUsers.count", {
           total: originalUsers.length,
           filtered: users.length
         });
