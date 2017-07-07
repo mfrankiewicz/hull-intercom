@@ -6,7 +6,7 @@ import getLeadIdent from "../lib/lead/get-lead-ident";
 /**
  * Gets a list of Intercom's leads and saves them as users to hull
  */
-export default function saveLeads(ctx: Object, payload: Object, options: Object): Promise<String> {
+export default function saveLeads(ctx: Object, payload: Object, options: Object = {}): Promise<String> {
   const { useFastlane = true } = options;
   const { client } = ctx;
   const { leads } = payload;

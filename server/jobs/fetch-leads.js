@@ -24,7 +24,7 @@ export default function fetchLeads(ctx: Object, payload: Object) {
   }
 
   if (page === 1) {
-    ctx.client.logger.info("incoming.job.start", { jobName: "fetch", type: "user", fetch_all, updated_after, updated_before });
+    ctx.client.logger.info("incoming.job.start", { jobName: "fetch", type: "user", updated_after, updated_before });
   }
 
   return getRecentLeads(ctx, { page, count, updated_after, updated_before })
