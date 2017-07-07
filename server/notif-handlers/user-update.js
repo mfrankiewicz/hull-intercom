@@ -5,7 +5,7 @@ export default function userUpdate(ctx, messages) {
   const { syncAgent } = ctx.service;
   const { logger } = ctx.client;
   if (!syncAgent.isConfigured()) {
-    logger.error("connector.configuration.error", { errors: "ship is not configured" });
+    logger.error("connector.configuration.error", { errors: "connector is not configured" });
     return Promise.resolve();
   }
   logger.debug("MESSAGES", messages.length);
