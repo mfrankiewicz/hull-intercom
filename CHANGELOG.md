@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.7.11
+- fix intercom event tracking to capture the right data
+
 ## 0.7.10
 - remove requirement for validated email to complete oauth flow
 
