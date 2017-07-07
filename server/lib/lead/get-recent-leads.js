@@ -2,11 +2,9 @@
 import _ from "lodash";
 import moment from "moment";
 
-
 export default function getRecentLeads(ctx: Object, options: Object): Object {
   const { intercomClient } = ctx.service;
   const { page, count, updated_after, updated_before } = options;
-
   return intercomClient.get("/contacts")
     .query({
       per_page: count,
@@ -16,8 +14,7 @@ export default function getRecentLeads(ctx: Object, options: Object): Object {
     })
     .then(response => {
       const originalLeads = _.get(response, "body.contacts", []);
-      const totalPages = _.get(response, "body.total_pages");
-
+      const totalPages = _.get(response, "body.pages.total_pages");
       const leads = originalLeads
       .filter(u => {
         if (!updated_after || !moment(updated_after).isValid()) {

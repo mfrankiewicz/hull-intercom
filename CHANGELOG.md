@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.7.11
+- fix intercom event tracking to capture the right data
+
+## 0.7.10
+- remove requirement for validated email to complete oauth flow
+
+## 0.7.9
+- adds support for fetch scrolling (using `/contacts/scroll`) API endpoint
+
+## 0.7.8
+- fixes fetch leads pagination
+
 ## 0.7.7
 - adds `src/ship.js` for easy client side embedding - webpack build script
 

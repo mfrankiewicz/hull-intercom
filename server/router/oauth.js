@@ -17,7 +17,8 @@ export default function OAuthRouter(dependencies: Object) {
     tokenInUrl: false,
     options: {
       clientID,
-      clientSecret
+      clientSecret,
+      requireVerifiedEmail: false
     },
     isSetup(req) {
       if (req.query.reset) return Promise.reject();

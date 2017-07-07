@@ -11,7 +11,7 @@ export default function webhook(req, res, next) {
       ctx: req.hull,
       options: {
         maxSize: process.env.NOTIFY_BATCH_HANDLER_SIZE || 100,
-        throttle: process.env.NOTIFY_BATCH_HANDLER_THROTTLE || 30000
+        maxTime: process.env.NOTIFY_BATCH_HANDLER_THROTTLE || 30000
       }
     })
     .setCallback(users => saveUsers(req.hull, { users }))
@@ -25,7 +25,7 @@ export default function webhook(req, res, next) {
       ctx: req.hull,
       options: {
         maxSize: process.env.NOTIFY_BATCH_HANDLER_SIZE || 100,
-        throttle: process.env.NOTIFY_BATCH_HANDLER_THROTTLE || 30000
+        maxTime: process.env.NOTIFY_BATCH_HANDLER_THROTTLE || 30000
       }
     })
     .setCallback(leads => saveLeads(req.hull, { leads }))
@@ -39,7 +39,7 @@ export default function webhook(req, res, next) {
       ctx: req.hull,
       options: {
         maxSize: process.env.NOTIFY_BATCH_HANDLER_SIZE || 100,
-        throttle: process.env.NOTIFY_BATCH_HANDLER_THROTTLE || 30000
+        maxTime: process.env.NOTIFY_BATCH_HANDLER_THROTTLE || 30000
       }
     })
     .setCallback(users => saveUsers(req.hull, { users }))
@@ -51,7 +51,7 @@ export default function webhook(req, res, next) {
     ctx: req.hull,
     options: {
       maxSize: process.env.NOTIFY_BATCH_HANDLER_SIZE || 100,
-      throttle: process.env.NOTIFY_BATCH_HANDLER_THROTTLE || 30000
+      maxTime: process.env.NOTIFY_BATCH_HANDLER_THROTTLE || 30000
     }
   })
   .setCallback(events => saveEvents(req.hull, { events }))
