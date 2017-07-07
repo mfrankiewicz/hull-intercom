@@ -36,7 +36,7 @@ export default function getLeadsScroll(ctx, scroll_param = null, updated_after, 
     }
 
     if (_.get(fErr, "body.errors[0].code") === "not_found") {
-      client.logger.error("incoming.job.error", { jobName: "fetchAllLeads", errors: "Scroll expired, should start it again" });
+      client.logger.warn("incoming.job.warning", { jobName: "fetchAllLeads", errors: "Scroll expired, what could mean the end of the list" });
       return Promise.resolve([]);
     }
 

@@ -73,16 +73,11 @@ export default class SyncAgent {
 
       const errorMessage = errorDetails.map(e => e.message).join(" ");
 
-      if (_.find(errorDetails, { code: "conflict" })) {
-        this.client.logger.error("saving user error", { errorDetails });
-      }
-
       const ident = this.userMapping.getIdentFromIntercom(error.data);
 
-      this.client.logger.info("outgoing.user.error", _.merge(ident, { errors: errorDetails }));
-      return this.client.asUser(ident).traits({
-        "intercom/import_error": errorMessage
-      });
+      const asUser = this.client.asUser(ident);
+      asUser.logger.error("outgoing.user.error", { errors: errorDetails });
+      return asUser.traits({ "intercom/import_error": errorMessage });
     });
   }
 
@@ -194,7 +189,7 @@ export default class SyncAgent {
           id: ev.user.id,
           metadata: ev.properties
         };
-        this.logger.info("outgoing.event", data);
+        this.logger.debug("outgoing.event", data);
         return data;
       })
       .value();

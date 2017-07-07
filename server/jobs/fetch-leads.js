@@ -24,12 +24,12 @@ export default function fetchLeads(ctx: Object, payload: Object) {
   }
 
   if (page === 1) {
-    ctx.client.logger.info("fetch.leads.start", { updated_after, updated_before });
+    ctx.client.logger.info("incoming.job.start", { jobName: "fetch", type: "user", fetch_all, updated_after, updated_before });
   }
 
   return getRecentLeads(ctx, { page, count, updated_after, updated_before })
     .then(({ leads, hasMore }) => {
-      ctx.client.logger.info("fetch.leads.progress", { leads: ((page - 1) * count + leads.length), hasMore });
+      ctx.client.logger.info("incoming.job.progress", { jobName: "fetch", stepName: "recent-leads", progress: ((page - 1) * count + leads.length), hasMore });
       const promises = [];
       if (hasMore) {
         promises.push(fetchLeads(ctx, {

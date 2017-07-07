@@ -12,11 +12,11 @@ function batchHandler(ctx, source, segmentId) {
       return ctx.service.syncAgent.updateUserSegments(u, { add_segment_ids: [segmentId] }, ignoreFilter);
     }));
 
-    users.map(u => ctx.client.logger.debug("outgoing.user.start", _.pick(u, ["email", "id"])));
-
     const leads = users.filter((u) => u["traits_intercom/is_lead"] === true);
 
     users = users.filter((u) => !u["traits_intercom/is_lead"]);
+
+    users.map(u => ctx.client.asUser(_.pick(u, ["email", "id"])).logger.debug("outgoing.user.start", { leads, users }));
 
     if (!_.isEmpty(leads)) {
       promises.push(sendLeads(ctx, { leads }));

@@ -18,7 +18,7 @@ export default function fetchAllLeads(ctx, payload = {}) {
         return Promise.resolve();
       }
       return Promise.all([
-        fetchAllLeads(ctx, { scroll_param: next_scroll_param, updated_after, updated_before }),
+        fetchAllLeads(ctx, { scroll_param: next_scroll_param, updated_after, updated_before }, { useFastlane: false }),
         saveLeads(ctx, { leads })
       ]);
     });
