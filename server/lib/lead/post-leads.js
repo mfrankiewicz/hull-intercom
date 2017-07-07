@@ -17,7 +17,7 @@ export default function postLeads(ctx: Object, leads: Array<Object>): Promise {
       .then(response => response.body)
       .catch(err => {
         const fErr = service.intercomClient.handleError(err);
-        client.logger.error("postLeads.error", fErr);
+        client.asUser({ email: lead.email, external_id: lead.user_id }).logger.error("outgoing.user.error", fErr);
         return Promise.resolve(fErr);
       });
   }, { concurrency: 5 });
