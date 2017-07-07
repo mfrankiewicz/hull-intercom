@@ -1,5 +1,6 @@
 import Promise from "bluebird";
 import handleRateLimitError from "../lib/handle-rate-limit-error";
+import _ from "lodash";
 
 export default function handleBulk(ctx, payload) {
   const { id, users, attempt = 1 } = payload;
