@@ -83,7 +83,11 @@ export default class SyncAgent {
 
   getUsersToSave(users) {
     return users.filter((u) => !_.isEmpty(u.email)
-      && !this.userWithError(u));
+      && !this.userWithError(u))
+      .map((u) => {
+        u.email = _.toLower(u.email);
+        return u;
+      });
   }
 
   getUsersToTag(users) {
