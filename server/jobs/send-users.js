@@ -47,7 +47,7 @@ export default function sendUsers(ctx, payload) {
       }
 
       if (_.get(res, "body.id")) {
-        return ctx.enqueue("handleBulk", { users: usersToSave, id: res.body.id });
+        return ctx.enqueue("handleBulk", { users: usersToSave, id: res.body.id }, { delay: parseInt(process.env.BULK_JOB_DELAY, 10) || 10000 });
       }
       return Promise.resolve();
     })

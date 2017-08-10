@@ -1,8 +1,11 @@
 # Changelog
 
-## 0.7.14
+## 0.7.15
 - added connector docs
 - simplified settings
+
+## 0.7.14
+- make sure that the first handleBulkJob is delayed
 
 ## 0.7.13
 - remove bloat logs payload
