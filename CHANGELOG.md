@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.7.13
+- remove bloat logs payload
+
 ## 0.7.12
 - adjust log levels
 - upgrade the hull-node - use new firehose
