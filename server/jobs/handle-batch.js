@@ -16,7 +16,7 @@ function batchHandler(ctx, source, segmentId) {
 
     users = users.filter((u) => !u["traits_intercom/is_lead"]);
 
-    users.map(u => ctx.client.asUser(_.pick(u, ["email", "id"])).logger.debug("outgoing.user.start", { leads, users }));
+    users.map(u => ctx.client.asUser(_.pick(u, ["email", "id"])).logger.debug("outgoing.user.start"));
 
     if (!_.isEmpty(leads)) {
       promises.push(sendLeads(ctx, { leads }));
