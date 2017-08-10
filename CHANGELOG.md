@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.7.14
+- make sure that the first handleBulkJob is delayed
+
 ## 0.7.13
 - remove bloat logs payload
 
