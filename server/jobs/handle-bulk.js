@@ -34,7 +34,7 @@ export default function handleBulk(ctx, payload) {
         users,
         id,
         attempt: attempt + 1
-      }, { delay: attempt * 10000 });
+      }, { delay: attempt * (parseInt(process.env.BULK_JOB_DELAY, 10) || 10000) });
     })
     .catch(err => handleRateLimitError(ctx, "handleBulk", payload, err));
 }
