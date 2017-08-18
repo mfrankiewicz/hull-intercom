@@ -5,7 +5,7 @@
   "index": "ship.js",
   "admin": "/auth/",
   "picture": "picture.png",
-  "version": "0.7.14",
+  "version": "0.7.15",
   "settings": [],
   "private_settings": [{
       "name": "access_token",

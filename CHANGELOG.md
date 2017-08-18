@@ -3,6 +3,7 @@
 ## 0.7.15
 - added connector docs
 - simplified settings
+- upgraded to hull@0.11.12
 
 ## 0.7.14
 - make sure that the first handleBulkJob is delayed
