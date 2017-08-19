@@ -41,10 +41,11 @@ export default class IntercomClient {
     if (!this.ifConfigured()) {
       throw new Error("Client access data not set!");
     }
+    const throttle = this.throttle;
 
     const preparedReq = req
       .use(prefixPlugin(process.env.OVERRIDE_INTERCOM_URL || "https://api.intercom.io"))
-      .use(this.throttle.plugin())
+      .use(throttle.plugin())
       .use(superagentPromisePlugin)
       .accept("application/json")
       .on("request", (reqData) => {
@@ -67,10 +68,10 @@ export default class IntercomClient {
           this.metric.value("ship.service_api.remaining", remaining);
           if (remaining === "0") {
             console.warn("---------> pausing throttle", JSON.stringify({ limit, remaining, reset: _.get(res.header, "x-ratelimit-reset") }));
-            this.throttle.options("active", false);
+            throttle.options("active", false);
             setTimeout(() => {
               console.warn("---------> restarting throttle");
-              this.throttle.options("active", true);
+              throttle.options("active", true);
             }, 10000);
           }
         }
