@@ -28,7 +28,7 @@ export default class IntercomClient {
       .use(superagentPromisePlugin)
       .accept("application/json")
       .on("request", (reqData) => {
-        console.log("REQ", reqData.method, reqData.url);
+        console.log("REQ", JSON.stringify({ method: reqData.method, url: reqData.url }));
       })
       .on("response", (res) => {
         const limit = _.get(res.header, "x-ratelimit-limit");
