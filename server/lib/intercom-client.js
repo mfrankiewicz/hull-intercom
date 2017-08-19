@@ -2,6 +2,22 @@ import request from "superagent";
 import prefixPlugin from "superagent-prefix";
 import superagentPromisePlugin from "superagent-promise-plugin";
 import _ from "lodash";
+import Throttle from "superagent-throttle";
+
+const THROTTLES = {};
+
+function getThrottle(ship) {
+  const key = ship.id;
+  if (THROTTLES[key]) return THROTTLES[key];
+  const throttle = new Throttle({
+    active: true,
+    rate: 75,
+    ratePer: 10000,
+    concurrent: 20
+  });
+  THROTTLES[key] = throttle;
+  return throttle;
+}
 
 export default class IntercomClient {
 
@@ -12,6 +28,7 @@ export default class IntercomClient {
     this.client = client;
     this.metric = metric;
     this.req = request;
+    this.throttle = getThrottle(ship);
   }
 
   ifConfigured() {
@@ -26,6 +43,7 @@ export default class IntercomClient {
     const preparedReq = req
       .use(prefixPlugin(process.env.OVERRIDE_INTERCOM_URL || "https://api.intercom.io"))
       .use(superagentPromisePlugin)
+      .use(this.throttle.plugin())
       .accept("application/json")
       .on("request", (reqData) => {
         this.client.logger.debug("intercomClient.req", { method: reqData.method, url: reqData.url });
