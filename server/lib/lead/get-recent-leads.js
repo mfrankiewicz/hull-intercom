@@ -3,6 +3,7 @@ import _ from "lodash";
 import moment from "moment";
 
 export default function getRecentLeads(ctx: Object, options: Object): Object {
+  const { client } = ctx;
   const { intercomClient } = ctx.service;
   const { page, count, updated_after, updated_before } = options;
   return intercomClient.get("/contacts")
@@ -35,5 +36,10 @@ export default function getRecentLeads(ctx: Object, options: Object): Object {
         hasMore: leads.length === originalLeads.length && page < totalPages,
         leads
       };
+    })
+    .catch(err => {
+      const fErr = intercomClient.handleError(err);
+      client.logger.error("getRecentLeads.error", fErr);
+      return Promise.reject(fErr);
     });
 }

@@ -46,5 +46,11 @@ export default function fetchLeads(ctx: Object, payload: Object) {
         }));
       }
       return Promise.all(promises);
+    })
+    .catch(err => {
+      if (err.statusCode === 429) {
+        return Promise.resolve("ok");
+      }
+      return Promise.reject(err);
     });
 }
