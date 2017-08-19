@@ -62,6 +62,7 @@ export default class IntercomClient {
         //   .diff(moment(), "seconds");
         // x-runtime
         this.metric.increment("ship.service_api.call", 1);
+        console.warn("--------> ship.service_api.remaining", { remaining });
         if (remaining !== undefined) {
           this.metric.value("ship.service_api.remaining", remaining);
           if (remaining === 0) {
