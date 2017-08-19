@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.16
+- limit concurrency on API calls
+- log only part of incoming webhooks payload
+
 ## 0.7.15
 - add more logging to Intercom Client
 - upgrade hull-node to skip empty jobs
