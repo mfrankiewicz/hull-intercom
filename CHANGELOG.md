@@ -2,6 +2,8 @@
 
 ## 0.7.15
 - add more logging to Intercom Client
+- upgrade hull-node to skip empty jobs
+- handle and skip interval based fetchLeads operation rate limit errors
 
 ## 0.7.14
 - make sure that the first handleBulkJob is delayed
