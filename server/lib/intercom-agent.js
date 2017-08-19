@@ -131,6 +131,7 @@ export default class IntercomAgent {
   tagUsers(ops) {
     const opArray = [];
     _.map(ops, (op, segmentName) => {
+      this.logger.debug("intercomAgent.tagUsers", { segmentName, usersCount: op.length });
       opArray.push({
         name: segmentName,
         users: op

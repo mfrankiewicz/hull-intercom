@@ -11,7 +11,7 @@ process.env.OVERRIDE_INTERCOM_URL = "http://localhost:8002";
 
 describe("fetchLeads", function test() {
   let minihull, miniintercom, server;
-  before((done) => {
+  beforeEach((done) => {
     minihull = new Minihull();
     miniintercom = new Miniintercom();
     server = bootstrap();
@@ -73,7 +73,21 @@ describe("fetchLeads", function test() {
     .then((res) => {});
   });
 
-  after(() => {
+  it("should skip the fetch operation in case of rate limit error", (done) => {
+    const now = moment().format("X");
+    const contactsStub = miniintercom.stubGet("/contacts")
+    .onFirstCall().callsFake((req, res) => {
+      res.status(429).end();
+    });
+
+    minihull.callFirstShip("/fetch-leads")
+    .then((res) => {
+      expect(contactsStub.callCount).to.equal(1);
+      done();
+    });
+  });
+
+  afterEach(() => {
     minihull.close();
     miniintercom.close();
     server.close();

@@ -28,7 +28,12 @@ export default class IntercomClient {
       .use(superagentPromisePlugin)
       .accept("application/json")
       .on("request", (reqData) => {
-        console.log("REQ", reqData.method, reqData.url);
+        this.client.logger.debug("intercomClient.req", { method: reqData.method, url: reqData.url });
+      })
+      .on("error", (error) => {
+        const path = _.get(error, "response.req.path", "").split("?")[0];
+        const method = _.get(error, "response.req.method");
+        this.client.logger.debug("intercomClient.resError", { status: error.status, path, method });
       })
       .on("response", (res) => {
         const limit = _.get(res.header, "x-ratelimit-limit");
@@ -37,7 +42,7 @@ export default class IntercomClient {
         //   .diff(moment(), "seconds");
         // x-runtime
         this.metric.increment("ship.service_api.call", 1);
-        if (remaining) {
+        if (remaining !== undefined) {
           this.metric.value("ship.service_api.remaining", remaining);
         }
 
