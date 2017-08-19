@@ -9,11 +9,13 @@ const THROTTLES = {};
 function getThrottle(ship) {
   const key = ship.id;
   if (THROTTLES[key]) return THROTTLES[key];
+
+  console.warn("------> building a new Throttle for ", { key });
   const throttle = new Throttle({
     active: true,
     rate: 75,
     ratePer: 10000,
-    concurrent: 20
+    concurrent: 10
   });
   THROTTLES[key] = throttle;
   return throttle;
@@ -62,6 +64,14 @@ export default class IntercomClient {
         this.metric.increment("ship.service_api.call", 1);
         if (remaining !== undefined) {
           this.metric.value("ship.service_api.remaining", remaining);
+          if (remaining === 0) {
+            console.warn("---------> pausing throttle", JSON.stringify({ limit, remaining, reset: _.get(res.header, "x-ratelimit-reset") }));
+            this.throttle.options("active", false);
+            setTimeout(() => {
+              console.warn("---------> restarting throttle");
+              this.throttle.options("active", true);
+            }, 10000);
+          }
         }
 
         if (limit) {
