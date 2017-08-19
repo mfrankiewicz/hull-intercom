@@ -32,7 +32,8 @@ export default class IntercomClient {
       })
       .on("error", (error) => {
         const path = _.get(error, "response.req.path", "").split("?")[0];
-        this.client.logger.debug("intercom.client.resError", { status: error.status, path });
+        const method = _.get(error, "response.req.method");
+        this.client.logger.debug("intercom.client.resError", { status: error.status, path, method });
       })
       .on("response", (res) => {
         const limit = _.get(res.header, "x-ratelimit-limit");
