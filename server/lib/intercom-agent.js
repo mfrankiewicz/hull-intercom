@@ -115,7 +115,7 @@ export default class IntercomAgent {
             this.logger.error("intercomAgent.sendUsers.microbatch.error", fErr);
             return Promise.reject(fErr);
           });
-      }, { concurrency: 5 });
+      }, { concurrency: 1 });
     }
 
     return this.intercomClient
@@ -145,7 +145,7 @@ export default class IntercomAgent {
           this.logger.error("intercomAgent.tagUsers.error", fErr);
           return Promise.reject(fErr);
         });
-    }, { concurrency: 3 });
+    }, { concurrency: 1 });
   }
 
   /**
@@ -215,7 +215,7 @@ export default class IntercomAgent {
         .catch((err) => {
           return Promise.reject(this.intercomClient.handleError(err));
         });
-      }, { concurrency: 3 });
+      }, { concurrency: 1 });
     }
 
     const wrappedEvents = events.map(e => {
@@ -245,7 +245,7 @@ export default class IntercomAgent {
         .catch((err) => {
           return Promise.reject(this.intercomClient.handleError(err));
         });
-    }, { concurrency: 3 });
+    }, { concurrency: 1 });
   }
 
   getTags() {

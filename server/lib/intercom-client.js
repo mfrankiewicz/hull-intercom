@@ -17,6 +17,13 @@ function getThrottle(ship) {
     ratePer: 10000,
     concurrent: 4
   });
+  setInterval(() => {
+    console.warn("----> Throttle for ", key, JSON.stringify({
+      current: throttle._current,
+      buffer: (throttle._buffer || []).length,
+      requestTimes: throttle._requestTimes
+    }));
+  }, 1000);
   THROTTLES[key] = throttle;
   return throttle;
 }
