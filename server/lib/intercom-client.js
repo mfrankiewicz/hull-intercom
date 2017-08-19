@@ -65,7 +65,7 @@ export default class IntercomClient {
         console.warn("--------> ship.service_api.remaining", { remaining });
         if (remaining !== undefined) {
           this.metric.value("ship.service_api.remaining", remaining);
-          if (remaining === 0) {
+          if (remaining === "0") {
             console.warn("---------> pausing throttle", JSON.stringify({ limit, remaining, reset: _.get(res.header, "x-ratelimit-reset") }));
             this.throttle.options("active", false);
             setTimeout(() => {
