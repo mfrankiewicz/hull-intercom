@@ -28,12 +28,12 @@ export default class IntercomClient {
       .use(superagentPromisePlugin)
       .accept("application/json")
       .on("request", (reqData) => {
-        this.client.logger.debug("intercom.client.req", { method: reqData.method, url: reqData.url });
+        this.client.logger.debug("intercomClient.req", { method: reqData.method, url: reqData.url });
       })
       .on("error", (error) => {
         const path = _.get(error, "response.req.path", "").split("?")[0];
         const method = _.get(error, "response.req.method");
-        this.client.logger.debug("intercom.client.resError", { status: error.status, path, method });
+        this.client.logger.debug("intercomClient.resError", { status: error.status, path, method });
       })
       .on("response", (res) => {
         const limit = _.get(res.header, "x-ratelimit-limit");
