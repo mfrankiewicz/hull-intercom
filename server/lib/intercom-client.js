@@ -44,8 +44,8 @@ export default class IntercomClient {
 
     const preparedReq = req
       .use(prefixPlugin(process.env.OVERRIDE_INTERCOM_URL || "https://api.intercom.io"))
-      .use(superagentPromisePlugin)
       .use(this.throttle.plugin())
+      .use(superagentPromisePlugin)
       .accept("application/json")
       .on("request", (reqData) => {
         this.client.logger.debug("intercomClient.req", { method: reqData.method, url: reqData.url });
