@@ -13,9 +13,9 @@ function getThrottle(ship) {
   console.warn("------> building a new Throttle for ", { key });
   const throttle = new Throttle({
     active: true,
-    rate: 75,
+    rate: 50,
     ratePer: 10000,
-    concurrent: 10
+    concurrent: 4
   });
   THROTTLES[key] = throttle;
   return throttle;
