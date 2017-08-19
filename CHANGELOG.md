@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.7.15
+- add more logging to Intercom Client
+
 ## 0.7.14
 - make sure that the first handleBulkJob is delayed
 
