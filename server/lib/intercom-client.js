@@ -3,7 +3,6 @@ import Throttle from "superagent-throttle";
 import prefixPlugin from "superagent-prefix";
 import _ from "lodash";
 
-
 const THROTTLES = {};
 
 function getThrottle(ship) {
@@ -18,7 +17,6 @@ function getThrottle(ship) {
   THROTTLES[key] = throttle;
   return throttle;
 }
-
 
 export default class IntercomClient {
 

@@ -2,8 +2,8 @@ const Hull = require("hull");
 const Minihull = require("minihull");
 const expect = require("chai").expect;
 const sinon = require("sinon");
-const winston = require('winston');
-const spyLogger = require("winston-spy");
+const winston = require("winston");
+require("winston-spy");
 
 const Miniintercom = require("./miniintercom");
 const bootstrap = require("./bootstrap");
@@ -12,7 +12,9 @@ process.env.OVERRIDE_INTERCOM_URL = "http://localhost:8002";
 process.env.RATE_LIMIT_DELAY = 200;
 
 describe("log error response from intercom", function test() {
-  let minihull, miniintercom, server;
+  let minihull;
+  let miniintercom;
+  let server;
   beforeEach(() => {
     minihull = new Minihull();
     miniintercom = new Miniintercom();
@@ -31,22 +33,20 @@ describe("log error response from intercom", function test() {
   it("should log the response status after the error", (done) => {
     const loggerSpy = sinon.spy();
     Hull.logger.transports.console.level = "debug";
-    Hull.logger.add(winston.transports.SpyLogger, { level: "debug", spy: loggerSpy })
+    Hull.logger.add(winston.transports.SpyLogger, { level: "debug", spy: loggerSpy });
 
     miniintercom.stubGet("/subscriptions/abc-123")
-      .returnsStatus(429)
+      .returnsStatus(429);
 
     minihull.notifyConnector("595103c73628d081190000f6", "http://localhost:8000/notify", "ship:update", { foo: "bar" })
-      .then((res) => {});
+      .then(() => {});
 
     setTimeout(() => {
-      console.log("loggerSpy.callCount", loggerSpy.callCount)
-      if (loggerSpy.callCount === 6) {
-        expect(loggerSpy.getCall(4).args[0]).to.equal("debug");
-        expect(loggerSpy.getCall(4).args[1]).to.equal("intercomClient.resError");
-        Hull.logger.remove(winston.transports.SpyLogger);
-        done();
-      }
+      expect(loggerSpy.callCount).to.equal(6);
+      expect(loggerSpy.getCall(4).args[0]).to.equal("debug");
+      expect(loggerSpy.getCall(4).args[1]).to.equal("intercomClient.resError");
+      Hull.logger.remove(winston.transports.SpyLogger);
+      done();
     }, 200);
   });
 

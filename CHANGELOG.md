@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.7.16
+- respect api rate limits via superagent-throttle
+
 ## 0.7.15
 - add more logging to Intercom Client
 - upgrade hull-node to skip empty jobs
@@ -137,7 +140,7 @@ incoming user is processed by the ship)
 - capturing basic events from Intercom (skipping events for Hull Segments Tags)
 - adds `ensureWebhook` method which makes sure that the webhook has all topics set
 - fixes handling data coming from Hull and Intercom webhook
-- makes sure that companies, tags and segments array are clean 
+- makes sure that companies, tags and segments array are clean
 - overall maintenance fixes - linting, logging and cleanup
 
 ## 0.0.2
