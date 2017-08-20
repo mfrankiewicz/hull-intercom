@@ -9,7 +9,7 @@ function batchHandler(ctx, source, segmentId) {
     const promises = [];
     const ignoreFilter = (source !== "connector");
     users = _.filter(users.map(u => {
-      return ctx.service.syncAgent.updateUserSegments(u, { add_segment_ids: [segmentId] }, ignoreFilter);
+      return ctx.service.syncAgent.updateUserSegments(u, { add_segment_ids: _.concat(u.segment_ids, segmentId) }, ignoreFilter);
     }));
 
     const leads = users.filter((u) => u["traits_intercom/is_lead"] === true);

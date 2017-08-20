@@ -145,7 +145,7 @@ export default class SyncAgent {
    */
   updateUserSegments(user, { add_segment_ids = [], remove_segment_ids = [] }, ignoreFilter = false) {
     if (this.userWhitelisted(user) || ignoreFilter === true) {
-      user.segment_ids = _.uniq(_.concat(user.segment_ids || [], _.filter(add_segment_ids)));
+      user.add_segment_ids = _.uniq(_.concat(user.segment_ids || [], _.filter(add_segment_ids)));
       user.remove_segment_ids = _.filter(remove_segment_ids);
     } else {
       return null;
