@@ -7,7 +7,7 @@ const Throttler = new Throttle({
   active: true,
   rate: 50,
   ratePer: 10000,
-  concurrent: 5
+  concurrent: 20
 });
 
 export default class IntercomClient {
