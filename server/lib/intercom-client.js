@@ -42,8 +42,10 @@ export default class IntercomClient {
     req.on("response", (res) => {
       const limit = _.get(res.header, "x-ratelimit-limit");
       const remaining = _.get(res.header, "x-ratelimit-remaining");
+      const reset = _.get(res.header, "x-ratelimit-reset");
       this.metric.increment("ship.service_api.call", 1);
       if (remaining !== undefined) {
+        this.client.logger.debug("intercomClient.ratelimit", { remaining, limit, reset });
         this.metric.value("ship.service_api.remaining", remaining);
       }
 
