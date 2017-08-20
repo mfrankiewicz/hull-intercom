@@ -13,7 +13,7 @@ export default function userUpdate(ctx, messages) {
   const leadsToConvert = [];
   const users = messages.reduce((accumulator, message) => {
     const { user, changes = {}, segments = [], events = [] } = message;
-    const { left = [] } = _.get(changes, "segments", {});
+    const { left = [], entered = [] } = _.get(changes, "segments", {});
 
     logger.debug("outgoing.user.start", { email: user.email, hull_id: user.id });
 
@@ -22,10 +22,10 @@ export default function userUpdate(ctx, messages) {
       ctx.client.asUser(_.pick(user, ["email", "id"])).logger.info("outgoing.user.skip", { reason: "User was just updated by the Intercom connector, avoiding loop" });
       return accumulator;
     }
-    user.segment_ids = user.segment_ids || segments.map(s => s.id);
+    user.segment_ids = _.concat(user.segment_ids || [], segments.map(s => s.id));
 
     const filteredUser = syncAgent.updateUserSegments(user, {
-      add_segment_ids: segments.map(s => s.id),
+      add_segment_ids: entered.map(s => s.id),
       remove_segment_ids: left.map(s => s.id)
     });
 
