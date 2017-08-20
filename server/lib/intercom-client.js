@@ -3,12 +3,22 @@ import Throttle from "superagent-throttle";
 import prefixPlugin from "superagent-prefix";
 import _ from "lodash";
 
-const Throttler = new Throttle({
-  active: true,
-  rate: 40,
-  ratePer: 10000,
-  concurrent: 10
-});
+
+const THROTTLES = {};
+
+function getThrottle(ship) {
+  const key = ship.id;
+  if (THROTTLES[key]) return THROTTLES[key];
+  const throttle = new Throttle({
+    active: true,
+    rate: 75,
+    ratePer: 10000,
+    concurrent: 10
+  });
+  THROTTLES[key] = throttle;
+  return throttle;
+}
+
 
 export default class IntercomClient {
 
@@ -26,6 +36,8 @@ export default class IntercomClient {
   }
 
   exec = (method, path, params = {}) => {
+    const throttle = getThrottle(this.ship);
+
     if (!this.ifConfigured()) {
       throw new Error("Client access data not set!");
     }
@@ -66,7 +78,7 @@ export default class IntercomClient {
       req.send(params);
     }
 
-    req.use(Throttler.plugin(this.ship.id));
+    req.use(throttle.plugin(this.ship.id));
 
     return new Promise((resolve, reject) => {
       req.end((err, response) => {
