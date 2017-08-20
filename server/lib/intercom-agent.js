@@ -43,8 +43,7 @@ export default class IntercomAgent {
   }
 
   importUsers(scroll_param = null, updated_after, updated_before) {
-    return this.intercomClient.get("/users/scroll")
-    .query({ scroll_param })
+    return this.intercomClient.get("/users/scroll", { scroll_param })
     .then(response => {
       let { users } = response.body;
       const { scroll_param: next_scroll_param } = response.body;
@@ -105,8 +104,7 @@ export default class IntercomAgent {
     if (users.length < (process.env.MINIMUM_BULK_SIZE || 10)
       || mode === "regular") {
       return Promise.map(body.items, item => {
-        return this.intercomClient.post("/users")
-          .send(item.data)
+        return this.intercomClient.post("/users", item.data)
           .then(response => {
             return response.body;
           })
@@ -119,8 +117,7 @@ export default class IntercomAgent {
     }
 
     return this.intercomClient
-      .post("/bulk/users")
-      .send(body)
+      .post("/bulk/users", body)
       .catch(err => {
         const fErr = this.intercomClient.handleError(err);
         this.logger.error("intercomAgent.sendUsers.bulkSubmit.error", fErr);
@@ -138,8 +135,7 @@ export default class IntercomAgent {
       });
     });
     return Promise.map(opArray, (op) => {
-      return this.intercomClient.post("/tags")
-        .send(op)
+      return this.intercomClient.post("/tags", op)
         .catch(err => {
           const fErr = this.intercomClient.handleError(err);
           this.logger.error("intercomAgent.tagUsers.error", fErr);
@@ -152,8 +148,7 @@ export default class IntercomAgent {
    * get total count of users
    */
   getUsersTotalCount() {
-    return this.intercomClient.get("/users")
-      .query({ per_page: 1 })
+    return this.intercomClient.get("/users", { per_page: 1 })
       .then(response => {
         return _.get(response, "body.total_count");
       })
@@ -165,35 +160,34 @@ export default class IntercomAgent {
   }
 
   getRecentUsers(last_updated_at, count, page) {
-    return this.intercomClient.get("/users")
-      .query({
-        per_page: count,
-        page,
-        order: "desc",
-        sort: "updated_at"
-      })
-      .then(response => {
-        const originalUsers = _.get(response, "body.users", []);
-        const users = originalUsers.filter((u) => {
-          return moment(u.updated_at, "X")
-            .isAfter(last_updated_at);
-        });
-        this.logger.debug("getRecentUsers.count", {
-          total: originalUsers.length,
-          filtered: users.length
-        });
-
-        return {
-          users,
-          hasMore: !_.isEmpty(_.get(response, "body.pages.next"))
-            && users.length === originalUsers.length
-        };
-      })
-      .catch(err => {
-        const fErr = this.intercomClient.handleError(err);
-        this.logger.error("getRecentUsers.error", fErr);
-        return Promise.reject(fErr);
+    return this.intercomClient.get("/users", {
+      per_page: count,
+      page,
+      order: "desc",
+      sort: "updated_at"
+    })
+    .then(response => {
+      const originalUsers = _.get(response, "body.users", []);
+      const users = originalUsers.filter((u) => {
+        return moment(u.updated_at, "X")
+          .isAfter(last_updated_at);
       });
+      this.logger.debug("getRecentUsers.count", {
+        total: originalUsers.length,
+        filtered: users.length
+      });
+
+      return {
+        users,
+        hasMore: !_.isEmpty(_.get(response, "body.pages.next"))
+          && users.length === originalUsers.length
+      };
+    })
+    .catch(err => {
+      const fErr = this.intercomClient.handleError(err);
+      this.logger.error("getRecentUsers.error", fErr);
+      return Promise.reject(fErr);
+    });
   }
 
   /**
@@ -210,8 +204,7 @@ export default class IntercomAgent {
     if (true || events.length <= 10) { // eslint-disable-line no-constant-condition
       return Promise.map(events, (event) => {
         return this.intercomClient
-        .post("/events")
-        .send(event)
+        .post("/events", event)
         .catch((err) => {
           return Promise.reject(this.intercomClient.handleError(err));
         });
@@ -228,12 +221,9 @@ export default class IntercomAgent {
 
     const batches = _.chunk(wrappedEvents, 100);
 
-    return Promise.map(batches, (batch) => {
+    return Promise.map(batches, (items) => {
       return this.intercomClient
-        .post("/bulk/events")
-        .send({
-          items: batch
-        })
+        .post("/bulk/events", { items })
         .then(({ body }) => {
           return this.intercomClient
             .get(body.links.error)

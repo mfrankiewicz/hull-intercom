@@ -1,32 +1,14 @@
-import request from "superagent";
-import prefixPlugin from "superagent-prefix";
-import superagentPromisePlugin from "superagent-promise-plugin";
-import _ from "lodash";
+import superagent from "superagent";
 import Throttle from "superagent-throttle";
+import prefixPlugin from "superagent-prefix";
+import _ from "lodash";
 
-const THROTTLES = {};
-
-function getThrottle(ship) {
-  const key = ship.id;
-  if (THROTTLES[key]) return THROTTLES[key];
-
-  console.warn("------> building a new Throttle for ", { key });
-  const throttle = new Throttle({
-    active: true,
-    rate: 50,
-    ratePer: 10000,
-    concurrent: 4
-  });
-  setInterval(() => {
-    console.warn("----> Throttle for ", key, JSON.stringify({
-      current: throttle._current,
-      buffer: (throttle._buffer || []).length,
-      requestTimes: throttle._requestTimes
-    }));
-  }, 1000);
-  THROTTLES[key] = throttle;
-  return throttle;
-}
+const Throttler = new Throttle({
+  active: true,
+  rate: 50,
+  ratePer: 10000,
+  concurrent: 5
+});
 
 export default class IntercomClient {
 
@@ -36,77 +18,75 @@ export default class IntercomClient {
     this.accessToken = _.get(ship, "private_settings.access_token");
     this.client = client;
     this.metric = metric;
-    this.req = request;
-    this.throttle = getThrottle(ship);
+    this.ship = ship;
   }
 
   ifConfigured() {
     return (!_.isEmpty(this.apiKey) && !_.isEmpty(this.appId)) || !_.isEmpty(this.accessToken);
   }
 
-  attach(req) {
+  exec = (method, path, params = {}) => {
     if (!this.ifConfigured()) {
       throw new Error("Client access data not set!");
     }
-    const throttle = this.throttle;
 
-    const preparedReq = req
-      .use(prefixPlugin(process.env.OVERRIDE_INTERCOM_URL || "https://api.intercom.io"))
-      .use(throttle.plugin())
-      .use(superagentPromisePlugin)
-      .accept("application/json")
-      .on("request", (reqData) => {
-        this.client.logger.debug("intercomClient.req", { method: reqData.method, url: reqData.url });
-      })
-      .on("error", (error) => {
-        const path = _.get(error, "response.req.path", "").split("?")[0];
-        const method = _.get(error, "response.req.method");
-        this.client.logger.debug("intercomClient.resError", { status: error.status, path, method });
-      })
-      .on("response", (res) => {
-        const limit = _.get(res.header, "x-ratelimit-limit");
-        const remaining = _.get(res.header, "x-ratelimit-remaining");
-        // const remainingSeconds = moment(_.get(res.header, "x-ratelimit-reset"), "X")
-        //   .diff(moment(), "seconds");
-        // x-runtime
-        this.metric.increment("ship.service_api.call", 1);
-        console.warn("--------> ship.service_api.remaining", { remaining });
-        if (remaining !== undefined) {
-          this.metric.value("ship.service_api.remaining", remaining);
-          if (remaining === "0") {
-            console.warn("---------> pausing throttle", JSON.stringify({ limit, remaining, reset: _.get(res.header, "x-ratelimit-reset") }));
-            throttle.options("active", false);
-            setTimeout(() => {
-              console.warn("---------> restarting throttle");
-              throttle.options("active", true);
-            }, 10000);
-          }
-        }
+    const req = superagent[method](path);
+    req.use(prefixPlugin(process.env.OVERRIDE_INTERCOM_URL || "https://api.intercom.io"));
+    req.accept("application/json");
+    req.on("request", (reqData) => {
+      this.client.logger.debug("intercomClient.req", { method: reqData.method, url: reqData.url });
+    });
+    req.on("error", (error) => {
+      this.client.logger.debug("intercomClient.resError", { status: error.status, path, method });
+    });
+    req.on("response", (res) => {
+      const limit = _.get(res.header, "x-ratelimit-limit");
+      const remaining = _.get(res.header, "x-ratelimit-remaining");
+      this.metric.increment("ship.service_api.call", 1);
+      if (remaining !== undefined) {
+        this.metric.value("ship.service_api.remaining", remaining);
+      }
 
-        if (limit) {
-          this.metric.value("ship.service_api.limit", limit);
-        }
-      });
+      if (limit) {
+        this.metric.value("ship.service_api.limit", limit);
+      }
+    });
 
     if (this.accessToken) {
-      return preparedReq.auth(this.accessToken);
+      req.auth(this.accessToken);
+    } else {
+      req.auth(this.appId, this.apiKey);
     }
-    return preparedReq.auth(this.appId, this.apiKey);
+
+    if (method === "get" && params) {
+      req.query(params);
+    } else if (params) {
+      req.send(params);
+    }
+
+    req.use(Throttler.plugin());
+
+    return new Promise((resolve, reject) => {
+      req.end((err, response) => {
+        if (err) {
+          err.response = response;
+          return reject(err);
+        }
+        return resolve(response);
+      });
+    });
   }
 
-  get(url) {
-    const req = this.req.get(url);
-    return this.attach(req);
+  get(url, query) {
+    return this.exec("get", url, query);
   }
 
-  post(url) {
-    const req = this.req.post(url);
-    return this.attach(req);
+  post(url, params) {
+    return this.exec("post", url, params);
   }
 
-  delete(url) {
-    const req = this.req.delete(url);
-    return this.attach(req);
+  delete(url, params) {
+    return this.exec("delete", url, params);
   }
 
   handleError(err) {

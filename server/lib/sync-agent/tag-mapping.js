@@ -61,13 +61,11 @@ export default class TagMapping {
    * @return Promise
    */
   createTag(segment) {
+    const { id, name } = segment;
     return this.intercomClient
-      .post("/tags")
-      .send({
-        name: segment.name
-      })
+      .post("/tags", { name })
       .then(({ body = {} }) => {
-        this.mapping[segment.id] = body.id;
+        this.mapping[id] = body.id;
         return body;
       });
   }
