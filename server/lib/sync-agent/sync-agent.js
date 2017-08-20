@@ -106,7 +106,7 @@ export default class SyncAgent {
           } else {
             return o;
           }
-          user.segment_ids.map(segment_id => {
+          user.add_segment_ids.map(segment_id => {
             const segment = _.find(segments, { id: segment_id });
             if (_.isEmpty(segment)) {
               this.client.logger.debug("outgoing.user.add_segment_not_found", segment);
