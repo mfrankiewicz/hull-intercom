@@ -7,7 +7,7 @@ const Throttler = new Throttle({
   active: true,
   rate: 40,
   ratePer: 10000,
-  concurrent: 20
+  concurrent: 10
 });
 
 export default class IntercomClient {
@@ -64,7 +64,7 @@ export default class IntercomClient {
       req.send(params);
     }
 
-    req.use(Throttler.plugin());
+    req.use(Throttler.plugin(this.ship.id));
 
     return new Promise((resolve, reject) => {
       req.end((err, response) => {
