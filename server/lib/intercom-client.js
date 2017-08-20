@@ -11,9 +11,9 @@ function getThrottle(ship) {
   if (THROTTLES[key]) return THROTTLES[key];
   const throttle = new Throttle({
     active: true,
-    rate: 75,
+    rate: parseInt(process.env.THROTTLE_RATE || 80, 10),
     ratePer: 10000,
-    concurrent: 10
+    concurrent: parseInt(process.env.THROTTLE_CONCURRENT || 10, 10)
   });
   THROTTLES[key] = throttle;
   return throttle;
