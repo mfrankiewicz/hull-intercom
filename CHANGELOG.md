@@ -2,6 +2,8 @@
 
 ## 0.7.16
 - respect api rate limits via superagent-throttle
+- limit concurrency on API calls
+- log only part of incoming webhooks payload
 
 ## 0.7.15
 - add more logging to Intercom Client
