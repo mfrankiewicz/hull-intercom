@@ -5,7 +5,7 @@ import _ from "lodash";
 
 const Throttler = new Throttle({
   active: true,
-  rate: 50,
+  rate: 40,
   ratePer: 10000,
   concurrent: 20
 });
