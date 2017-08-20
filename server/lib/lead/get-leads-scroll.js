@@ -5,8 +5,7 @@ import moment from "moment";
 export default function getLeadsScroll(ctx, scroll_param = null, updated_after, updated_before) {
   const { client } = ctx;
   const { intercomClient } = ctx.service;
-  return intercomClient.get("/contacts/scroll")
-  .query({ scroll_param })
+  return intercomClient.get("/contacts/scroll", { scroll_param })
   .then(response => {
     let { contacts } = response.body;
     const { scroll_param: next_scroll_param } = response.body;
