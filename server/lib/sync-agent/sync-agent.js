@@ -106,7 +106,10 @@ export default class SyncAgent {
           } else {
             return o;
           }
-          (user.add_segment_ids || user.segment_ids).map(segment_id => {
+          const segmentsToAdd = _.has(user, "add_segment_ids")
+            ? user.add_segment_ids
+            : user.segment_ids;
+          segmentsToAdd.map(segment_id => {
             const segment = _.find(segments, { id: segment_id });
             if (_.isEmpty(segment)) {
               this.client.logger.debug("outgoing.user.add_segment_not_found", segment);
@@ -124,10 +127,6 @@ export default class SyncAgent {
             if (_.isEmpty(segment)) {
               this.client.logger.debug("outgoing.user.remove_segment_not_found", segment);
               return o;
-            }
-            if (!_.includes(existingUserTags, segment.name)) {
-              this.client.logger.debug("outgoing.user.remove_segment_skip", segment.name);
-              return null;
             }
             o[segment.name] = o[segment.name] || [];
             return o[segment.name].push(_.merge({}, userOp, {
