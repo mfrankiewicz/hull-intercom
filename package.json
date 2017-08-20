@@ -1,6 +1,6 @@
 {
   "name": "hull-intercom",
-  "version": "0.7.15",
+  "version": "0.7.16",
   "description": "Hull Intercom integration",
   "main": "index.js",
   "scripts": {
@@ -68,6 +68,7 @@
     "superagent": "^3.5.2",
     "superagent-prefix": "0.0.2",
     "superagent-promise-plugin": "^3.2.0",
+    "superagent-throttle": "^0.2.5",
     "urijs": "^1.18.0",
     "webpack": "^3.0.0",
     "winston-spy": "^0.2.0"

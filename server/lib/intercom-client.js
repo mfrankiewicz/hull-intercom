@@ -1,7 +1,23 @@
 import request from "superagent";
+import Throttle from "superagent-throttle";
 import prefixPlugin from "superagent-prefix";
 import superagentPromisePlugin from "superagent-promise-plugin";
 import _ from "lodash";
+
+const THROTTLES = {};
+
+function getThrottle(ship) {
+  const key = ship.id;
+  if (THROTTLES[key]) return THROTTLES[key];
+  const throttle = new Throttle({
+    active: true,
+    rate: parseInt(process.env.THROTTLE_RATE || 80, 10),
+    ratePer: 10000,
+    concurrent: parseInt(process.env.THROTTLE_CONCURRENT || 10, 10)
+  });
+  THROTTLES[key] = throttle;
+  return throttle;
+}
 
 export default class IntercomClient {
 
@@ -12,6 +28,7 @@ export default class IntercomClient {
     this.client = client;
     this.metric = metric;
     this.req = request;
+    this.ship = ship;
   }
 
   ifConfigured() {
@@ -19,6 +36,8 @@ export default class IntercomClient {
   }
 
   attach(req) {
+    const throttle = getThrottle(this.ship);
+
     if (!this.ifConfigured()) {
       throw new Error("Client access data not set!");
     }
@@ -26,6 +45,7 @@ export default class IntercomClient {
     const preparedReq = req
       .use(prefixPlugin(process.env.OVERRIDE_INTERCOM_URL || "https://api.intercom.io"))
       .use(superagentPromisePlugin)
+      .use(throttle.plugin())
       .accept("application/json")
       .on("request", (reqData) => {
         this.client.logger.debug("intercomClient.req", { method: reqData.method, url: reqData.url });
@@ -38,9 +58,8 @@ export default class IntercomClient {
       .on("response", (res) => {
         const limit = _.get(res.header, "x-ratelimit-limit");
         const remaining = _.get(res.header, "x-ratelimit-remaining");
-        // const remainingSeconds = moment(_.get(res.header, "x-ratelimit-reset"), "X")
-        //   .diff(moment(), "seconds");
-        // x-runtime
+        this.client.logger.debug("intercomClient.ratelimit", { remaining, limit });
+
         this.metric.increment("ship.service_api.call", 1);
         if (remaining !== undefined) {
           this.metric.value("ship.service_api.remaining", remaining);
