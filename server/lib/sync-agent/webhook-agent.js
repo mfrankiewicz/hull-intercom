@@ -62,28 +62,27 @@ export default class WebhookAgent {
   createWebhook(webhookId = "") {
     const url = this.getWebhookUrl();
 
-    return this.intercomClient.post(`/subscriptions/${webhookId}`)
-      .send({
-        service_type: "web",
-        topics: this.topics,
-        url
-      })
-      .catch(err => {
-        const fErr = this.intercomClient.handleError(err);
-        // handle errors which may happen here
-        return Promise.reject(fErr);
-      })
-      .then(res => {
-        this.webhookId = res.body.id;
-        return this.helpers.updateSettings({
-          webhook_id: this.webhookId
-        }).then(() => {
-          return this.webhookId;
-        });
-      })
-      .then(() => {
-        return this.cache.del("intercom-webhook");
+    return this.intercomClient.post(`/subscriptions/${webhookId}`, {
+      service_type: "web",
+      topics: this.topics,
+      url
+    })
+    .catch(err => {
+      const fErr = this.intercomClient.handleError(err);
+      // handle errors which may happen here
+      return Promise.reject(fErr);
+    })
+    .then(res => {
+      this.webhookId = res.body.id;
+      return this.helpers.updateSettings({
+        webhook_id: this.webhookId
+      }).then(() => {
+        return this.webhookId;
       });
+    })
+    .then(() => {
+      return this.cache.del("intercom-webhook");
+    });
   }
 
   getWebhookUrl() {
