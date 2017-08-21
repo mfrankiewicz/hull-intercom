@@ -5,7 +5,7 @@
   "index": "ship.js",
   "admin" : "/auth/",
   "picture": "picture.png",
-  "version": "0.7.17",
+  "version": "0.7.18",
   "settings": [],
   "private_settings":[
     {

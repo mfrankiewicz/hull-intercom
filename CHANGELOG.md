@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.7.18
+- improve logging on fetching operation
+
 ## 0.7.17
 - filter tag events using not only ids but also names
 
