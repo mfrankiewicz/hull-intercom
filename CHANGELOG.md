@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.7.17
+- filter tag events using not only ids but also names
+
 ## 0.7.16
 - respect api rate limits via superagent-throttle
 - limit concurrency on API calls
