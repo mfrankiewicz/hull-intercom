@@ -1,8 +1,11 @@
 # Changelog
 
-## 0.7.18
+## 0.7.19
 - added connector docs
 - simplified settings
+
+## 0.7.18
+- improve logging on fetching operation
 
 ## 0.7.17
 - filter tag events using not only ids but also names

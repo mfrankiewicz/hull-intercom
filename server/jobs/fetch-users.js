@@ -16,10 +16,7 @@ export default function fetchUsers(ctx, payload = {}) {
       && moment(ctx.ship.private_settings.last_updated_at).isAfter(moment().subtract(1, "day"))) {
       last_updated_at = ctx.ship.private_settings.last_updated_at;
     } else {
-      ctx.metric.event({
-        title: "fetchUsers - wrong last_updated_at value, switching to default - 1 day",
-        text: ctx.ship.private_settings.last_updated_at
-      });
+      ctx.client.logger.debug("fetchUsers.last_updated_at.fallback", { last_updated_at: ctx.ship.private_settings.last_updated_at });
       last_updated_at = moment().subtract(1, "day").format();
     }
   }
@@ -59,7 +56,8 @@ export default function fetchUsers(ctx, payload = {}) {
 
       return Promise.all(promises)
         .then(() => {
-          if ((page === 1 || page % 5 === 0) && !_.isEmpty(users)) {
+          ctx.client.logger.debug("fetchUsers.finishedStep", { page, usersCount: users.length });
+          if (page === 1 && !_.isEmpty(users)) {
             const newLastUpdatedAt = moment(_.get(_.first(users), "updated_at"), "X").format();
             return ctx.helpers.updateSettings({
               last_updated_at: newLastUpdatedAt
