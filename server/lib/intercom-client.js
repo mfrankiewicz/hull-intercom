@@ -1,7 +1,22 @@
-import request from "superagent";
+import superagent from "superagent";
+import Throttle from "superagent-throttle";
 import prefixPlugin from "superagent-prefix";
-import superagentPromisePlugin from "superagent-promise-plugin";
 import _ from "lodash";
+
+const THROTTLES = {};
+
+function getThrottle(ship) {
+  const key = ship.id;
+  if (THROTTLES[key]) return THROTTLES[key];
+  const throttle = new Throttle({
+    active: true,
+    rate: parseInt(process.env.THROTTLE_RATE || 80, 10),
+    ratePer: 10000,
+    concurrent: parseInt(process.env.THROTTLE_CONCURRENT || 10, 10)
+  });
+  THROTTLES[key] = throttle;
+  return throttle;
+}
 
 export default class IntercomClient {
 
@@ -11,60 +26,79 @@ export default class IntercomClient {
     this.accessToken = _.get(ship, "private_settings.access_token");
     this.client = client;
     this.metric = metric;
-    this.req = request;
+    this.ship = ship;
   }
 
   ifConfigured() {
     return (!_.isEmpty(this.apiKey) && !_.isEmpty(this.appId)) || !_.isEmpty(this.accessToken);
   }
 
-  attach(req) {
+  exec = (method, path, params = {}) => {
+    const throttle = getThrottle(this.ship);
+
     if (!this.ifConfigured()) {
       throw new Error("Client access data not set!");
     }
 
-    const preparedReq = req
-      .use(prefixPlugin(process.env.OVERRIDE_INTERCOM_URL || "https://api.intercom.io"))
-      .use(superagentPromisePlugin)
-      .accept("application/json")
-      .on("request", (reqData) => {
-        console.log("REQ", reqData.method, reqData.url);
-      })
-      .on("response", (res) => {
-        const limit = _.get(res.header, "x-ratelimit-limit");
-        const remaining = _.get(res.header, "x-ratelimit-remaining");
-        // const remainingSeconds = moment(_.get(res.header, "x-ratelimit-reset"), "X")
-        //   .diff(moment(), "seconds");
-        // x-runtime
-        this.metric.increment("ship.service_api.call", 1);
-        if (remaining) {
-          this.metric.value("ship.service_api.remaining", remaining);
-        }
+    const req = superagent[method](path);
+    req.use(prefixPlugin(process.env.OVERRIDE_INTERCOM_URL || "https://api.intercom.io"));
+    req.accept("application/json");
+    req.on("request", (reqData) => {
+      this.client.logger.debug("intercomClient.req", { method: reqData.method, url: reqData.url });
+    });
+    req.on("error", (error) => {
+      this.client.logger.debug("intercomClient.resError", { status: error.status, path, method });
+    });
+    req.on("response", (res) => {
+      const limit = _.get(res.header, "x-ratelimit-limit");
+      const remaining = _.get(res.header, "x-ratelimit-remaining");
+      const reset = _.get(res.header, "x-ratelimit-reset");
+      this.metric.increment("ship.service_api.call", 1);
+      if (remaining !== undefined) {
+        this.client.logger.debug("intercomClient.ratelimit", { remaining, limit, reset });
+        this.metric.value("ship.service_api.remaining", remaining);
+      }
 
-        if (limit) {
-          this.metric.value("ship.service_api.limit", limit);
-        }
-      });
+      if (limit) {
+        this.metric.value("ship.service_api.limit", limit);
+      }
+    });
 
     if (this.accessToken) {
-      return preparedReq.auth(this.accessToken);
+      req.auth(this.accessToken);
+    } else {
+      req.auth(this.appId, this.apiKey);
     }
-    return preparedReq.auth(this.appId, this.apiKey);
+
+    if (method === "get" && params) {
+      req.query(params);
+    } else if (params) {
+      req.send(params);
+    }
+
+    req.use(throttle.plugin(this.ship.id));
+
+    return new Promise((resolve, reject) => {
+      req.end((err, response) => {
+        if (err) {
+          err.response = response;
+          return reject(err);
+        }
+        return resolve(response);
+      });
+    });
   }
 
-  get(url) {
-    const req = this.req.get(url);
-    return this.attach(req);
+  get(url, query) {
+    return this.exec("get", url, query);
   }
 
-  post(url) {
-    const req = this.req.post(url);
-    return this.attach(req);
+  post(url, params) {
+    return this.exec("post", url, params);
   }
 
-  delete(url) {
-    const req = this.req.delete(url);
-    return this.attach(req);
+  delete(url, params) {
+    return this.exec("delete", url, params);
   }
 
   handleError(err) {

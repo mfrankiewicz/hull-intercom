@@ -1,9 +1,21 @@
 # Changelog
 
-## 0.7.15
+## 0.7.18
 - added connector docs
 - simplified settings
-- upgraded to hull@0.11.12
+
+## 0.7.17
+- filter tag events using not only ids but also names
+
+## 0.7.16
+- respect api rate limits via superagent-throttle
+- limit concurrency on API calls
+- log only part of incoming webhooks payload
+
+## 0.7.15
+- add more logging to Intercom Client
+- upgrade hull-node to skip empty jobs
+- handle and skip interval based fetchLeads operation rate limit errors
 
 ## 0.7.14
 - make sure that the first handleBulkJob is delayed

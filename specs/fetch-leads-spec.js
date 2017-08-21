@@ -1,6 +1,4 @@
 const Minihull = require("minihull");
-const Connector = require("hull").Connector;
-const express = require("express");
 const expect = require("chai").expect;
 const moment = require("moment");
 
@@ -10,8 +8,10 @@ const bootstrap = require("./bootstrap");
 process.env.OVERRIDE_INTERCOM_URL = "http://localhost:8002";
 
 describe("fetchLeads", function test() {
-  let minihull, miniintercom, server;
-  before((done) => {
+  let minihull;
+  let miniintercom;
+  let server;
+  beforeEach((done) => {
     minihull = new Minihull();
     miniintercom = new Miniintercom();
     server = bootstrap();
@@ -34,7 +34,7 @@ describe("fetchLeads", function test() {
     miniintercom.stubGet("/contacts")
     .callsFake((req, res) => {
       res.json({
-        "contacts": [{
+        contacts: [{
           email: "foo@bar.com",
           user_id: "abc123",
           updated_at: now
@@ -70,10 +70,23 @@ describe("fetchLeads", function test() {
     });
 
     minihull.callFirstShip("/fetch-leads")
-    .then((res) => {});
+    .then(() => {});
   });
 
-  after(() => {
+  it("should skip the fetch operation in case of rate limit error", (done) => {
+    const contactsStub = miniintercom.stubGet("/contacts")
+    .onFirstCall().callsFake((req, res) => {
+      res.status(429).end();
+    });
+
+    minihull.callFirstShip("/fetch-leads")
+    .then(() => {
+      expect(contactsStub.callCount).to.equal(1);
+      done();
+    });
+  });
+
+  afterEach(() => {
     minihull.close();
     miniintercom.close();
     server.close();

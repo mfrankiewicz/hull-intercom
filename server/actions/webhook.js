@@ -4,7 +4,7 @@ import _ from "lodash";
 import { saveUsers, saveLeads, saveEvents } from "../jobs";
 
 export default function webhook(req, res, next) {
-  req.hull.client.logger.debug("intercom message", req.body);
+  req.hull.client.logger.debug("intercom message", _.pick(req.body, "id", "topic"));
   if (_.get(req, "body.topic") === "user.created") {
     // map the users to get only mapped fields
     return Batcher.getHandler("webhook", {
