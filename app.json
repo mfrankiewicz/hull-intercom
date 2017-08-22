@@ -29,6 +29,12 @@
     },
     "NOTIFY_BATCH_HANDLER_THROTTLE": {
       "description": "Defines batch handler throttle"
+    },
+    "TRACE_API_KEY": {
+      "description": "The Trace API key"
+    },
+    "TRACE_SERVICE_NAME": {
+      "description": "The Trace service name"
     }
   },
   "scripts": {},
