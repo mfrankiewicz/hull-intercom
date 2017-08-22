@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.7.19
+- adds support for trace monitoring service
+
 ## 0.7.18
 - improve logging on fetching operation
 
