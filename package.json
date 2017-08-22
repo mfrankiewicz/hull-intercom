@@ -40,6 +40,7 @@
   },
   "homepage": "https://github.com/hull-ships/hull-intercom",
   "dependencies": {
+    "@risingstack/trace": "^3.16.0",
     "JSONStream": "^1.1.1",
     "babel-cli": "^6.14.0",
     "babel-loader": "^7.1.1",
