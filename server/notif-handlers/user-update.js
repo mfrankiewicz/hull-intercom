@@ -8,7 +8,6 @@ export default function userUpdate(ctx, messages) {
     logger.error("connector.configuration.error", { errors: "connector is not configured" });
     return Promise.resolve();
   }
-  logger.debug("MESSAGES", messages.length);
   const leads = [];
   const leadsToConvert = [];
   const users = messages.reduce((accumulator, message) => {
