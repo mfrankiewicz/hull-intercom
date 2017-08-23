@@ -15,7 +15,7 @@ export default function userUpdate(ctx, messages) {
     const { user, changes = {}, segments = [], events = [] } = message;
     const { left = [], entered = [] } = _.get(changes, "segments", {});
 
-    logger.debug("outgoing.user.start", { email: user.email, hull_id: user.id });
+    logger.debug("outgoing.user.start", { changes, events: _.map(events, e => e.event) });
 
     if (!_.isEmpty(_.get(changes, "user['traits_intercom/id'][1]"))
       || !_.isEmpty(_.get(changes, "user['traits_intercom/tags'][1]"))) {
