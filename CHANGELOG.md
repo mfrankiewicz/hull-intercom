@@ -1,7 +1,7 @@
 # Changelog
 
 ## 0.7.21
-- **IMPORTANT** - added filtering out users coming from notifications who already have `traits_intercom/id` and there is no change in for traits selected for outgoing traffic in settings
+- **IMPORTANT** - added filtering out users coming from notifications who already have `traits_intercom/id`, there is no change in for traits selected for outgoing traffic in settings and there is no outgoing event
 
 ## 0.7.20
 - added connector docs
