@@ -3,6 +3,7 @@
 ## 0.7.20
 - added connector docs
 - simplified settings
+- adds logging changes and events names for notifications
 
 ## 0.7.19
 - adds support for trace monitoring service
