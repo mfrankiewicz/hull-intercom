@@ -1,4 +1,6 @@
 /* @flow */
+require("@risingstack/trace");
+
 import Hull from "hull";
 import { Queue, Cache } from "hull/lib/infra";
 import express from "express";
@@ -33,6 +35,11 @@ const queue = new Queue("kue", {
   prefix: KUE_PREFIX,
   redis: REDIS_URL
 });
+try {
+  queue.adapter.queue.watchStuckJobs();
+} catch (e) {
+  console.error(e);
+}
 
 const connector = new Hull.Connector({ queue, cache, hostSecret: SECRET, port: PORT });
 const app = express();
