@@ -5,5 +5,5 @@ node_modules
 *.log
 dist
 .idea
-.vscode
 package-lock.json
+.vscode
