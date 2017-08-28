@@ -181,6 +181,11 @@
       "url": "/fetch-leads",
       "type": "cron",
       "value": "*/5 * * * *"
+    },
+    {
+      "url": "/status",
+      "type": "cron",
+      "value": "*/30 * * * *"
     }
   ]
 }
