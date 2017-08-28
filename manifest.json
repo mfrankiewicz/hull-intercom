@@ -1,22 +1,13 @@
 {
   "name": "Intercom",
-  "description": "Sync Leads and Users in Intercom with Hull",
+  "description": "Supercharge your engagement in Intercom",
   "tags": ["outgoing", "incoming", "batch", "oneColumn"],
   "index": "ship.js",
-  "admin" : "/auth/",
+  "admin": "/auth/",
   "picture": "picture.png",
-  "version": "0.7.19",
+  "version": "0.7.20",
   "settings": [],
-  "private_settings":[
-    {
-      "name": "synchronized_segments",
-      "title": "Segments",
-      "description": "Post to Intercom when users match these segments",
-      "default": [],
-      "type": "array",
-      "format": "segment"
-    },
-    {
+  "private_settings": [{
       "name": "access_token",
       "title": "Access Token",
       "type": "string",
@@ -47,100 +38,141 @@
       "format": "hidden"
     },
     {
-      "name": "send_events_enabled",
-      "title": "Enable sending events",
-      "description": "Allow sending events to Intercom",
-      "type" : "boolean",
-      "default" : false
+      "type": "string",
+      "format": "title",
+      "name": "connector_info",
+      "title": "Connector Configuration"
     },
     {
-      "name": "send_events",
-      "title": "Events to send",
-      "description": "Send following Events to Intercom. Empty sends nothing.",
-      "format": "event",
-      "type": "array",
-      "default": ["Entered segment", "Left segment"]
-    },
-    {
-      "name" : "sync_fields_to_intercom",
-      "title" : "List of User attributes to push to Intercom",
-      "type" : "array",
-      "format" : "table",
+      "name": "synchronized_segments",
+      "title": "Send users to Intercom when belonging to one of these segments",
       "default": [],
-      "items" : {
-        "type" : "object",
-        "properties" : {
-          "hull" : {
-            "type" : "string",
-            "format" : "trait",
-            "title" : "Hull Attribute"
+      "type": "array",
+      "format": "segment"
+    },
+    {
+      "name": "synchronized_segments_hero",
+      "type": "string",
+      "headerTemplate": "The above list of segments is a whitelist. You need to *explicitely specify one or more segments* for which events and users shall be sent to Intercom.<br>If you do not specify any segment, no user or event will be sent to Intercom.",
+      "format": "information",
+      "title": "Whitelisted Segments"
+    },
+    {
+      "type": "string",
+      "format": "title",
+      "name": "sync_fields_out_info",
+      "title": "Outgoing Attributes (Hull to Intercom)"
+    },
+    {
+      "name": "sync_fields_to_intercom",
+      "title": "List of attributes to send to Intercom",
+      "type": "array",
+      "format": "table",
+      "default": [],
+      "items": {
+        "type": "object",
+        "properties": {
+          "hull": {
+            "type": "string",
+            "format": "trait",
+            "title": "Hull Attribute"
           },
-          "name" : {
-            "type" : "string",
+          "name": {
+            "type": "string",
             "format": "select",
-            "title" : "Intercom Attribute",
-            "options" : {
+            "title": "Intercom Attribute",
+            "options": {
               "allowCreate": true,
-              "loadOptions" : "/schema/user_fields"
+              "loadOptions": "/schema/user_fields"
             }
           },
-          "overwrite" : {
-            "type" : "boolean",
-            "title" : "Hull overwrites Intercom",
-            "default" : false
+          "overwrite": {
+            "type": "boolean",
+            "title": "Hull overwrites Intercom",
+            "default": false
           }
         },
-        "required" : [
+        "required": [
           "hull",
           "name"
         ]
       }
     },
     {
-      "name" : "sync_fields_to_hull",
-      "title" : "List of User custom attributes to fetch from Intercom",
-      "type" : "array",
-      "format" : "table",
+      "type": "string",
+      "format": "title",
+      "name": "sync_fields_in_info",
+      "title": "Incoming Attributes (Intercom to Hull)"
+    },
+    {
+      "name": "sync_fields_in_hero",
+      "type": "string",
+      "headerTemplate": "Hull fetches all standard attributes from Intercom by default. If you have custom attributes, please list them below to synchronize the data with Hull.",
+      "format": "information",
+      "title": "Custom attributes only"
+    },
+    {
+      "name": "sync_fields_to_hull",
+      "title": "List of custom attributes to fetch from Intercom",
+      "type": "array",
+      "format": "table",
       "default": [],
-      "items" : {
-        "type" : "object",
-        "properties" : {
-          "name" : {
-            "type" : "string",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
             "format": "select",
-            "title" : "Intercom Attributes",
-            "options" : {
-              "loadOptions" : "/schema/user_fields"
+            "title": "Intercom Attributes",
+            "options": {
+              "loadOptions": "/schema/user_fields"
             }
           },
-          "hull" : {
-            "type" : "string",
-            "format" : "trait",
-            "title" : "Hull Attributes",
+          "hull": {
+            "type": "string",
+            "format": "trait",
+            "title": "Hull Attributes",
             "options": {
               "allowCreate": true,
               "source": "intercom"
             }
           }
         },
-        "required" : [
+        "required": [
           "name",
           "hull"
         ]
       }
+    },
+    {
+      "type": "string",
+      "format": "title",
+      "name": "send_events_info",
+      "title": "Event Handling"
+    },
+    {
+      "name": "send_events",
+      "title": "Sends these events to Intercom",
+      "format": "event",
+      "type": "array",
+      "default": ["Entered segment", "Left segment"]
+    },
+    {
+      "name": "send_events_hero",
+      "type": "string",
+      "headerTemplate": "The above list of events is a whitelist. You need to *explicitely specify one or more events* that shall be sent to Intercom.<br>If you do not specify any event, no event data will be sent to Intercom.",
+      "format": "information",
+      "title": "Whitelisted Events"
     }
   ],
   "deployment_settings": [],
   "resources": [],
   "readme": "readme.md",
   "ui": false,
-  "subscriptions": [
-    {
-      "url": "/notify"
-    }
-  ],
-  "schedules": [
-    {
+  "subscriptions": [{
+    "url": "/notify"
+  }],
+  "schedules": [{
       "url": "/sync",
       "type": "cron",
       "value": "*/5 * * * *"
@@ -150,5 +182,5 @@
       "type": "cron",
       "value": "*/5 * * * *"
     }
- ]
+  ]
 }

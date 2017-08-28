@@ -83,7 +83,11 @@ export default class SyncAgent {
 
   getUsersToSave(users) {
     return users.filter((u) => !_.isEmpty(u.email)
-      && !this.userWithError(u));
+      && !this.userWithError(u))
+      .map((u) => {
+        u.email = _.toLower(u.email);
+        return u;
+      });
   }
 
   getUsersToTag(users) {
@@ -159,8 +163,8 @@ export default class SyncAgent {
    * @return {Promise}
    */
   sendEvents(users) {
-    if (this.ship.private_settings.send_events_enabled !== true) {
-      this.logger.debug("sendEvents.send_events_enabled", this.ship.private_settings.send_events_enabled);
+    if (!this.ship.private_settings.send_events || this.ship.private_settings.send_events.length === 0) {
+      this.logger.debug("sendEvents.send_events_enabled", "No events specified.");
       return Promise.resolve();
     }
 

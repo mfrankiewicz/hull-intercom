@@ -147,7 +147,7 @@ export default class UserMapping {
     }
 
     if (_.get(hullUser, "email")) {
-      _.set(intercomFields, "email", _.get(hullUser, "email"));
+      _.set(intercomFields, "email", _.toLower(_.get(hullUser, "email")));
     }
 
     if (_.get(hullUser, "external_id")) {
