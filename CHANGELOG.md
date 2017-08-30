@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.7.21
+- status endpoint
+
 ## 0.7.20
 - added connector docs
 - simplified settings

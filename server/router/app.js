@@ -44,5 +44,7 @@ export default function AppRouter(): Router {
 
   router.get("/schema/user_fields", cors(), requireConfiguration, actions.fields);
 
+  router.all("/status", actions.statusCheck);
+
   return router;
 }

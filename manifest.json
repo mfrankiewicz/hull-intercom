@@ -5,7 +5,7 @@
   "index": "ship.js",
   "admin": "/auth/",
   "picture": "picture.png",
-  "version": "0.7.20",
+  "version": "0.7.21",
   "settings": [],
   "private_settings": [{
       "name": "access_token",
@@ -181,6 +181,11 @@
       "url": "/fetch-leads",
       "type": "cron",
       "value": "*/5 * * * *"
+    },
+    {
+      "url": "/status",
+      "type": "cron",
+      "value": "*/30 * * * *"
     }
   ]
 }
