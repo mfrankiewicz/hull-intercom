@@ -22,7 +22,8 @@ export default function (req: Request, res: Response) {
   }
 
   if (_.isEmpty(_.get(ship, "private_settings.send_events", []))) {
-    pushMessage("No events will be sent to Intercom because of missing configuration");
+    // FIXME: decide how to handle emty events settings
+    // pushMessage("No events will be sent to Intercom because of missing configuration");
   }
 
   if (_.get(ship, "private_settings.access_token")) {
