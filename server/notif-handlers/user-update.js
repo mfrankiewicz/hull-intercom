@@ -25,7 +25,7 @@ export default function userUpdate(ctx, messages) {
       const hullTraits = syncAgent.userMapping.computeIntercomFields().map(f => f.hull);
       const changedTraits = _.keys(_.get(changes, "user"));
       if (_.intersection(hullTraits, changedTraits).length === 0) {
-        ctx.client.asUser(_.pick(user, ["email", "id", "external_id"])).logger.info("outgoing.user.skip", { reason: "user already synced with Intercom, none of selected attributes were changed and no event happened" });
+        ctx.client.asUser(user).logger.info("outgoing.user.skip", { reason: "user already synced with Intercom, none of selected attributes were changed and no event happened" });
         return accumulator;
       }
     }
