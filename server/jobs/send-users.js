@@ -13,7 +13,7 @@ export default function sendUsers(ctx, payload) {
 
   ctx.client.logger.debug("sendUsers.preFilter", users.length);
   const usersToSave = syncAgent.getUsersToSave(users);
-  const intercomUsersToSave = usersToSave.map(u => syncAgent.userMapping.getIntercomFields(u));
+  const intercomUsersToSave = usersToSave.map(u => syncAgent.userMapping.getIntercomFields(u, ctx));
 
   ctx.client.logger.debug("sendUsers.filtered", intercomUsersToSave.length);
   ctx.metric.increment("ship.outgoing.users", intercomUsersToSave.length);
