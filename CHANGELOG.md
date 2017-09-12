@@ -1,7 +1,7 @@
 # Changelog
 
 ## 0.7.21
-- **IMPORTANT** - added filtering out users coming from notifications who already have `traits_intercom/id`, there is no change in for traits selected for outgoing traffic in settings and there is no outgoing event
+- **IMPORTANT** - added filtering out users coming from notifications who already have `traits_intercom/id`, there is no change in for traits selected for outgoing traffic in settings and there is no outgoing event. This behavior is controlled by `skip_users_already_synced` private settings in the manifest.
 
 ## 0.7.20
 - added connector docs
