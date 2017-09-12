@@ -38,6 +38,19 @@
       "format": "hidden"
     },
     {
+      "name": "skip_users_already_synced",
+      "type": "boolean",
+      "default": false,
+      "format": "hidden"
+    },
+    {
+      "name": "send_events_enabled",
+      "title": "Enable sending events",
+      "description": "Allow sending events to Intercom",
+      "type" : "boolean",
+      "default" : false
+    },
+    {
       "type": "string",
       "format": "title",
       "name": "connector_info",

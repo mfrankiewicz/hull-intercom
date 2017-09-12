@@ -21,7 +21,7 @@ export default function userUpdate(ctx, messages) {
       return accumulator;
     }
 
-    if (_.get(user, "traits_intercom/id") && _.isEmpty(events)) {
+    if (ctx.ship.private_settings.skip_users_already_synced && _.get(user, "traits_intercom/id") && _.isEmpty(events)) {
       const hullTraits = syncAgent.userMapping.computeIntercomFields().map(f => f.hull);
       const changedTraits = _.keys(_.get(changes, "user"));
       if (_.intersection(hullTraits, changedTraits).length === 0) {
