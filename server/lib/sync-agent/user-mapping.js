@@ -2,8 +2,8 @@ import _ from "lodash";
 
 export default class UserMapping {
 
-  constructor(ship) {
-    this.ship = ship;
+  constructor(ctx) {
+    this.ship = ctx.ship;
     /* eslint-disable quote-props, no-multi-spaces, key-spacing */
     this.map = [
       { "name": "email",   "hull":"email",                "type": "string", "read_only": false },
@@ -35,6 +35,7 @@ export default class UserMapping {
       { "name": "location_data.timezone",       "hull":"traits_intercom/location_timezone",         "type": "string",    "read_only": true }
     ];
     /* eslint-enable quote-props, no-multi-spaces, key-spacing */
+    this.client = ctx.client;
   }
 
   computeHullTraits() {
@@ -122,7 +123,7 @@ export default class UserMapping {
    * @param  {Object} hullUser
    * @return {Object}
    */
-  getIntercomFields(hullUser, ctx) {
+  getIntercomFields(hullUser) {
     const constrainedFields = ["custom_attributes.*"];
     const intercomFields = _.reduce(this.computeIntercomFields(), (fields, prop) => {
       if (_.has(hullUser, prop.hull)) {
@@ -143,7 +144,7 @@ export default class UserMapping {
           const trimmed = this.joinWithLimit(value, ",", 255);
           // if we had to trim the value, then we issue a warning
           if (trimmed.length < value.join(",").length) {
-            ctx.client.logger.warning("user.outgoing.warning", `Field ${prop.hull} is too long. Maximum length is 255 when current value is ${value.join(",")}`);
+            this.client.logger.warning("user.outgoing.warning", `Field ${prop.hull} is too long. Maximum length is 255 when current value is ${value.join(",")}`);
           }
           value = trimmed;
         } else if (constraint) {

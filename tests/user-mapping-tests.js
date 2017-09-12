@@ -6,9 +6,25 @@ import mapping from "../server/lib/sync-agent/user-mapping";
 const logger = {
   warning(key, msg) { console.log(key, msg); }
 };
-const ctx = {
-  client: { logger }
+const client = { logger };
+const ship = {
+  private_settings: {
+    sync_fields_to_intercom: [
+      {
+        hull: "tech",
+        name: "technologies"
+      }, {
+        hull: "traits_intercom/id",
+        name: "id"
+      }, {
+        hull: "email",
+        name: "email"
+      }
+    ]
+  }
 };
+const ctx = { client, ship };
+const m = new mapping(ctx);
 
 describe("joinWithLimit function", () => {
   it("should trim arrays with single separator", () => {
@@ -16,15 +32,15 @@ describe("joinWithLimit function", () => {
     const arrayWithLongValues = _.fill(Array(3), value);
     const separator = ",";
 
-    expect(new mapping().joinWithLimit(arrayWithLongValues, separator, 5)).to.equal("");
-    expect(new mapping().joinWithLimit(arrayWithLongValues, separator, 9)).to.equal("");
+    expect(m.joinWithLimit(arrayWithLongValues, separator, 5)).to.equal("");
+    expect(m.joinWithLimit(arrayWithLongValues, separator, 9)).to.equal("");
 
-    expect(new mapping().joinWithLimit(arrayWithLongValues, separator, 10)).to.equal(value);
-    expect(new mapping().joinWithLimit(arrayWithLongValues, separator, 11)).to.equal(value);
-    expect(new mapping().joinWithLimit(arrayWithLongValues, separator, 20)).to.equal(value);
+    expect(m.joinWithLimit(arrayWithLongValues, separator, 10)).to.equal(value);
+    expect(m.joinWithLimit(arrayWithLongValues, separator, 11)).to.equal(value);
+    expect(m.joinWithLimit(arrayWithLongValues, separator, 20)).to.equal(value);
 
-    expect(new mapping().joinWithLimit(arrayWithLongValues, separator, 20)).to.equal(value);
-    expect(new mapping().joinWithLimit(arrayWithLongValues, separator, 21)).to.equal([value, value].join(separator));
+    expect(m.joinWithLimit(arrayWithLongValues, separator, 20)).to.equal(value);
+    expect(m.joinWithLimit(arrayWithLongValues, separator, 21)).to.equal([value, value].join(separator));
   });
 
   it("should trim arrays with mulitple characters separator", () => {
@@ -32,37 +48,21 @@ describe("joinWithLimit function", () => {
     const arrayWithLongValues = _.fill(Array(3), value);
     const separator = "@@";
 
-    expect(new mapping().joinWithLimit(arrayWithLongValues, separator, 5)).to.equal("");
-    expect(new mapping().joinWithLimit(arrayWithLongValues, separator, 9)).to.equal("");
+    expect(m.joinWithLimit(arrayWithLongValues, separator, 5)).to.equal("");
+    expect(m.joinWithLimit(arrayWithLongValues, separator, 9)).to.equal("");
 
-    expect(new mapping().joinWithLimit(arrayWithLongValues, separator, 10)).to.equal(value);
-    expect(new mapping().joinWithLimit(arrayWithLongValues, separator, 11)).to.equal(value);
-    expect(new mapping().joinWithLimit(arrayWithLongValues, separator, 20)).to.equal(value);
+    expect(m.joinWithLimit(arrayWithLongValues, separator, 10)).to.equal(value);
+    expect(m.joinWithLimit(arrayWithLongValues, separator, 11)).to.equal(value);
+    expect(m.joinWithLimit(arrayWithLongValues, separator, 20)).to.equal(value);
 
-    expect(new mapping().joinWithLimit(arrayWithLongValues, separator, 20)).to.equal(value);
-    expect(new mapping().joinWithLimit(arrayWithLongValues, separator, 22)).to.equal([value, value].join(separator));
+    expect(m.joinWithLimit(arrayWithLongValues, separator, 20)).to.equal(value);
+    expect(m.joinWithLimit(arrayWithLongValues, separator, 22)).to.equal([value, value].join(separator));
   });
 });
 
 describe("computeIntercomFields", () => {
   it("should map values", () => {
-    const ship = {
-      private_settings: {
-        sync_fields_to_intercom: [
-          {
-            hull: "tech",
-            name: "technologies"
-          }, {
-            hull: "traits_intercom/id",
-            name: "id"
-          }, {
-            hull: "email",
-            name: "email"
-          }
-        ]
-      }
-    };
-    const fields = new mapping(ship).computeIntercomFields();
+    const fields = m.computeIntercomFields();
 
     expect(fields).to.have.lengthOf(3);
     expect(fields[0]).to.deep.equal({ hull: "tech", name: "custom_attributes.technologies" });
@@ -73,24 +73,6 @@ describe("computeIntercomFields", () => {
 
 describe("getIntercomFields", () => {
   it("should trim constrained values", () => {
-    const ship = {
-      private_settings: {
-        sync_fields_to_intercom: [
-          {
-            hull: "tech",
-            name: "technologies"
-          }, {
-            hull: "traits_intercom/id",
-            name: "id"
-          }, {
-            hull: "email",
-            name: "email"
-          }
-        ]
-      }
-    };
-    const m = new mapping(ship);
-
     // empty user
     let fields = m.getIntercomFields({}, ctx);
     expect(fields).to.deep.equal({});
