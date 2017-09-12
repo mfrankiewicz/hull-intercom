@@ -122,7 +122,8 @@ export default class UserMapping {
    * @param  {Object} hullUser
    * @return {Object}
    */
-  getIntercomFields(hullUser) {
+  getIntercomFields(hullUser, ctx) {
+    const constrainedFields = ["custom_attributes.*"];
     const intercomFields = _.reduce(this.computeIntercomFields(), (fields, prop) => {
       if (_.has(hullUser, prop.hull)) {
         let value = "";
@@ -134,9 +135,22 @@ export default class UserMapping {
         } else {
           value = _.get(hullUser, prop.hull);
         }
-        if (_.isArray(value)) {
+
+        const constraint = _.some(constrainedFields, c => prop.name.match(new RegExp(c)));
+        if (_.isArray(value) && !constraint) {
           value = value.join(",");
+        } else if (_.isArray(value) && constraint) {
+          const trimmed = this.joinWithLimit(value, ",", 255);
+          // if we had to trim the value, then we issue a warning
+          if (trimmed.length < value.join(",").length) {
+            ctx.client.logger.warning("user.outgoing.warning", `Field ${prop.hull} is too long. Maximum length is 255 when current value is ${value.join(",")}`);
+          }
+          value = trimmed;
+        } else if (constraint) {
+          // not an array but still constrained
+          value = this.joinWithLimit([value], ",", 255);
         }
+
         _.set(fields, prop.name, value);
       }
       return fields;
@@ -178,5 +192,18 @@ export default class UserMapping {
     }
 
     return ident;
+  }
+
+  joinWithLimit(values, separator, limit) {
+    return values.reduce((memo, v) => {
+      // initial
+      if (memo.length === 0 && v.length <= limit) {
+        return v;
+      }
+      if ((memo + separator + v).length <= limit) {
+        return [memo, v].join(separator);
+      }
+      return memo;
+    }, "");
   }
 }
