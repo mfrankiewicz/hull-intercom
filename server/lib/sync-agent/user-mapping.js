@@ -137,21 +137,23 @@ export default class UserMapping {
           value = _.get(hullUser, prop.hull);
         }
 
-        const constraint = _.some(constrainedFields, c => prop.name.match(new RegExp(c)));
-        if (_.isArray(value) && !constraint) {
+        if (_.isArray(value)) {
           value = value.join(",");
-        } else if (_.isArray(value) && constraint) {
-          const trimmed = this.joinWithLimit(value, ",", 255);
-          // if we had to trim the value, then we issue a warning
-          if (trimmed.length < value.join(",").length) {
-            this.client.logger.warning("user.outgoing.warning", `Field ${prop.hull} is too long. Maximum length is 255 when current value is ${value.join(",")}`);
-          }
-          value = trimmed;
-        } else if (constraint) {
-          // not an array but still constrained
-          value = this.joinWithLimit([value], ",", 255);
         }
 
+        // is this field constrained ?
+        const constraint = _.some(constrainedFields, c => prop.name.match(new RegExp(c)));
+
+        // if we had to trim the value, then we issue a warning
+        if (constraint && value.length > 255) {
+          // we then trim the value
+          const originalValue = value;
+          value = _.truncate(value, {
+            length: 255,
+            omission: " [...]"
+          });
+          this.client.logger.warning("user.outgoing.warning", `Field ${prop.hull} is too long. Maximum length is 255 when current value is ${originalValue}`);
+        }
         _.set(fields, prop.name, value);
       }
       return fields;
@@ -195,16 +197,4 @@ export default class UserMapping {
     return ident;
   }
 
-  joinWithLimit(values, separator, limit) {
-    return values.reduce((memo, v) => {
-      // initial
-      if (memo.length === 0 && v.length <= limit) {
-        return v;
-      }
-      if ((memo + separator + v).length <= limit) {
-        return [memo, v].join(separator);
-      }
-      return memo;
-    }, "");
-  }
 }
