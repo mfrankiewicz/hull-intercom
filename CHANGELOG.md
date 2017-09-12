@@ -1,8 +1,12 @@
 # Changelog
 
+## 0.7.21
+- **IMPORTANT** - added filtering out users coming from notifications who already have `traits_intercom/id`, there is no change in for traits selected for outgoing traffic in settings and there is no outgoing event
+
 ## 0.7.20
 - added connector docs
 - simplified settings
+- adds logging changes and events names for notifications
 
 ## 0.7.19
 - adds support for trace monitoring service
