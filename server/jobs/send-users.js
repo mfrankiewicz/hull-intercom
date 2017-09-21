@@ -36,7 +36,8 @@ export default function sendUsers(ctx, payload) {
         const groupedErrors = errors.map(errorReq => {
           return {
             data: errorReq.req.data,
-            error: errorReq.body.errors
+            error: errorReq.body.errors,
+            statusCode: res.statusCode
           };
         });
 

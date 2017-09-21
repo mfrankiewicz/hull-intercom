@@ -44,6 +44,7 @@ export default class IntercomClient {
     req.use(prefixPlugin(process.env.OVERRIDE_INTERCOM_URL || "https://api.intercom.io"));
     req.accept("application/json");
     req.timeout(60000);
+    req.retry(2);
     req.on("request", (reqData) => {
       this.client.logger.debug("intercomClient.req", { method: reqData.method, url: reqData.url });
     });

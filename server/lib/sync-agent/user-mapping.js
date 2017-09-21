@@ -66,9 +66,8 @@ export default class UserMapping {
         name = f.name;
       }
 
-      return { name, hull };
+      return { name, hull, overwrite: (f.overwrite || false) };
     });
-
     return fields;
   }
 
