@@ -13,15 +13,26 @@ export default function saveLeads(ctx: Object, payload: Object, options: Object 
   return Promise.all(_.map(leads, (lead) => {
     const ident = getLeadIdent(ctx, lead);
     let traits = ctx.service.syncAgent.userMapping.getHullTraits(lead);
-    // set all traits as set if null not to overwrite matching user
-    traits = _.mapValues(traits, (trait) => {
-      if (_.isObject(trait)) {
-        return trait;
+    // prevent only certain attributes from being overwritten,
+    // all other attributes should be updated
+    const protectedAttribs = ["intercom/id", "intercom/signed_up_at", "intercom/created_at", "traits_intercom/pseudonym"];
+    traits = _.map(traits, (traitVal, traitName) => {
+      const attr = {};
+      if (_.isObject(traitVal)) {
+        attr[traitName] = traitVal;
+        return attr;
       }
-      return {
-        operation: "setIfNull",
-        value: trait
-      };
+
+      if (_.includes(protectedAttribs, traitName)) {
+        attr[traitName] = {
+          operation: "setIfNull",
+          value: traitVal
+        };
+        return attr;
+      }
+
+      attr[traitName] = traitVal;
+      return attr;
     });
 
     if (lead.avatar && lead.avatar.image_url) {

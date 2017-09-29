@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.7.22
+- update attributes for leads with intercom values (overwrite)
+
 ## 0.7.21
 - status endpoint
 

@@ -30,6 +30,7 @@ describe("fetchLeads", function test() {
   });
 
   it("should fetch all leads", (done) => {
+    this.timeout(10000);
     const now = moment().format("X");
     miniintercom.stubGet("/contacts")
     .callsFake((req, res) => {
@@ -62,7 +63,6 @@ describe("fetchLeads", function test() {
         "intercom/is_lead": true,
         "intercom/lead_user_id": "abc123"
       });
-      done();
     });
 
     minihull.on("incoming.request#6", (req) => {
@@ -70,7 +70,9 @@ describe("fetchLeads", function test() {
     });
 
     minihull.callFirstShip("/fetch-leads")
-    .then(() => {});
+    .then(() => {
+      done();
+    });
   });
 
   it("should skip the fetch operation in case of rate limit error", (done) => {
