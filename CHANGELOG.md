@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.7.23
+- fix update attributes for leads
+
 ## 0.7.22
 - update attributes for leads with intercom values (overwrite)
 
