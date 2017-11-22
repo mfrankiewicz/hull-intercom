@@ -2362,7 +2362,7 @@ flexbuffer@0.0.6:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/flexbuffer/-/flexbuffer-0.0.6.tgz#039fdf23f8823e440c38f3277e6fef1174215b30"
 
-flow-bin@0.59.0:
+flow-bin@^0.59.0:
   version "0.59.0"
   resolved "https://registry.yarnpkg.com/flow-bin/-/flow-bin-0.59.0.tgz#8c151ee7f09f1deed9bf0b9d1f2e8ab9d470f1bb"
 
@@ -2720,15 +2720,9 @@ https-proxy-agent@^0.3.5:
     debug "2"
     extend "3"
 
-"hull-connector-tester@https://3-111663436-gh.circle-artifacts.com/0/hull-connector-tester.tgz":
+hull-connector-tester@^0.0.1:
   version "0.0.1"
-  resolved "https://3-111663436-gh.circle-artifacts.com/0/hull-connector-tester.tgz#fe5f2d10c5a0266c8d6bc5fda08ad5eb72805d29"
-  dependencies:
-    circle-github-bot "^0.4.0"
-
-"hull-connector-tester@https://4-111663436-gh.circle-artifacts.com/0/hull-connector-tester.tgz":
-  version "0.0.1"
-  resolved "https://4-111663436-gh.circle-artifacts.com/0/hull-connector-tester.tgz#7fb433a451a6acbf88d787a6a0e7e095cd76a629"
+  resolved "https://registry.yarnpkg.com/hull-connector-tester/-/hull-connector-tester-0.0.1.tgz#e745e08d1670f615b582f1774902c49401c5160c"
   dependencies:
     circle-github-bot "^0.4.0"
 
@@ -5551,10 +5545,6 @@ window-size@0.1.0:
 window-size@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/window-size/-/window-size-0.2.0.tgz#b4315bb4214a3d7058ebeee892e13fa24d98b075"
-
-winston-spy@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/winston-spy/-/winston-spy-0.2.0.tgz#d4fe680ba1352a0781704052d57e7509b1789c5c"
 
 winston@^2.2.0:
   version "2.3.1"
