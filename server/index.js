@@ -1,6 +1,4 @@
 /* @flow */
-require("@risingstack/trace");
-
 import Hull from "hull";
 import { Queue, Cache } from "hull/lib/infra";
 import express from "express";

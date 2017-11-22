@@ -8,7 +8,7 @@ import oAuthRouter from "./router/oauth";
 export default function server(app: express, dependencies: Object = {}): express {
   const { hostSecret, queue } = dependencies;
 
-  app.use("/", appRouter(dependencies));
+  app.use("/", appRouter());
 
   app.use("/auth", oAuthRouter(dependencies));
 

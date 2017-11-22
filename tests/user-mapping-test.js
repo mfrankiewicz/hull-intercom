@@ -31,9 +31,9 @@ describe("computeIntercomFields", () => {
     const fields = m.computeIntercomFields();
 
     expect(fields).to.have.lengthOf(3);
-    expect(fields[0]).to.deep.equal({ hull: "tech", name: "custom_attributes.technologies" });
-    expect(fields[1]).to.deep.equal({ hull: "traits_intercom/id", name: "custom_attributes.id" });
-    expect(fields[2]).to.deep.equal({ hull: "email", name: "email" });
+    expect(fields[0]).to.deep.equal({ hull: "tech", name: "custom_attributes.technologies", overwrite: false });
+    expect(fields[1]).to.deep.equal({ hull: "traits_intercom/id", name: "custom_attributes.id", overwrite: false });
+    expect(fields[2]).to.deep.equal({ hull: "email", name: "email", overwrite: false });
   });
 });
 

@@ -67,7 +67,7 @@ export default class SyncAgent {
   handleUserErrors(errors) {
     return Promise.map(errors, error => {
       if (_.get(error, "statusCode") === 429) {
-
+        // Rate limit error
       }
       let errorDetails = _.get(error, "error", []);
       if (!_.isArray(errorDetails)) {
@@ -77,7 +77,7 @@ export default class SyncAgent {
       const errorMessage = errorDetails.map(e => e.message).join(" ");
 
       // TODO: handle leads ident
-      console.log("DETECT LEAD HERE", error.data);
+      // console.log("DETECT LEAD HERE", error.data);
       const ident = this.userMapping.getIdentFromIntercom(error.data);
 
       const asUser = this.client.asUser(ident);
