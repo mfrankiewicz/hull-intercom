@@ -2726,6 +2726,12 @@ https-proxy-agent@^0.3.5:
   dependencies:
     circle-github-bot "^0.4.0"
 
+"hull-connector-tester@https://3-111663436-gh.circle-artifacts.com/0/hull-connector-tester.tgz":
+  version "0.0.1"
+  resolved "https://3-111663436-gh.circle-artifacts.com/0/hull-connector-tester.tgz#fe5f2d10c5a0266c8d6bc5fda08ad5eb72805d29"
+  dependencies:
+    circle-github-bot "^0.4.0"
+
 hull@0.11.13:
   version "0.11.13"
   resolved "https://registry.yarnpkg.com/hull/-/hull-0.11.13.tgz#38d5e173f8df2ce3096e3cfcf815d8ad0627476a"
