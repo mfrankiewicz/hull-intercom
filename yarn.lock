@@ -2720,15 +2720,15 @@ https-proxy-agent@^0.3.5:
     debug "2"
     extend "3"
 
-"hull-connector-tester@https://2-111663436-gh.circle-artifacts.com/0/hull-connector-tester.tgz":
-  version "0.0.1"
-  resolved "https://2-111663436-gh.circle-artifacts.com/0/hull-connector-tester.tgz#8510aee11a3d05e23742ebedc545313f31dcb13b"
-  dependencies:
-    circle-github-bot "^0.4.0"
-
 "hull-connector-tester@https://3-111663436-gh.circle-artifacts.com/0/hull-connector-tester.tgz":
   version "0.0.1"
   resolved "https://3-111663436-gh.circle-artifacts.com/0/hull-connector-tester.tgz#fe5f2d10c5a0266c8d6bc5fda08ad5eb72805d29"
+  dependencies:
+    circle-github-bot "^0.4.0"
+
+"hull-connector-tester@https://4-111663436-gh.circle-artifacts.com/0/hull-connector-tester.tgz":
+  version "0.0.1"
+  resolved "https://4-111663436-gh.circle-artifacts.com/0/hull-connector-tester.tgz#7fb433a451a6acbf88d787a6a0e7e095cd76a629"
   dependencies:
     circle-github-bot "^0.4.0"
 
