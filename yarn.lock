@@ -1275,6 +1275,10 @@ cipher-base@^1.0.0, cipher-base@^1.0.1, cipher-base@^1.0.3:
     inherits "^2.0.1"
     safe-buffer "^5.0.1"
 
+circle-github-bot@^0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/circle-github-bot/-/circle-github-bot-0.4.0.tgz#d1702cea19277db4333936647828cd433fbcafd9"
+
 circular-json@^0.3.1:
   version "0.3.3"
   resolved "https://registry.yarnpkg.com/circular-json/-/circular-json-0.3.3.tgz#815c99ea84f6809529d2f45791bdf82711352d66"
@@ -2715,6 +2719,12 @@ https-proxy-agent@^0.3.5:
     agent-base "~1.0.1"
     debug "2"
     extend "3"
+
+"hull-connector-tester@https://2-111663436-gh.circle-artifacts.com/0/hull-connector-tester.tgz":
+  version "0.0.1"
+  resolved "https://2-111663436-gh.circle-artifacts.com/0/hull-connector-tester.tgz#8510aee11a3d05e23742ebedc545313f31dcb13b"
+  dependencies:
+    circle-github-bot "^0.4.0"
 
 hull@0.11.13:
   version "0.11.13"
