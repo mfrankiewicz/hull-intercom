@@ -18,6 +18,7 @@ export default function saveLeads(ctx: Object, payload: Object, options: Object 
       if (_.isObject(trait)) {
         return trait;
       }
+
       return {
         operation: "setIfNull",
         value: trait
