@@ -34,7 +34,9 @@ const queue = new Queue("kue", {
   redis: REDIS_URL
 });
 
-const connector = new Hull.Connector({ queue, cache, hostSecret: SECRET, port: PORT });
+const connector = new Hull.Connector({
+  queue, cache, hostSecret: SECRET, port: PORT
+});
 const app = express();
 
 connector.setupApp(app);

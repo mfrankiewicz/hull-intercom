@@ -28,17 +28,16 @@ export default function (req: Request, res: Response) {
 
   if (_.get(ship, "private_settings.access_token")) {
     promises.push(service.intercomAgent.getUsersTotalCount()
-      .then(total => {
+      .then((total) => {
         if (!total || (total === 0)) {
           pushMessage("Got zero results from Intercom");
         }
-      }).catch(err => {
+      }).catch((err) => {
         if (err && err.statusCode === 401) {
           return pushMessage("API Credentials are invalid");
         }
         return pushMessage(`Error when trying to connect with Intercom: ${_.get(err, "message", "Unknown")}`);
-      })
-    );
+      }));
   }
 
   Promise.all(promises).then(() => {

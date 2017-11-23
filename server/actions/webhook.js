@@ -14,9 +14,9 @@ export default function webhook(req, res, next) {
         maxTime: process.env.NOTIFY_BATCH_HANDLER_THROTTLE || 30000
       }
     })
-    .setCallback(users => saveUsers(req.hull, { users }))
-    .addMessage(_.get(req, "body.data.item"))
-    .then(next, next);
+      .setCallback(users => saveUsers(req.hull, { users }))
+      .addMessage(_.get(req, "body.data.item"))
+      .then(next, next);
   }
 
   if (_.get(req, "body.topic") === "contact.created") {
@@ -28,9 +28,9 @@ export default function webhook(req, res, next) {
         maxTime: process.env.NOTIFY_BATCH_HANDLER_THROTTLE || 30000
       }
     })
-    .setCallback(leads => saveLeads(req.hull, { leads }))
-    .addMessage(lead)
-    .then(next, next);
+      .setCallback(leads => saveLeads(req.hull, { leads }))
+      .addMessage(lead)
+      .then(next, next);
   }
 
   if (_.get(req, "body.topic") === "contact.signed_up") {
@@ -42,9 +42,9 @@ export default function webhook(req, res, next) {
         maxTime: process.env.NOTIFY_BATCH_HANDLER_THROTTLE || 30000
       }
     })
-    .setCallback(users => saveUsers(req.hull, { users }))
-    .addMessage(lead)
-    .then(next, next);
+      .setCallback(users => saveUsers(req.hull, { users }))
+      .addMessage(lead)
+      .then(next, next);
   }
 
   return Batcher.getHandler("webhook_events", {
@@ -54,7 +54,7 @@ export default function webhook(req, res, next) {
       maxTime: process.env.NOTIFY_BATCH_HANDLER_THROTTLE || 30000
     }
   })
-  .setCallback(events => saveEvents(req.hull, { events }))
-  .addMessage(_.get(req, "body"))
-  .then(next, next);
+    .setCallback(events => saveEvents(req.hull, { events }))
+    .addMessage(_.get(req, "body"))
+    .then(next, next);
 }

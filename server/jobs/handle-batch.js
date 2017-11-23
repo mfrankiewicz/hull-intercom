@@ -8,13 +8,13 @@ function batchHandler(ctx, source, segmentId) {
   return (users) => {
     const promises = [];
     const ignoreFilter = (source !== "connector");
-    users = _.filter(users.map(u => {
+    users = _.filter(users.map((u) => {
       return ctx.service.syncAgent.updateUserSegments(u, { add_segment_ids: _.concat(u.segment_ids, segmentId) }, ignoreFilter);
     }));
 
-    const leads = users.filter((u) => u["traits_intercom/is_lead"] === true);
+    const leads = users.filter(u => u["traits_intercom/is_lead"] === true);
 
-    users = users.filter((u) => !u["traits_intercom/is_lead"]);
+    users = users.filter(u => !u["traits_intercom/is_lead"]);
 
     users.map(u => ctx.client.asUser(_.pick(u, ["email", "id"])).logger.debug("outgoing.user.start"));
 

@@ -32,9 +32,9 @@ export default function OAuthRouter(dependencies: Object) {
         // req.service.intercomAgent.syncContactProperties()
         //   .catch((err) => hull.logger.error("Error in creating segments property", err));
 
-        return client.get(ship.id).then(s => {
+        return client.get(ship.id).then((s) => {
           return req.hull.service.intercomAgent.getUsersTotalCount()
-            .then(total_count => {
+            .then((total_count) => {
               return { settings: s.private_settings, total_count };
             });
         });

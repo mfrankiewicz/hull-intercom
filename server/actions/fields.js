@@ -6,7 +6,7 @@ export default function fields(req, res) {
   const customAttributes = req.hull.ship.private_settings.custom_attributes;
   const fieldsList = _.uniq(_.concat(fieldsMap, customAttributes));
   res.json({
-    options: fieldsList.map(f => {
+    options: fieldsList.map((f) => {
       return { label: f, value: f };
     })
   });

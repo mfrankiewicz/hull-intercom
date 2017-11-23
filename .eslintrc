@@ -19,7 +19,16 @@
     "eqeqeq": [1],
     "no-unused-vars": ["error", {
         "argsIgnorePattern": "^_"
-    }]
+    }],
+    "prefer-destructuring": [0],
+    "flowtype-errors/show-errors": 1
   },
-  "extends": "airbnb-base"
+  "extends": [
+    "plugin:flowtype/recommended",
+    "airbnb-base"
+  ],
+  "plugins": [
+    "flowtype",
+    "flowtype-errors"
+  ]
 }

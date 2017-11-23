@@ -1,6 +1,7 @@
 import Promise from "bluebird";
-import handleRateLimitError from "../lib/handle-rate-limit-error";
 import _ from "lodash";
+
+import handleRateLimitError from "../lib/handle-rate-limit-error";
 
 export default function handleBulk(ctx, payload) {
   const { id, users, attempt = 1 } = payload;
@@ -17,7 +18,7 @@ export default function handleBulk(ctx, payload) {
           return Promise.resolve();
         })()
           .then(() => {
-            users.map(u => {
+            users.map((u) => {
               return ctx.client.asUser(_.pick(u, ["id", "email", "external_id"])).logger.info("outgoing.user.success");
             });
           })

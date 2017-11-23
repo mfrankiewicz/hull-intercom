@@ -47,7 +47,7 @@ export default function saveLeads(ctx: Object, payload: Object, options: Object 
 
     return asUser.traits(traits).then(
       () => asUser.logger.info("incoming.user.success", { traits }),
-      (error) => asUser.logger.error("incoming.user.error", { traits, errors: error })
+      error => asUser.logger.error("incoming.user.error", { traits, errors: error })
     );
   }));
 }

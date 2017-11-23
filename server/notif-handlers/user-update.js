@@ -11,7 +11,9 @@ export default function userUpdate(ctx, messages) {
   const leads = [];
   const leadsToConvert = [];
   const users = messages.reduce((accumulator, message) => {
-    const { user, changes = {}, segments = [], events = [] } = message;
+    const {
+      user, changes = {}, segments = [], events = []
+    } = message;
     const { left = [], entered = [] } = _.get(changes, "segments", {});
 
     ctx.client.asUser(user).logger.debug("outgoing.user.start", { changes, events: _.map(events, e => e.event) });

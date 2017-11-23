@@ -35,5 +35,5 @@ export default function saveUsers(ctx, payload) {
     }
     return true;
   })
-  .catch(err => handleRateLimitError(ctx, "saveUsers", payload, err));
+    .catch(err => handleRateLimitError(ctx, "saveUsers", payload, err));
 }

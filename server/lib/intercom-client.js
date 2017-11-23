@@ -19,7 +19,6 @@ function getThrottle(ship) {
 }
 
 export default class IntercomClient {
-
   constructor({ ship, client, metric }) {
     this.apiKey = _.get(ship, "private_settings.api_key");
     this.appId = _.get(ship, "private_settings.app_id");
@@ -103,7 +102,7 @@ export default class IntercomClient {
     return this.exec("delete", url, params);
   }
 
-  handleError(err) {
+  handleError(err) { // eslint-disable-line class-methods-use-this
     const filteredError = new Error(err.message);
     filteredError.stack = err.stack;
     filteredError.req = {
@@ -115,5 +114,4 @@ export default class IntercomClient {
     filteredError.statusCode = _.get(err, "response.statusCode");
     return filteredError;
   }
-
 }
