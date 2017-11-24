@@ -1,9 +1,8 @@
 /* @flow */
-
-import { Request, Response } from "express";
+import type { $Response } from "express";
 import _ from "lodash";
 
-export default function (req: Request, res: Response) {
+export default function (req: Object, res: $Response) {
   const { ship = {}, client = {}, service = {} } = req.hull;
   const messages = [];
   let status = "ok";
