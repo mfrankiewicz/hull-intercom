@@ -3,7 +3,6 @@ import uri from "urijs";
 import Promise from "bluebird";
 
 export default class WebhookAgent {
-
   constructor(intercomAgent, client, ship, helpers, hostname, cache) {
     this.ship = ship;
     this.client = client;
@@ -67,22 +66,22 @@ export default class WebhookAgent {
       topics: this.topics,
       url
     })
-    .catch(err => {
-      const fErr = this.intercomClient.handleError(err);
-      // handle errors which may happen here
-      return Promise.reject(fErr);
-    })
-    .then(res => {
-      this.webhookId = res.body.id;
-      return this.helpers.updateSettings({
-        webhook_id: this.webhookId
-      }).then(() => {
-        return this.webhookId;
+      .catch((err) => {
+        const fErr = this.intercomClient.handleError(err);
+        // handle errors which may happen here
+        return Promise.reject(fErr);
+      })
+      .then((res) => {
+        this.webhookId = res.body.id;
+        return this.helpers.updateSettings({
+          webhook_id: this.webhookId
+        }).then(() => {
+          return this.webhookId;
+        });
+      })
+      .then(() => {
+        return this.cache.del("intercom-webhook");
       });
-    })
-    .then(() => {
-      return this.cache.del("intercom-webhook");
-    });
   }
 
   getWebhookUrl() {

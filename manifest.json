@@ -38,6 +38,12 @@
       "format": "hidden"
     },
     {
+      "name": "skip_users_already_synced",
+      "type": "boolean",
+      "default": false,
+      "format": "hidden"
+    },
+    {
       "type": "string",
       "format": "title",
       "name": "connector_info",

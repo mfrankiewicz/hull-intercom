@@ -20,10 +20,10 @@ export default function sendUsers(ctx, payload) {
 
   return syncAgent.syncShip()
     .then(() => intercomAgent.sendUsers(intercomUsersToSave, mode))
-    .then(res => {
+    .then((res) => {
       if (_.isArray(res)) {
         const savedUsers = _.intersectionBy(usersToSave, res, "email")
-          .map(u => {
+          .map((u) => {
             const intercomData = _.find(res, { email: u.email });
             u["traits_intercom/id"] = intercomData.id;
             u["traits_intercom/tags"] = intercomData.tags.tags.map(t => t.name);
@@ -33,10 +33,11 @@ export default function sendUsers(ctx, payload) {
           });
         const errors = _.filter(res, { body: { type: "error.list" } });
 
-        const groupedErrors = errors.map(errorReq => {
+        const groupedErrors = errors.map((errorReq) => {
           return {
             data: errorReq.req.data,
-            error: errorReq.body.errors
+            error: errorReq.body.errors,
+            statusCode: res.statusCode
           };
         });
 

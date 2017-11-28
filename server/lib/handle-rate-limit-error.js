@@ -14,7 +14,9 @@ export default function handleRateLimitError(ctx: Object, jobName: String, paylo
     const method = _.get(err, "req.method") || _.get(err, "response.request.method");
     const miliseconds = parseInt(process.env.OVERRIDE_RATE_LIMIT_DELAY, 10) || seconds * 1000;
     const delay = resetIn + miliseconds;
-    ctx.client.logger.warn("service.api.ratelimit", { message: "wait 10 seconds to retry", jobName, url, method, delay });
+    ctx.client.logger.warn("service.api.ratelimit", {
+      message: "wait 10 seconds to retry", jobName, url, method, delay
+    });
     return ctx.enqueue(jobName, payload, { delay });
   }
   return Promise.reject(err);

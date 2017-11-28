@@ -5,7 +5,7 @@ const mapping = [
   {
     intercom: "conversation.user.created",
     eventName: "User started conversation",
-    user: (event) => _.get(event, "data.item.user"),
+    user: event => _.get(event, "data.item.user"),
     props: (event) => {
       return {
         message: _.get(event, "data.item.conversation_message.body"),
@@ -26,7 +26,7 @@ const mapping = [
   {
     intercom: "conversation.user.replied",
     eventName: "User replied to conversation",
-    user: (event) => _.get(event, "data.item.user"),
+    user: event => _.get(event, "data.item.user"),
     props: (event) => {
       return {
         message: _.get(event, "data.item.conversation_parts.conversation_parts[0].body"),
@@ -47,7 +47,7 @@ const mapping = [
   {
     intercom: "conversation.admin.replied",
     eventName: "Admin replied to conversation",
-    user: (event) => _.get(event, "data.item.user"),
+    user: event => _.get(event, "data.item.user"),
     props: (event) => {
       return {
         message: _.get(event, "data.item.conversation_parts.conversation_parts[0].body"),
@@ -68,7 +68,7 @@ const mapping = [
   {
     intercom: "conversation.admin.single.created",
     eventName: "Admin started conversation",
-    user: (event) => _.get(event, "data.item.user"),
+    user: event => _.get(event, "data.item.user"),
     props: (event) => {
       return {
         message: _.get(event, "data.item.conversation_message.body"),
@@ -89,7 +89,7 @@ const mapping = [
   {
     intercom: "conversation.admin.assigned",
     eventName: "Admin assigned conversation",
-    user: (event) => _.get(event, "data.item.user"),
+    user: event => _.get(event, "data.item.user"),
     props: (event) => {
       return {
         to: _.get(event, "data.item.user.id"),
@@ -107,7 +107,7 @@ const mapping = [
   {
     intercom: "conversation.admin.closed",
     eventName: "Admin closed conversation",
-    user: (event) => _.get(event, "data.item.user"),
+    user: event => _.get(event, "data.item.user"),
     props: (event) => {
       return {
         admin: _.get(event, "data.item.assignee.id")
@@ -123,7 +123,7 @@ const mapping = [
   {
     intercom: "conversation.admin.opened",
     eventName: "Admin opened conversation",
-    user: (event) => _.get(event, "data.item.user"),
+    user: event => _.get(event, "data.item.user"),
     props: (event) => {
       return {
         admin: _.get(event, "data.item.assignee.id")
@@ -139,7 +139,7 @@ const mapping = [
   {
     intercom: "user.tag.created",
     eventName: "Added Tag",
-    user: (event) => _.get(event, "data.item.user"),
+    user: event => _.get(event, "data.item.user"),
     props: (event) => {
       return {
         tag: _.get(event, "data.item.tag.name"),
@@ -155,7 +155,7 @@ const mapping = [
   {
     intercom: "user.tag.deleted",
     eventName: "Removed Tag",
-    user: (event) => _.get(event, "data.item.user"),
+    user: event => _.get(event, "data.item.user"),
     props: (event) => {
       return {
         tag: _.get(event, "data.item.tag.name"),
@@ -171,7 +171,7 @@ const mapping = [
   {
     intercom: "user.unsubscribed",
     eventName: "Unsubscribed from emails",
-    user: (event) => _.get(event, "data.item"),
+    user: event => _.get(event, "data.item"),
     props: (_event) => {
       return {};
     },
@@ -185,7 +185,7 @@ const mapping = [
   {
     intercom: "user.email.updated",
     eventName: "Updated email address",
-    user: (event) => _.get(event, "data.item"),
+    user: event => _.get(event, "data.item"),
     props: (event) => {
       return {
         email: _.get(event, "data.item.email"),
@@ -207,7 +207,7 @@ export default function getEventPayload(ctx: Object, intercomEvent: Object): Obj
   }
 
   const user = mappedEvent.user(intercomEvent);
-  const eventName = mappedEvent.eventName;
+  const { eventName } = mappedEvent;
   const props = _.defaults(mappedEvent.props(intercomEvent), {
     topic: intercomEvent.topic
   });
@@ -217,5 +217,7 @@ export default function getEventPayload(ctx: Object, intercomEvent: Object): Obj
     created_at: intercomEvent.created_at,
   });
 
-  return { user, eventName, props, context };
+  return {
+    user, eventName, props, context
+  };
 }

@@ -6,7 +6,6 @@ import moment from "moment";
  * Superset of Intercom API
  */
 export default class IntercomAgent {
-
   constructor(intercomClient, { client, metric, cache }) {
     this.intercomClient = intercomClient;
     this.client = client;
@@ -17,7 +16,7 @@ export default class IntercomAgent {
 
   getJob(id) {
     return this.intercomClient.get(`/jobs/${id}`)
-      .then(res => {
+      .then((res) => {
         const isCompleted = _.get(res, "body.tasks[0].state") === "completed"
           || _.get(res, "body.tasks[0].state") === "completed_with_errors";
 
@@ -37,49 +36,49 @@ export default class IntercomAgent {
    */
   getJobErrors(id) {
     return this.intercomClient.get(`/jobs/${id}/error`)
-      .then(res => {
+      .then((res) => {
         return _.get(res, "body.items", []);
       });
   }
 
   importUsers(scroll_param = null, updated_after, updated_before) {
     return this.intercomClient.get("/users/scroll", { scroll_param })
-    .then(response => {
-      let { users } = response.body;
-      const { scroll_param: next_scroll_param } = response.body;
+      .then((response) => {
+        let { users } = response.body;
+        const { scroll_param: next_scroll_param } = response.body;
 
-      if (updated_after && moment(updated_after).isValid()) {
-        users = users.filter((u) => {
-          return moment(u.updated_at, "X")
-            .isAfter(updated_after);
-        });
-      }
+        if (updated_after && moment(updated_after).isValid()) {
+          users = users.filter((u) => {
+            return moment(u.updated_at, "X")
+              .isAfter(updated_after);
+          });
+        }
 
-      if (updated_before && moment(updated_before).isValid()) {
-        users = users.filter((u) => {
-          return moment(u.updated_at, "X")
-            .isBefore(updated_before);
-        });
-      }
+        if (updated_before && moment(updated_before).isValid()) {
+          users = users.filter((u) => {
+            return moment(u.updated_at, "X")
+              .isBefore(updated_before);
+          });
+        }
 
-      return { users, scroll_param: next_scroll_param };
-    })
-    .catch(err => {
-      const fErr = this.intercomClient.handleError(err);
+        return { users, scroll_param: next_scroll_param };
+      })
+      .catch((err) => {
+        const fErr = this.intercomClient.handleError(err);
 
-      if (_.get(fErr, "body.errors[0].code") === "scroll_exists") {
-        this.metric.event({ title: "Trying to perform two separate scrolls" });
-        return Promise.resolve([]);
-      }
+        if (_.get(fErr, "body.errors[0].code") === "scroll_exists") {
+          this.metric.event({ title: "Trying to perform two separate scrolls" });
+          return Promise.resolve([]);
+        }
 
-      if (_.get(fErr, "body.errors[0].code") === "not_found") {
-        this.metric.event({ title: "Scroll expired, should start it again" });
-        return Promise.resolve([]);
-      }
+        if (_.get(fErr, "body.errors[0].code") === "not_found") {
+          this.metric.event({ title: "Scroll expired, should start it again" });
+          return Promise.resolve([]);
+        }
 
-      // handle errors which may happen here
-      return Promise.reject(fErr);
-    });
+        // handle errors which may happen here
+        return Promise.reject(fErr);
+      });
   }
 
   sendUsers(users, mode = "bulk") {
@@ -91,7 +90,7 @@ export default class IntercomAgent {
     this.logger.debug("sendUsers", users.length);
 
     const body = {
-      items: users.map(u => {
+      items: users.map((u) => {
         this.logger.debug("outgoing.user.payload", u);
         return {
           method: "post",
@@ -103,12 +102,12 @@ export default class IntercomAgent {
 
     if (users.length < (process.env.MINIMUM_BULK_SIZE || 10)
       || mode === "regular") {
-      return Promise.map(body.items, item => {
+      return Promise.map(body.items, (item) => {
         return this.intercomClient.post("/users", item.data)
-          .then(response => {
+          .then((response) => {
             return response.body;
           })
-          .catch(err => {
+          .catch((err) => {
             const fErr = this.intercomClient.handleError(err);
             this.logger.error("intercomAgent.sendUsers.microbatch.error", fErr);
             return Promise.reject(fErr);
@@ -118,7 +117,7 @@ export default class IntercomAgent {
 
     return this.intercomClient
       .post("/bulk/users", body)
-      .catch(err => {
+      .catch((err) => {
         const fErr = this.intercomClient.handleError(err);
         this.logger.error("intercomAgent.sendUsers.bulkSubmit.error", fErr);
         return Promise.reject(fErr);
@@ -136,7 +135,7 @@ export default class IntercomAgent {
     });
     return Promise.map(opArray, (op) => {
       return this.intercomClient.post("/tags", op)
-        .catch(err => {
+        .catch((err) => {
           const fErr = this.intercomClient.handleError(err);
           this.logger.error("intercomAgent.tagUsers.error", fErr);
           return Promise.reject(fErr);
@@ -149,10 +148,10 @@ export default class IntercomAgent {
    */
   getUsersTotalCount() {
     return this.intercomClient.get("/users", { per_page: 1 })
-      .then(response => {
+      .then((response) => {
         return _.get(response, "body.total_count");
       })
-      .catch(err => {
+      .catch((err) => {
         const fErr = this.intercomClient.handleError(err);
         this.logger.error("getUsersTotalCount.error", fErr);
         return Promise.reject(fErr);
@@ -166,28 +165,28 @@ export default class IntercomAgent {
       order: "desc",
       sort: "updated_at"
     })
-    .then(response => {
-      const originalUsers = _.get(response, "body.users", []);
-      const users = originalUsers.filter((u) => {
-        return moment(u.updated_at, "X")
-          .isAfter(last_updated_at);
-      });
-      this.logger.debug("getRecentUsers.count", {
-        total: originalUsers.length,
-        filtered: users.length
-      });
+      .then((response) => {
+        const originalUsers = _.get(response, "body.users", []);
+        const users = originalUsers.filter((u) => {
+          return moment(u.updated_at, "X")
+            .isAfter(last_updated_at);
+        });
+        this.logger.debug("getRecentUsers.count", {
+          total: originalUsers.length,
+          filtered: users.length
+        });
 
-      return {
-        users,
-        hasMore: !_.isEmpty(_.get(response, "body.pages.next"))
-          && users.length === originalUsers.length
-      };
-    })
-    .catch(err => {
-      const fErr = this.intercomClient.handleError(err);
-      this.logger.error("getRecentUsers.error", fErr);
-      return Promise.reject(fErr);
-    });
+        return {
+          users,
+          hasMore: !_.isEmpty(_.get(response, "body.pages.next"))
+            && users.length === originalUsers.length
+        };
+      })
+      .catch((err) => {
+        const fErr = this.intercomClient.handleError(err);
+        this.logger.error("getRecentUsers.error", fErr);
+        return Promise.reject(fErr);
+      });
   }
 
   /**
@@ -204,14 +203,14 @@ export default class IntercomAgent {
     if (true || events.length <= 10) { // eslint-disable-line no-constant-condition
       return Promise.map(events, (event) => {
         return this.intercomClient
-        .post("/events", event)
-        .catch((err) => {
-          return Promise.reject(this.intercomClient.handleError(err));
-        });
+          .post("/events", event)
+          .catch((err) => {
+            return Promise.reject(this.intercomClient.handleError(err));
+          });
       }, { concurrency: 1 });
     }
 
-    const wrappedEvents = events.map(e => {
+    const wrappedEvents = events.map((e) => {
       return {
         method: "post",
         data_type: "event",
@@ -244,7 +243,7 @@ export default class IntercomAgent {
       this.logger.debug("connector.getTags.cachemiss");
       // TODO check if /tags endpoint has pagination
       return this.intercomClient.get("/tags")
-        .then(res => {
+        .then((res) => {
           // console.log("TEST", res.body);
           return _.get(res, "body.tags", []);
         });

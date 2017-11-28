@@ -11,8 +11,10 @@ export default function saveEvents(ctx, payload) {
   const { syncAgent } = ctx.service;
   const { events = [] } = payload;
 
-  return Promise.map(events, event => {
-    const { user, eventName, props, context } = getEventPayload(ctx, event);
+  return Promise.map(events, (event) => {
+    const {
+      user, eventName, props, context
+    } = getEventPayload(ctx, event);
 
     if (!user) {
       return Promise.resolve();
@@ -40,8 +42,10 @@ export default function saveEvents(ctx, payload) {
     const asUser = client.asUser(ident);
     return asUser.track(eventName, props, context).then(
       () => asUser.logger.info("incoming.event.success", { eventName, props, context }),
-      (error) => asUser.logger.error("incoming.event.error", { eventName, props, context, errors: error })
+      error => asUser.logger.error("incoming.event.error", {
+        eventName, props, context, errors: error
+      })
     );
   })
-  .catch(err => handleRateLimitError(ctx, "saveEvents", payload, err));
+    .catch(err => handleRateLimitError(ctx, "saveEvents", payload, err));
 }

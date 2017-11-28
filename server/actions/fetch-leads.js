@@ -1,7 +1,7 @@
-// @flow
-import { Request, Response } from "express";
+/* @flow */
+import type { $Response, NextFunction } from "express";
 
-export default function fetchLeads(req: Request, res: Response, next: Function) {
+export default function fetchLeads(req: Object, res: $Response, next: NextFunction) {
   if (req.query.fetch_all) {
     return req.hull.enqueue("fetchAllLeads").then(next, next);
   }

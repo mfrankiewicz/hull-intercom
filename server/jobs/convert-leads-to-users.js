@@ -14,7 +14,7 @@ export default function convertLeadsToUsers(ctx: Object, payload: Object): Promi
           "intercom/is_lead": false
         });
       })
-      .catch(fErr => {
+      .catch((fErr) => {
         if (fErr.statusCode === 404) {
           return ctx.client.asUser(ident).traits({
             "intercom/is_lead": false

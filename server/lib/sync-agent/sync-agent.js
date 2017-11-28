@@ -7,7 +7,6 @@ import UserMapping from "./user-mapping";
 import WebhookAgent from "./webhook-agent";
 
 export default class SyncAgent {
-
   constructor(intercomAgent, client, segments, metric, ship, helpers, hostname, cache) {
     this.ship = ship;
     this.segments = segments;
@@ -16,7 +15,7 @@ export default class SyncAgent {
     this.logger = client.logger;
 
     this.tagMapping = new TagMapping(intercomAgent, ship, helpers, this.logger);
-    this.userMapping = new UserMapping(ship);
+    this.userMapping = new UserMapping({ ship, client });
     this.webhookAgent = new WebhookAgent(intercomAgent, client, ship, helpers, hostname, cache);
   }
 
@@ -36,14 +35,14 @@ export default class SyncAgent {
   /**
    *
    */
-  userAdded(user) {
+  userAdded(user) { // eslint-disable-line class-methods-use-this
     return !_.isEmpty(user["traits_intercom/id"]);
   }
 
   /**
    *
    */
-  userWithError(user) {
+  userWithError(user) { // eslint-disable-line class-methods-use-this
     return !_.isEmpty(user["traits_intercom/import_error"]);
   }
 
@@ -65,7 +64,10 @@ export default class SyncAgent {
    * @return {Promise}
    */
   handleUserErrors(errors) {
-    return Promise.map(errors, error => {
+    return Promise.map(errors, (error) => {
+      if (_.get(error, "statusCode") === 429) {
+        // Rate limit error
+      }
       let errorDetails = _.get(error, "error", []);
       if (!_.isArray(errorDetails)) {
         errorDetails = [errorDetails];
@@ -73,6 +75,8 @@ export default class SyncAgent {
 
       const errorMessage = errorDetails.map(e => e.message).join(" ");
 
+      // TODO: handle leads ident
+      // console.log("DETECT LEAD HERE", error.data);
       const ident = this.userMapping.getIdentFromIntercom(error.data);
 
       const asUser = this.client.asUser(ident);
@@ -82,7 +86,7 @@ export default class SyncAgent {
   }
 
   getUsersToSave(users) {
-    return users.filter((u) => !_.isEmpty(u.email)
+    return users.filter(u => !_.isEmpty(u.email)
       && !this.userWithError(u))
       .map((u) => {
         u.email = _.toLower(u.email);
@@ -91,14 +95,14 @@ export default class SyncAgent {
   }
 
   getUsersToTag(users) {
-    return users.filter((u) => this.userWhitelisted(u)
+    return users.filter(u => this.userWhitelisted(u)
       && this.userAdded(u)
       && !this.userWithError(u));
   }
 
   groupUsersToTag(users) {
     return Promise.resolve(this.segments)
-      .then(segments => {
+      .then((segments) => {
         return _.reduce(users, (o, user) => {
           const existingUserTags = _.intersection(user["traits_intercom/tags"], segments.map(s => s.name));
 
@@ -113,7 +117,7 @@ export default class SyncAgent {
           const segmentsToAdd = _.has(user, "add_segment_ids")
             ? user.add_segment_ids
             : user.segment_ids;
-          segmentsToAdd.map(segment_id => {
+          segmentsToAdd.map((segment_id) => {
             const segment = _.find(segments, { id: segment_id });
             if (_.isEmpty(segment)) {
               this.client.logger.debug("outgoing.user.add_segment_not_found", segment);
@@ -126,7 +130,7 @@ export default class SyncAgent {
             o[segment.name] = o[segment.name] || [];
             return o[segment.name].push(userOp);
           });
-          user.remove_segment_ids.map(segment_id => {
+          user.remove_segment_ids.map((segment_id) => {
             const segment = _.find(segments, { id: segment_id });
             if (_.isEmpty(segment)) {
               this.client.logger.debug("outgoing.user.remove_segment_not_found", segment);
@@ -172,8 +176,8 @@ export default class SyncAgent {
       .tap(u => this.logger.debug("sendEvents.users", u.length))
       .filter(u => !_.isUndefined(u["traits_intercom/id"]))
       .tap(u => this.logger.debug("sendEvents.users.filtered", u.length))
-      .map(u => {
-        return _.get(u, "events", []).map(e => {
+      .map((u) => {
+        return _.get(u, "events", []).map((e) => {
           e.user = {
             id: u["traits_intercom/id"]
           };
@@ -185,7 +189,7 @@ export default class SyncAgent {
       .filter(e => _.includes(this.ship.private_settings.send_events, e.event))
       .filter(e => e.event_source !== "intercom")
       .tap(e => this.logger.debug("sendEvents.events.filtered", e.length))
-      .map(ev => {
+      .map((ev) => {
         const data = {
           event_name: ev.event,
           created_at: moment(ev.created_at).format("X"),
@@ -198,10 +202,9 @@ export default class SyncAgent {
       .value();
 
     return this.intercomAgent.sendEvents(events)
-      .catch(err => {
+      .catch((err) => {
         this.logger.error("outgoing.event.error", err);
         return Promise.reject(err);
       });
   }
-
 }

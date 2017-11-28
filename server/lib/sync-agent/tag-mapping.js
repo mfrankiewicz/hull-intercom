@@ -2,7 +2,6 @@ import _ from "lodash";
 import Promise from "bluebird";
 
 export default class TagMapping {
-
   constructor(intercomAgent, ship, helpers, logger) {
     this.ship = ship;
     this.intercomClient = intercomAgent.intercomClient;
@@ -39,19 +38,19 @@ export default class TagMapping {
    * @return Promise
    */
   sync(segments = []) {
-    const mappedSegments = _.keys(this.mapping).map(id => { return { id }; });
+    const mappedSegments = _.keys(this.mapping).map((id) => { return { id }; });
     const newSegments = _.differenceBy(segments, mappedSegments, "id");
     const oldSegments = _.differenceBy(mappedSegments, segments, "id");
 
-    return Promise.map(newSegments, segment => {
+    return Promise.map(newSegments, (segment) => {
       return this.createTag(segment);
     }, { concurrency: 1 })
-    .then(() => {
-      return Promise.map(oldSegments, segment => {
-        return this.deleteTag(segment);
-      }, { concurrency: 3 });
-    })
-    .then(() => this.persist());
+      .then(() => {
+        return Promise.map(oldSegments, (segment) => {
+          return this.deleteTag(segment);
+        }, { concurrency: 3 });
+      })
+      .then(() => this.persist());
   }
 
   /**
@@ -89,7 +88,7 @@ export default class TagMapping {
         _.unset(this.mapping, segment.id);
         return Promise.resolve();
       })
-      .catch(err => {
+      .catch((err) => {
         const fErr = this.intercomClient.handleError(err);
 
         if (fErr.statusCode === 404) {
