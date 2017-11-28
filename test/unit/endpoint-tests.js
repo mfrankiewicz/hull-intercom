@@ -3,8 +3,8 @@ import Hull from "hull";
 import express from "express";
 import request from "request";
 
-import AppRouter from "../server/router/app";
-import OAuthRouter from "../server/router/oauth";
+import AppRouter from "../../server/router/app";
+import OAuthRouter from "../../server/router/oauth";
 import ClientMock from "./mocks/client-mock";
 
 const assert = require("assert");

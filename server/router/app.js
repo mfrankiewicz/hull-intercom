@@ -10,15 +10,6 @@ import * as actions from "./../actions";
 
 export default function AppRouter(): Router {
   const router = new Router();
-
-  // FIXME: since we have two routers on the same mountpoint: "/"
-  // all middleware applied here also is applied to the static router,
-  // which is a bad things, that's why we add the middleware on per route basis
-  // router.use(deps.hullMiddleware);
-  // router.use(AppMiddleware(deps));
-
-  // const middlewareSet = [requireConfiguration];
-
   router.use(appMiddleware());
   router.use("/batch", requireConfiguration, actions.batchHandler, responseMiddleware());
 

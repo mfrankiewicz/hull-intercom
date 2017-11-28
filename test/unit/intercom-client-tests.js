@@ -1,6 +1,6 @@
 /* global describe, it */
 import assert from "assert";
-import IntercomClient from "../server/lib/intercom-client";
+import IntercomClient from "../../server/lib/intercom-client";
 import ClientMock from "./mocks/client-mock";
 
 const hullMock = {

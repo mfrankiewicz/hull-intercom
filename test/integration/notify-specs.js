@@ -1,8 +1,8 @@
 const Minihull = require("minihull");
 const expect = require("chai").expect;
 
-const Miniintercom = require("./miniintercom");
-const bootstrap = require("./bootstrap");
+const Miniintercom = require("./support/miniintercom");
+const bootstrap = require("./support/bootstrap");
 
 process.env.OVERRIDE_INTERCOM_URL = "http://localhost:8002";
 

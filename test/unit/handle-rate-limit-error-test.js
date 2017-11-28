@@ -3,7 +3,7 @@ import { expect } from "chai";
 import sinon from "sinon";
 import moment from "moment";
 
-import handleRateLimitError from "../server/lib/handle-rate-limit-error";
+import handleRateLimitError from "../../server/lib/handle-rate-limit-error";
 
 describe("handleRateLimitError", () => {
   const ctxStub = {

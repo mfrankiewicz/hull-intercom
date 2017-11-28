@@ -3,7 +3,7 @@ import { expect } from "chai";
 import sinon from "sinon";
 import { Cache } from "hull/lib/infra";
 
-import IntercomAgent from "../server/lib/intercom-agent";
+import IntercomAgent from "../../server/lib/intercom-agent";
 
 
 describe("IntercomAgent", () => {

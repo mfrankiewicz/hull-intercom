@@ -1,0 +1,11 @@
+email;user_id;full_name;
+foo@bar.com;111;Foo Bar;
+foo2@bar.com;222;Foo2 Bar2;
+foo3@bar.com;111;Foo3 Bar3;
+foo@bar.com;333;Foo4 Bar4;
+foo5@bar.com;;Foo5 Bar5;
+foo6@bar.com;666;Foo6 Bar6;
+foo6@bar.com;;Foo7 Bar7;
+foo7@bar.com;888;Foo8 Bar8;
+foo7@bar.com;999;Foo9 Bar9;
+foo9@bar.com;;Foo11 Bar11;

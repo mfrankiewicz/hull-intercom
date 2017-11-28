@@ -5,8 +5,8 @@ const sinon = require("sinon");
 const winston = require("winston");
 require("winston-spy");
 
-const Miniintercom = require("./miniintercom");
-const bootstrap = require("./bootstrap");
+const Miniintercom = require("./support/miniintercom");
+const bootstrap = require("./support/bootstrap");
 
 process.env.OVERRIDE_INTERCOM_URL = "http://localhost:8002";
 process.env.RATE_LIMIT_DELAY = 200;

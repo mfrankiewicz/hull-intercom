@@ -1,7 +1,7 @@
 import _ from "lodash";
 import { expect } from "chai";
 
-import mapping from "../server/lib/sync-agent/user-mapping";
+import mapping from "../../server/lib/sync-agent/user-mapping";
 
 const logger = {
   warning(key, msg) { console.log(key, msg); }
