@@ -6,36 +6,37 @@ export default function (req: Object, res: $Response) {
   const { ship = {}, client = {}, service = {} } = req.hull;
   const messages = [];
   let status = "ok";
-  const pushMessage = (message) => {
-    status = "error";
-    messages.push(message);
-  };
   const promises = [];
 
   if (!_.get(ship, "private_settings.access_token")) {
-    pushMessage("Missing access token");
+    messages.push("Missing access token");
+    status = "error";
   }
 
   if (_.isEmpty(_.get(ship, "private_settings.synchronized_segments", []))) {
-    pushMessage("No segments will be synchronized because of missing configuration");
+    messages.push("No segments will be send out to Intercom because of missing configuration");
+    status = "warning";
   }
 
   if (_.isEmpty(_.get(ship, "private_settings.send_events", []))) {
-    // FIXME: decide how to handle emty events settings
-    // pushMessage("No events will be sent to Intercom because of missing configuration");
+    messages.push("No events will be sent to Intercom because of missing configuration");
+    status = "warning";
   }
 
   if (_.get(ship, "private_settings.access_token")) {
     promises.push(service.intercomAgent.getUsersTotalCount()
       .then((total) => {
         if (!total || (total === 0)) {
-          pushMessage("Got zero results from Intercom");
+          messages.push("Got zero results from Intercom");
+          status = "error";
         }
       }).catch((err) => {
         if (err && err.statusCode === 401) {
-          return pushMessage("API Credentials are invalid");
+          messages.push("API Credentials are invalid");
+        } else {
+          messages.push(`Error when trying to connect with Intercom: ${_.get(err, "message", "Unknown")}`);
         }
-        return pushMessage(`Error when trying to connect with Intercom: ${_.get(err, "message", "Unknown")}`);
+        status = "error";
       }));
   }
 
