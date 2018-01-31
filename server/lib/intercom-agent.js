@@ -112,7 +112,7 @@ export default class IntercomAgent {
             this.logger.error("intercomAgent.sendUsers.microbatch.error", fErr);
             return Promise.reject(fErr);
           });
-      }, { concurrency: 1 });
+      }, { concurrency: parseInt(process.env.USERS_API_REQUEST_CONCURRENCY, 10) || 1 });
     }
 
     return this.intercomClient
@@ -140,7 +140,7 @@ export default class IntercomAgent {
           this.logger.error("intercomAgent.tagUsers.error", fErr);
           return Promise.reject(fErr);
         });
-    }, { concurrency: 1 });
+    }, { concurrency: parseInt(process.env.TAG_API_REQUEST_CONCURRENCY, 10) || 1 });
   }
 
   /**

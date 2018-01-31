@@ -19,5 +19,5 @@ export default function postLeads(ctx: Object, leads: Array<Object>): Promise {
         client.asUser({ email: lead.email, external_id: lead.user_id }).logger.error("outgoing.user.error", fErr);
         return Promise.resolve(fErr);
       });
-  }, { concurrency: 1 });
+  }, { concurrency: parseInt(process.env.LEADS_API_REQUEST_CONCURRENCY, 10) || 1 });
 }
