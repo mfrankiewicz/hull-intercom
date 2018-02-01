@@ -34,6 +34,7 @@ export default class IntercomClient {
 
   exec = (method, path, params = {}) => {
     const throttle = getThrottle(this.ship);
+    let start;
 
     if (!this.ifConfigured()) {
       throw new Error("Client access data not set!");
@@ -45,18 +46,23 @@ export default class IntercomClient {
     req.timeout(60000);
     req.retry(2);
     req.on("request", (reqData) => {
+      start = process.hrtime();
       this.client.logger.debug("intercomClient.req", { method: reqData.method, url: reqData.url });
     });
     req.on("error", (error) => {
       this.client.logger.debug("intercomClient.resError", { status: error.status, path, method });
     });
     req.on("response", (res) => {
+      const hrTime = process.hrtime(start);
+      const elapsed = (hrTime[0] * 1000) + (hrTime[1] / 1000000);
       const limit = _.get(res.header, "x-ratelimit-limit");
       const remaining = _.get(res.header, "x-ratelimit-remaining");
       const reset = _.get(res.header, "x-ratelimit-reset");
       this.metric.increment("ship.service_api.call", 1);
       if (remaining !== undefined) {
-        this.client.logger.debug("intercomClient.ratelimit", { remaining, limit, reset });
+        this.client.logger.debug("intercomClient.ratelimit", {
+          remaining, limit, reset, elapsed
+        });
         this.metric.value("ship.service_api.remaining", remaining);
       }
 
@@ -77,7 +83,7 @@ export default class IntercomClient {
       req.send(params);
     }
 
-    req.use(throttle.plugin(this.ship.id));
+    req.use(throttle.plugin());
 
     return new Promise((resolve, reject) => {
       req.end((err, response) => {
