@@ -11,7 +11,7 @@ function getThrottle(ship) {
   const throttle = new Throttle({
     active: true,
     rate: parseInt(process.env.THROTTLE_RATE || 80, 10),
-    ratePer: 10000,
+    ratePer: parseInt(process.env.THROTTLE_PER_RATE || 10500, 10),
     concurrent: parseInt(process.env.THROTTLE_CONCURRENT || 10, 10)
   });
   THROTTLES[key] = throttle;
@@ -50,7 +50,7 @@ export default class IntercomClient {
       this.client.logger.debug("intercomClient.req", { method: reqData.method, url: reqData.url });
     });
     req.on("error", (error) => {
-      this.client.logger.debug("intercomClient.resError", { status: error.status, path, method });
+      this.client.logger.error("intercomClient.resError", { status: error.status, path, method });
     });
     req.on("response", (res) => {
       const hrTime = process.hrtime(start);
