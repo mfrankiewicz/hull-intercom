@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.27
+- introduce `THROTTLE_PER_RATE` env variable to control throttle time window
+- change response error logs lines to error level
+
 ## 0.7.26
 - change batch handling to process leads and users sequentially
 - remove subqueues on superagent-throttle library

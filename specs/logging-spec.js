@@ -43,7 +43,7 @@ describe("log error response from intercom", function test() {
 
     setTimeout(() => {
       expect(loggerSpy.callCount).to.equal(6);
-      expect(loggerSpy.getCall(4).args[0]).to.equal("debug");
+      expect(loggerSpy.getCall(4).args[0]).to.equal("error");
       expect(loggerSpy.getCall(4).args[1]).to.equal("intercomClient.resError");
       Hull.logger.remove(winston.transports.SpyLogger);
       done();
