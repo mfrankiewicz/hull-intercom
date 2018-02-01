@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.26
+- change batch handling to process leads and users sequentially
+- remove subqueues on superagent-throttle library
+
 ## 0.7.25
 - add `LEADS_API_REQUEST_CONCURRENCY`, `USERS_API_REQUEST_CONCURRENCY` and `TAG_API_REQUEST_CONCURRENCY` env variables to control concurrency on outgoing API calls
 
