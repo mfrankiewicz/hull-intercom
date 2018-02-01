@@ -6,7 +6,6 @@ import sendLeads from "./send-leads";
 
 function batchHandler(ctx, source, segmentId) {
   return (users) => {
-    const promises = [];
     const ignoreFilter = (source !== "connector");
     users = _.filter(users.map((u) => {
       return ctx.service.syncAgent.updateUserSegments(u, { add_segment_ids: _.concat(u.segment_ids, segmentId) }, ignoreFilter);
@@ -18,15 +17,18 @@ function batchHandler(ctx, source, segmentId) {
 
     users.map(u => ctx.client.asUser(_.pick(u, ["email", "id"])).logger.debug("outgoing.user.start"));
 
-    if (!_.isEmpty(leads)) {
-      promises.push(sendLeads(ctx, { leads }));
-    }
-
-    if (!_.isEmpty(users)) {
-      promises.push(sendUsers(ctx, { users }));
-    }
-
-    return Promise.all(promises);
+    return (() => {
+      if (!_.isEmpty(leads)) {
+        return sendLeads(ctx, { leads });
+      }
+      return Promise.resolve();
+    })()
+      .then(() => {
+        if (!_.isEmpty(users)) {
+          return sendUsers(ctx, { users });
+        }
+        return Promise.resolve();
+      });
   };
 }
 

@@ -4,8 +4,10 @@
   "tags": ["outgoing", "incoming", "batch", "oneColumn"],
   "index": "ship.js",
   "admin": "/auth/",
+  "source": "intercom",
+  "logo": "logo.png",
   "picture": "picture.png",
-  "version": "0.7.23",
+  "version": "0.7.26",
   "settings": [],
   "private_settings": [{
       "name": "access_token",

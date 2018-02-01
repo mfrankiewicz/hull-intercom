@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.7.26
+- change batch handling to process leads and users sequentially
+- remove subqueues on superagent-throttle library
+
+## 0.7.25
+- add `LEADS_API_REQUEST_CONCURRENCY`, `USERS_API_REQUEST_CONCURRENCY` and `TAG_API_REQUEST_CONCURRENCY` env variables to control concurrency on outgoing API calls
+
 ## 0.7.24
 - **IMPORTANT** - added filtering out users coming from notifications who already have `traits_intercom/id`, there is no change in for traits selected for outgoing traffic in settings and there is no outgoing event. This behavior is controlled by `skip_users_already_synced` private settings in the manifest.
 - truncate outgoing custom attributes to 255 characters and add " [...]" string at the end to indicate it was truncated -> in that case a warning is logged
