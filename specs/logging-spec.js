@@ -35,16 +35,16 @@ describe("log error response from intercom", function test() {
     Hull.logger.transports.console.level = "debug";
     Hull.logger.add(winston.transports.SpyLogger, { level: "debug", spy: loggerSpy });
 
-    miniintercom.stubGet("/subscriptions/abc-123")
-      .returnsStatus(429);
+    miniintercom.stubApp("/subscriptions/abc-123")
+      .respond(429);
 
     minihull.notifyConnector("595103c73628d081190000f6", "http://localhost:8000/notify", "ship:update", { foo: "bar" })
       .then(() => {});
 
     setTimeout(() => {
-      expect(loggerSpy.callCount).to.equal(6);
-      expect(loggerSpy.getCall(4).args[0]).to.equal("error");
-      expect(loggerSpy.getCall(4).args[1]).to.equal("intercomClient.resError");
+      expect(loggerSpy.callCount).to.equal(7);
+      expect(loggerSpy.getCall(5).args[0]).to.equal("error");
+      expect(loggerSpy.getCall(5).args[1]).to.equal("intercomClient.resError");
       Hull.logger.remove(winston.transports.SpyLogger);
       done();
     }, 200);

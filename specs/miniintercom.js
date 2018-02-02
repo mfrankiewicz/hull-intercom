@@ -1,6 +1,6 @@
-const Minibase = require("minihull/src/minibase");
+const Miniapp = require("mini-application");
 
-class Miniintercom extends Minibase {
+class Miniintercom extends Miniapp {
   constructor(options = {}) {
     super(options);
     this.db.defaults({ contacts: [] }).write();
