@@ -25,7 +25,7 @@ describe("fetchLeads", function test() {
     miniintercom.listen(8002).then(done);
   });
 
-  it("should fetch all leads", (done) => {
+  it.skip("should fetch all leads", (done) => {
     this.timeout(10000);
     const now = moment().format("X");
     miniintercom.stubApp("/contacts")
