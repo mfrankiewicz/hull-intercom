@@ -83,7 +83,7 @@
     "eslint-plugin-import": "^2.8.0",
     "flow-bin": "^0.59.0",
     "flow-typed": "^2.2.3",
-    "hull-connector-tester": "^0.0.1",
+    "hull-connector-tester": "0.0.5",
     "mini-application": "^1.0.6",
     "minihull": "2.1.0",
     "mocha": "^3.4.1",
