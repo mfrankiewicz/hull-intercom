@@ -4,41 +4,28 @@ import Promise from "bluebird";
 import sendUsers from "./send-users";
 import sendLeads from "./send-leads";
 
-function batchHandler(ctx, source, segmentId) {
-  return (users) => {
-    const ignoreFilter = (source !== "connector");
-    users = _.filter(users.map((u) => {
-      return ctx.service.syncAgent.updateUserSegments(u, { add_segment_ids: _.concat(u.segment_ids, segmentId) }, ignoreFilter);
-    }));
+export default function handleBatch(ctx, messages) {
+  let users = _.filter(messages.map((message) => {
+    const { segments, user } = message;
+    return ctx.service.syncAgent.updateUserSegments(user, { add_segment_ids: segments.map(s => s.id) }, true);
+  }));
 
-    const leads = users.filter(u => u["traits_intercom/is_lead"] === true);
+  const leads = users.filter(u => u["traits_intercom/is_lead"] === true);
 
-    users = users.filter(u => !u["traits_intercom/is_lead"]);
+  users = users.filter(u => !u["traits_intercom/is_lead"]);
 
-    users.map(u => ctx.client.asUser(_.pick(u, ["email", "id"])).logger.debug("outgoing.user.start"));
+  users.map(u => ctx.client.asUser(_.pick(u, ["email", "id"])).logger.debug("outgoing.user.start"));
 
-    return (() => {
-      if (!_.isEmpty(leads)) {
-        return sendLeads(ctx, { leads });
+  return (() => {
+    if (!_.isEmpty(leads)) {
+      return sendLeads(ctx, { leads });
+    }
+    return Promise.resolve();
+  })()
+    .then(() => {
+      if (!_.isEmpty(users)) {
+        return sendUsers(ctx, { users });
       }
       return Promise.resolve();
-    })()
-      .then(() => {
-        if (!_.isEmpty(users)) {
-          return sendUsers(ctx, { users });
-        }
-        return Promise.resolve();
-      });
-  };
-}
-
-
-export default function handleBatch(ctx, payload) {
-  const { segmentId, body, source } = payload;
-  ctx.metric.event({
-    title: "batch",
-    text: JSON.stringify(payload.body)
-  });
-  ctx.client.logger.debug("outgoing.batch", { body });
-  return ctx.client.utils.extract.handle({ body, batchSize: 100, handler: batchHandler(ctx, source, segmentId) });
+    });
 }

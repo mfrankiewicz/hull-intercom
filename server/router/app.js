@@ -20,7 +20,12 @@ export default function AppRouter(): Router {
   // const middlewareSet = [requireConfiguration];
 
   router.use(appMiddleware());
-  router.use("/batch", requireConfiguration, actions.batchHandler, responseMiddleware());
+  // router.use("/batch", requireConfiguration, actions.batchHandler, responseMiddleware());
+  router.use("/batch", notifHandler({
+    handlers: {
+      "user:update": notifHandlers.batch
+    }
+  }));
 
   router.use("/notify", notifHandler({
     userHandlerOptions: {

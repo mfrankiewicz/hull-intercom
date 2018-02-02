@@ -26,7 +26,7 @@ describe("batch operation", function test() {
     }, 500);
   });
 
-  it("should pass batch extract to intercom batch endpoint via single api calls", (done) => {
+  it.only("should pass batch extract to intercom batch endpoint via single api calls", (done) => {
     minihull.fakeUsers(2);
     minihull.sendBatchToFirstShip()
     .then((res) => {
