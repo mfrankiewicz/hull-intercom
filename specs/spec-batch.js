@@ -13,24 +13,20 @@ describe("batch operation", function test() {
     minihull = new Minihull();
     miniintercom = new Miniintercom();
     minihull.listen(8001);
-    miniintercom.listen(8002);
     server = bootstrap();
-    setTimeout(() => {
-      minihull.install("http://localhost:8000")
-        .then(() => {
-          minihull.updateFirstShip({
-            access_token: "intercomABC"
-          });
-          done();
-        });
-    }, 500);
+    minihull.stubConnector({
+      id: "123456789012345678901234",
+      private_settings: {
+        access_token: "intercomABC"
+      }
+    });
+    miniintercom.listen(8002).then(done);
   });
 
-  it.only("should pass batch extract to intercom batch endpoint via single api calls", (done) => {
+  it("should pass batch extract to intercom batch endpoint via single api calls", (done) => {
     minihull.fakeUsers(2);
-    minihull.sendBatchToFirstShip()
-    .then((res) => {
-      const lastReq = miniintercom.requests.get("incoming").last().value();
+    minihull.batchConnector("123456789012345678901234", "http://localhost:8000/batch");
+    miniintercom.on("incoming.request#3", (lastReq) => {
       expect(lastReq.url).to.be.eq("/users");
       expect(lastReq.body).to.be.an("object");
       expect(lastReq.body).to.have.property("email");
@@ -40,9 +36,8 @@ describe("batch operation", function test() {
 
   it("should pass batch extract to intercom batch endpoint via bulk api", (done) => {
     minihull.fakeUsers(20);
-    minihull.sendBatchToFirstShip()
-    .then((res) => {
-      const lastReq = miniintercom.requests.get("incoming").last().value();
+    minihull.batchConnector("123456789012345678901234", "http://localhost:8000/batch");
+    miniintercom.on("incoming.request#2", (lastReq) => {
       expect(lastReq.url).to.be.eq("/bulk/users");
       expect(lastReq.body).to.be.an("object");
       expect(lastReq.body).to.have.property("items");
@@ -55,7 +50,7 @@ describe("batch operation", function test() {
 
   it("should retry after ten seconds in case of rate limit", (done) => {
     minihull.fakeUsers(1);
-    const stub = miniintercom.stubPost("/users")
+    const stub = miniintercom.stubApp("/users")
       .onFirstCall().callsFake((req, res) => {
         res.status(429).end();
       })
@@ -63,16 +58,16 @@ describe("batch operation", function test() {
         res.status(200).end();
       });
     miniintercom.on("incoming.request@/users", (req) => {
-        if (stub.callCount === 1) {
-          done();
-        }
-      });
+      if (stub.callCount === 1) {
+        done();
+      }
+    });
 
-    minihull.sendBatchToFirstShip()
-    .then((res) => {});
+    minihull.batchConnector("123456789012345678901234", "http://localhost:8000/batch");
   });
 
   afterEach(() => {
+    minihull.db.setState({});
     minihull.close();
     miniintercom.close();
     server.close();

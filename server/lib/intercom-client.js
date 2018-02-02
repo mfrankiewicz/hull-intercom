@@ -3,6 +3,8 @@ import Throttle from "superagent-throttle";
 import prefixPlugin from "superagent-prefix";
 import _ from "lodash";
 
+const { superagentUrlTemplatePlugin, superagentInstrumentationPlugin } = require("hull/lib/utils");
+
 const THROTTLES = {};
 
 function getThrottle(ship) {
@@ -58,7 +60,6 @@ export default class IntercomClient {
       const limit = _.get(res.header, "x-ratelimit-limit");
       const remaining = _.get(res.header, "x-ratelimit-remaining");
       const reset = _.get(res.header, "x-ratelimit-reset");
-      this.metric.increment("ship.service_api.call", 1);
       if (remaining !== undefined) {
         this.client.logger.debug("intercomClient.ratelimit", {
           remaining, limit, reset, elapsed
@@ -66,7 +67,7 @@ export default class IntercomClient {
         this.metric.value("ship.service_api.remaining", remaining);
       }
 
-      if (limit) {
+      if (limit !== undefined) {
         this.metric.value("ship.service_api.limit", limit);
       }
     });
@@ -84,16 +85,10 @@ export default class IntercomClient {
     }
 
     req.use(throttle.plugin());
+    req.use(superagentUrlTemplatePlugin());
+    req.use(superagentInstrumentationPlugin({ logger: this.client.logger, metric: this.metric }));
 
-    return new Promise((resolve, reject) => {
-      req.end((err, response) => {
-        if (err) {
-          err.response = response;
-          return reject(err);
-        }
-        return resolve(response);
-      });
-    });
+    return req;
   }
 
   get(url, query) {
