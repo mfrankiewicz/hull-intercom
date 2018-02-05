@@ -16,7 +16,7 @@ export default function userUpdate(ctx, messages) {
     } = message;
     const { left = [], entered = [] } = _.get(changes, "segments", {});
 
-    ctx.client.asUser(user).logger.debug("outgoing.user.start", { changes, events: _.map(events, e => e.event) });
+    ctx.client.asUser(user).logger.debug("outgoing.user.start", { changes, events: _.map(events, e => e.event), segments: _.map(segments, s => s.name) });
     if (!_.isEmpty(_.get(changes, "user['traits_intercom/id'][1]"))
       || !_.isEmpty(_.get(changes, "user['traits_intercom/tags'][1]"))) {
       ctx.client.asUser(user).logger.info("outgoing.user.skip", { reason: "User was just updated by the Intercom connector, avoiding loop" });
