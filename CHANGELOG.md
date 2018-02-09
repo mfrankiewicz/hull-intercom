@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.8.1
+- upgrade newrelic agent
+
 ## 0.8.0
 - upgrade hull-node to `0.13.10` (includes couple of compatibility updates)
 - improve batch handler
