@@ -1,5 +1,6 @@
 const Minihull = require("minihull");
 const expect = require("chai").expect;
+const moment = require("moment");
 
 const Miniintercom = require("./miniintercom");
 const bootstrap = require("./bootstrap");
@@ -25,22 +26,22 @@ describe("ensure webhook operation", function test() {
   });
 
   it("should retry after ten seconds in case of rate limit", (done) => {
-    miniintercom.stubGet("/users")
-      .returnsJson({
+    miniintercom.stubApp("/users")
+      .respond({
         users: [{
           id: "intercomUserId",
           email: "foo@bar.com",
-          updated_at: minihull.moment().format("X")
+          updated_at: moment().format("X")
         }]
       });
-    const stub = miniintercom.stubGet("/subscriptions/abc-123")
-      .onFirstCall().returnsStatus(429)
-      .onSecondCall().returnsStatus(200);
-    miniintercom.stubPost("/subscriptions/abc-123")
-      .returnsJson({});
+    const stub = miniintercom.stubApp("/subscriptions/abc-123")
+      .onFirstCall().respond(429)
+      .onSecondCall().respond(200);
+    miniintercom.stubApp("/subscriptions/abc-123")
+      .respond({});
 
     miniintercom.on("incoming.request@/subscriptions/abc-123", (req) => {
-      if(miniintercom.requests.get("incoming").filter({ url: "/subscriptions/abc-123" }).size().value()) {
+      if (miniintercom.requests.get("incoming").filter({ url: "/subscriptions/abc-123" }).size().value()) {
         done();
       }
     });

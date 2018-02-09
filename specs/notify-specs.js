@@ -8,37 +8,36 @@ process.env.OVERRIDE_INTERCOM_URL = "http://localhost:8002";
 
 describe("outgoing users traffic", function test() {
   let minihull, miniintercom, server;
-  before((done) => {
+  beforeEach((done) => {
     minihull = new Minihull();
     miniintercom = new Miniintercom();
     server = bootstrap();
-    setTimeout(() => {
-      minihull.listen(8001);
-      minihull.segments().push({ id: "s2", name: "Segment 2" }).write();
-      minihull.install("http://localhost:8000")
-        .then(() => {
-          minihull.updateFirstShip({
-            access_token: "intercomABC",
-            synchronized_segments: ["s1"]
-          });
-          done();
-        });
-    }, 100);
+    minihull.listen(8001);
+    minihull.stubSegments([{ id: "s2", name: "Segment 2" }]);
+    minihull.stubConnector({
+      id: "595103c73628d081190000f6",
+      private_settings: {
+        access_token: "intercomABC",
+        synchronized_segments: ["s1"]
+      }
+    });
 
-    miniintercom.listen(8002);
+    miniintercom.listen(8002).then(done);
   });
 
   it("should remove tags from users", (done) => {
-    miniintercom.stubPost("/users")
+    const getTagsStub = miniintercom.stubApp("GET", "/tags")
+      .respond({ tags: [] });
+    miniintercom.stubApp("POST", "/users")
       .callsFake((req, res) => {
         res.json({ email: "foo@bar.com", tags: { tags: [{ name: "Segment 2" }] } });
       });
-    const tagsStub = miniintercom.stubPost("/tags")
+    const tagsStub = miniintercom.stubApp("POST", "/tags")
       .callsFake((req, res) => {
         res.end("ok");
       });
 
-    minihull.sendNotification("user_report:update", {
+    minihull.notifyConnector("595103c73628d081190000f6", "http://localhost:8000/notify", "user_report:update", {
       user: { id: "123", email: "foo@bar.com" },
       segments: [{ id: "s1", name: "Segment 1" }],
       changes: {
@@ -58,7 +57,7 @@ describe("outgoing users traffic", function test() {
     });
   });
 
-  after(() => {
+  afterEach(() => {
     minihull.close();
     miniintercom.close();
     server.close();

@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.8.0
+- upgrade hull-node to `0.13.10` (includes couple of compatibility updates)
+- improve batch handler
+- disable tags deletion in tags mapper
+- try to find tags before recreating them
+- on `ship:update` refresh the mapping in the settings to make sure it's up to date
+- add tags related checks to status endpoint
+
 ## 0.7.27
 - introduce `THROTTLE_PER_RATE` env variable to control throttle time window
 - change response error logs lines to error level

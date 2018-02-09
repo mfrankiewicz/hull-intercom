@@ -45,7 +45,7 @@ export default class WebhookAgent {
           }
           return this.createWebhook(this.webhookId);
         }, (error) => {
-          if (error.response.statusCode === 404) {
+          if (error.status === 404) {
             return this.createWebhook();
           }
           return Promise.reject(error);

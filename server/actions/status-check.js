@@ -3,7 +3,12 @@ import type { $Response } from "express";
 import _ from "lodash";
 
 export default function (req: Object, res: $Response) {
-  const { ship = {}, client = {}, service = {} } = req.hull;
+  const {
+    segments = [],
+    ship = {},
+    client = {},
+    service = {}
+  } = req.hull;
   const messages = [];
   let status = "ok";
   const promises = [];
@@ -37,6 +42,19 @@ export default function (req: Object, res: $Response) {
           messages.push(`Error when trying to connect with Intercom: ${_.get(err, "message", "Unknown")}`);
         }
         status = "error";
+      }));
+
+    promises.push(service.intercomAgent.intercomClient.get("/tags")
+      .then(({ body }) => {
+        const mapping = _.get(ship, "private_settings.tag_mapping");
+        _.forEach(mapping, (tagId, segmentId) => {
+          const segment = _.find(segments, { id: segmentId });
+          const tag = _.find(body.tags, { id: tagId });
+          if (_.isUndefined(tag) && segment !== undefined) {
+            messages.push(`Not found tag: ${tagId} mapped to segment: ${segmentId} (${segment.name})`);
+            status = "error";
+          }
+        });
       }));
   }
 

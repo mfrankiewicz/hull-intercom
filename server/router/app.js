@@ -1,6 +1,7 @@
 /* @flow */
 import { Router } from "express";
 import cors from "cors";
+import bodyParser from "body-parser";
 import { notifHandler, responseMiddleware } from "hull/lib/utils";
 
 import appMiddleware from "../lib/middleware/app-middleware";
@@ -20,7 +21,12 @@ export default function AppRouter(): Router {
   // const middlewareSet = [requireConfiguration];
 
   router.use(appMiddleware());
-  router.use("/batch", requireConfiguration, actions.batchHandler, responseMiddleware());
+  // router.use("/batch", requireConfiguration, actions.batchHandler, responseMiddleware());
+  router.use("/batch", notifHandler({
+    handlers: {
+      "user:update": notifHandlers.batch
+    }
+  }));
 
   router.use("/notify", notifHandler({
     userHandlerOptions: {
@@ -36,7 +42,7 @@ export default function AppRouter(): Router {
 
   router.post("/fetch-all", requireConfiguration, actions.fetchAll, responseMiddleware());
   // FIXME: 404 for that endpoint?
-  router.use("/intercom", requireConfiguration, actions.webhook, responseMiddleware());
+  router.use("/intercom", bodyParser.json(), requireConfiguration, actions.webhook, responseMiddleware());
 
   router.post("/sync", requireConfiguration, actions.sync, responseMiddleware());
 
