@@ -7,5 +7,5 @@ export default function shipUpdate(ctx) {
     return Promise.resolve();
   }
 
-  return syncAgent.syncShip();
+  return syncAgent.syncShip({ forceTagsResync: true });
 }

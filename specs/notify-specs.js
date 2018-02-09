@@ -26,6 +26,8 @@ describe("outgoing users traffic", function test() {
   });
 
   it("should remove tags from users", (done) => {
+    const getTagsStub = miniintercom.stubApp("GET", "/tags")
+      .respond({ tags: [] });
     miniintercom.stubApp("POST", "/users")
       .callsFake((req, res) => {
         res.json({ email: "foo@bar.com", tags: { tags: [{ name: "Segment 2" }] } });
