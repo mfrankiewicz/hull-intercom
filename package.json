@@ -1,6 +1,6 @@
 {
   "name": "hull-intercom",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "Hull Intercom integration",
   "main": "index.js",
   "scripts": {
@@ -59,7 +59,7 @@
     "hull": "0.13.10",
     "lodash": "^4.12.0",
     "moment": "^2.19.2",
-    "newrelic": "^1.28.3",
+    "newrelic": "^2.7.0",
     "passport-intercom": "hull/passport-intercom#c7e038a2d1cba27858d33535bb319129b90eb723",
     "promise-streams": "^1.0.1",
     "redis": "^2.8.0",
