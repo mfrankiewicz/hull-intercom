@@ -94,6 +94,7 @@ export default class UserMapping {
         }
       });
     }
+    fields.push({ name: "email", hull: "traits_intercom/email" });
     return fields;
   }
 
