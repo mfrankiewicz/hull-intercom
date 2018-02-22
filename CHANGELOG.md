@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.2
+- upgrade node version to 8.9.x
+- store email address in the intercom traits group
+
 ## 0.8.1
 - upgrade newrelic agent
 
