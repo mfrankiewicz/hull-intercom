@@ -197,6 +197,22 @@ const mapping = [
         event_type: "email"
       };
     }
+  },
+  {
+    intercom: "contact.added_email",
+    eventName: "Updated email address",
+    user: event => _.get(event, "data.item"),
+    props: (event) => {
+      return {
+        email: _.get(event, "data.item.email"),
+      };
+    },
+    context: (event) => {
+      return {
+        ip: _.get(event, "data.item.last_seen_ip", "0"),
+        event_type: "email"
+      };
+    }
   }
 ];
 
