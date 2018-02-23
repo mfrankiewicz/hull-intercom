@@ -197,12 +197,32 @@ const mapping = [
         event_type: "email"
       };
     }
+  },
+  {
+    intercom: "contact.added_email",
+    eventName: "Updated email address",
+    user: event => _.get(event, "data.item"),
+    props: (event) => {
+      return {
+        email: _.get(event, "data.item.email"),
+      };
+    },
+    context: (event) => {
+      return {
+        ip: _.get(event, "data.item.last_seen_ip", "0"),
+        event_type: "email"
+      };
+    }
   }
 ];
 
 export default function getEventPayload(ctx: Object, intercomEvent: Object): Object {
   const mappedEvent = _.find(mapping, { intercom: intercomEvent.topic });
   if (!mappedEvent) {
+    return {};
+  }
+
+  if (intercomEvent.topic === "user.email.updated" && _.get(intercomEvent, "data.item.type") === "contact") {
     return {};
   }
 

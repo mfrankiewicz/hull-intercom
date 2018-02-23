@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.8.3
+- add `contact.added_email` event support on incoming webhooks
+
 ## 0.8.2
 - upgrade node version to 8.9.x
 - store email address in the intercom traits group
