@@ -222,6 +222,10 @@ export default function getEventPayload(ctx: Object, intercomEvent: Object): Obj
     return {};
   }
 
+  if (intercomEvent.topic === "user.email.updated" && _.get(intercomEvent, "data.item.type") === "contact") {
+    return {};
+  }
+
   const user = mappedEvent.user(intercomEvent);
   const { eventName } = mappedEvent;
   const props = _.defaults(mappedEvent.props(intercomEvent), {
