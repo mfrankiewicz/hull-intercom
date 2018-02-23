@@ -9,6 +9,9 @@ export default class UserMapping {
         "name": "email",   "hull":"email",                "type": "string", "read_only": false
       },
       {
+        "name": "email",   "hull":"traits_intercom/email",                "type": "string", "read_only": false
+      },
+      {
         "name": "id",      "hull":"traits_intercom/id",   "type": "string", "read_only": true
       },
       {

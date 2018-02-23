@@ -7,7 +7,7 @@
   "source": "intercom",
   "logo": "logo.png",
   "picture": "picture.png",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "settings": [],
   "private_settings": [{
       "name": "access_token",
