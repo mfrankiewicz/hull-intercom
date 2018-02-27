@@ -2,6 +2,8 @@
 
 ## 0.8.4
 - when updating leads use `user_id` Intercom object param instead of the `id`
+- don't filter out users and leads with "Exceeded rate limit" error
+- don't save the rate limit error as user trait
 
 ## 0.8.3
 - add `contact.added_email` event support on incoming webhooks
