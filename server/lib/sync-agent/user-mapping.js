@@ -222,6 +222,18 @@ export default class UserMapping {
   }
 
   /**
+   * For leads we don't use the id of the Intercom user, but we stick with user_id
+   * @param  {Object} hullUser
+   * @return {Object}
+   */
+  getIntercomLeadFields(hullUser) {
+    const fields = this.getIntercomFields(hullUser);
+    _.set(fields, "user_id", _.get(hullUser, "traits_intercom/lead_user_id"));
+    _.unset(fields, "id");
+    return fields;
+  }
+
+  /**
    * @see https://developers.intercom.com/reference#section-user-object
    * @param  {Object} user Intercom User
    * @return {Object}
