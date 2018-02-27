@@ -40,7 +40,7 @@ export default class SyncAgent {
   }
 
   /**
-   * Returns true with user had permanent error
+   * Returns true when user had permanent error, excludes "Exceeded rate limit" error
    */
   userWithError(user) { // eslint-disable-line class-methods-use-this
     return !_.isEmpty(user["traits_intercom/import_error"])
