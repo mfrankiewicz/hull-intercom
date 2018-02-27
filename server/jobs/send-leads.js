@@ -11,7 +11,7 @@ export default function sendLeads(ctx, payload) {
   const { syncAgent, intercomAgent } = ctx.service;
 
   ctx.client.logger.debug("sendLeads.preFilter", leads.length);
-  const leadsToSave = leads.filter(lead => !syncAgent.userWithError(lead));
+  const leadsToSave = leads;
   leadsToSave.map(u => ctx.client.asUser(u).logger.debug("outgoing.user.start"));
   const intercomLeadsToSave = leadsToSave.map(u => syncAgent.userMapping.getIntercomLeadFields(u));
 

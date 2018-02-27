@@ -44,7 +44,7 @@ export default class SyncAgent {
    */
   userWithError(user) { // eslint-disable-line class-methods-use-this
     return !_.isEmpty(user["traits_intercom/import_error"])
-      && _.get(user, "traits_intercom/import_error").match("Exceeded rate limit") === null;
+      && _.get(user, "traits_intercom/import_error", "").match("Exceeded rate limit") === null;
   }
 
   userWhitelisted(user) {
