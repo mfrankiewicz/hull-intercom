@@ -60,16 +60,16 @@ function statusCheck(req: Object, res: $Response) {
           if (segment !== undefined && _.includes(_.get(ship, "private_settings.synchronized_segments", []), segmentId)) {
             promises2.push(service.intercomAgent
               .intercomClient.get("/users").query({ tag_id: tagId, per_page: 1 })
-              .then((res) => {
+              .then((result) => {
                 return audit.push({
                   segmentId,
                   tagId,
                   name: segment.name,
                   hullCount: segment.stats.users,
-                  intercomCount: res.body.pages.total_pages,
+                  intercomCount: result.body.pages.total_pages,
                   percentage: segment.stats.users === 0
                     ? 0
-                    : res.body.pages.total_pages / segment.stats.users * 100
+                    : (result.body.pages.total_pages / segment.stats.users) * 100
                 });
               }));
           }
