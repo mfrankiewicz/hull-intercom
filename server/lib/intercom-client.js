@@ -1,9 +1,11 @@
-import superagent from "superagent";
-import Throttle from "superagent-throttle";
-import prefixPlugin from "superagent-prefix";
-import _ from "lodash";
+const superagent = require("superagent");
+const Throttle = require("superagent-throttle");
+const prefixPlugin = require("superagent-prefix");
+const _ = require("lodash");
 
 const { superagentUrlTemplatePlugin, superagentInstrumentationPlugin } = require("hull/lib/utils");
+const superagentErrorPlugin = require("hull/lib/utils/superagent-error-plugin");
+const { ConfigurationError, RateLimitError } = require("hull/lib/errors");
 
 const THROTTLES = {};
 
@@ -44,10 +46,15 @@ export default class IntercomClient {
     const req = superagent[method](path);
     req.use(prefixPlugin(process.env.OVERRIDE_INTERCOM_URL || "https://api.intercom.io"));
     req.accept("application/json");
-    req.timeout(60000);
-    req.retry(2);
-    req.on("error", (error) => {
-      this.client.logger.error("intercomClient.resError", { status: error.status, path, method });
+    req.use(superagentErrorPlugin({ timeout: 60000 }));
+    req.ok((res) => {
+      if (res.status === 401) {
+        throw new ConfigurationError();
+      }
+      if (res.status === 429) {
+        throw new RateLimitError();
+      }
+      return res.status < 400;
     });
     req.on("response", (res) => {
       const limit = _.get(res.header, "x-ratelimit-limit");
