@@ -15,7 +15,10 @@ export default class IntercomAgent {
   }
 
   getJob(id) {
-    return this.intercomClient.get(`/jobs/${id}`)
+    return this.intercomClient.get("/jobs/{{jobId}}")
+      .tmplVar({
+        jobId: id
+      })
       .then((res) => {
         const isCompleted = _.get(res, "body.tasks[0].state") === "completed"
           || _.get(res, "body.tasks[0].state") === "completed_with_errors";
@@ -35,7 +38,10 @@ export default class IntercomAgent {
    * @return {Array} items param of the job feed
    */
   getJobErrors(id) {
-    return this.intercomClient.get(`/jobs/${id}/error`)
+    return this.intercomClient.get("/jobs/{{jobId}}/error")
+      .tmplVar({
+        jobId: id
+      })
       .then((res) => {
         return _.get(res, "body.items", []);
       });

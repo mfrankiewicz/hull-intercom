@@ -28,7 +28,10 @@ export default class WebhookAgent {
     this.client.logger.debug("connector.getWebhook");
     return this.cache.wrap("intercom-webhook", () => {
       this.client.logger.debug("connector.getWebhook.cachemiss");
-      return this.intercomClient.get(`/subscriptions/${this.webhookId}`);
+      return this.intercomClient.get("/subscriptions/{{webhookId}}")
+        .tmplVar({
+          webhookId: this.webhookId
+        });
     });
   }
 
@@ -61,11 +64,14 @@ export default class WebhookAgent {
   createWebhook(webhookId = "") {
     const url = this.getWebhookUrl();
 
-    return this.intercomClient.post(`/subscriptions/${webhookId}`, {
+    return this.intercomClient.post("/subscriptions/{{webhookId}}", {
       service_type: "web",
       topics: this.topics,
       url
     })
+      .tmplVar({
+        webhookId
+      })
       .catch((err) => {
         const fErr = this.intercomClient.handleError(err);
         // handle errors which may happen here

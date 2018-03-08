@@ -30,6 +30,7 @@ export default function AppRouter(): Router {
 
   router.use("/notify", notifHandler({
     userHandlerOptions: {
+      maxSize: parseInt(process.env.SNS_SIZE, 10) || 50,
       groupTraits: false
     },
     handlers: {

@@ -40,10 +40,11 @@ export default class SyncAgent {
   }
 
   /**
-   *
+   * Returns true when user had permanent error, excludes "Exceeded rate limit" error
    */
   userWithError(user) { // eslint-disable-line class-methods-use-this
-    return !_.isEmpty(user["traits_intercom/import_error"]);
+    return !_.isEmpty(user["traits_intercom/import_error"])
+      && _.get(user, "traits_intercom/import_error", "").match("Exceeded rate limit") === null;
   }
 
   userWhitelisted(user) {
@@ -81,6 +82,10 @@ export default class SyncAgent {
 
       const asUser = this.client.asUser(ident);
       asUser.logger.error("outgoing.user.error", { errors: errorDetails });
+
+      if (errorMessage.match("Exceeded rate limit") !== null) {
+        return Promise.resolve();
+      }
       return asUser.traits({ "intercom/import_error": errorMessage });
     });
   }

@@ -112,7 +112,10 @@ export default class TagMapping {
     }
 
     return this.intercomClient
-      .delete(`/tags/${tagId}`)
+      .delete("/tags/{{tagId}}")
+      .tmplVar({
+        tagId
+      })
       .then(() => {
         _.unset(this.mapping, segment.id);
         return Promise.resolve();
