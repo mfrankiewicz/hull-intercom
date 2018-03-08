@@ -2,7 +2,6 @@
 
 ## 0.8.5
 - allow to set maximum notification batch size
-- improve service_api metrics
 
 ## 0.8.4
 - when updating leads use `user_id` Intercom object param instead of the `id`
