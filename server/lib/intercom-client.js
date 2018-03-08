@@ -49,10 +49,10 @@ export default class IntercomClient {
     req.use(superagentErrorPlugin({ timeout: 60000 }));
     req.ok((res) => {
       if (res.status === 401) {
-        throw new ConfigurationError();
+        throw new ConfigurationError(res.text);
       }
       if (res.status === 429) {
-        throw new RateLimitError();
+        throw new RateLimitError(res.text);
       }
       return res.status < 400;
     });
